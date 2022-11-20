@@ -1,0 +1,415 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+	 xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security/tags"
+    xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+	<style>
+    .custom-skeleton {
+        border: 1px solid var(--surface-d);
+        border-radius: 4px;
+    }
+    .custom-skeleton>ul {
+        list-style: none;
+    }
+	.content-section.implementation {
+    background-color: grey var(--surface-b);
+    color: var(--text-color);
+}
+</style>
+    </h:head>
+
+    <h:body>
+	
+	<div class="card">
+    <div class="grid formgrid">
+        <div class="field col-12 md:col-6 md:pr-6 pr-0">
+            <h5>Card</h5>
+            <div class="custom-skeleton p-4">
+                <div class="flex mb-3">
+                    <p:skeleton shape="square" size="10rem" class="mr-2">
+					
+                <p:imageSwitch effect="zoom" id="photos" >
+                                        <ui:repeat value="#{photoCamBean.photos}" var="photo">
+                                            <p:graphicImage value="/photocam/#{photo}.png" />
+                                        </ui:repeat>
+                                    </p:imageSwitch>
+            
+			</p:skeleton>
+                    <div>
+                        <p:skeleton width="15rem" class="mb-2"/>
+                        <p:skeleton width="5rem" class="mb-2"/>
+                        <p:skeleton height=".5rem"/>
+                    </div>
+                </div>
+                <p:skeleton width="100%" height="150px"/>
+                <div class="flex justify-content-between mt-3">
+                    <p:skeleton width="4rem" height="2rem"/>
+                    <p:skeleton width="4rem" height="2rem"/>
+                </div>
+            </div>
+        </div> 
+	</div>
+	</div>
+	
+	
+	
+      <div class="card">
+    <h:form>
+        <p:growl id="messages" showDetail="true"/>
+	<h5 class="mt-0">VISITOR PASS ISSUE FORM</h5>
+        <p:toolbar>
+			
+            <p:toolbarGroup>
+				 
+                <p:commandButton type="button" value="New" icon="pi pi-file" styleClass="mr-2" />
+                <p:commandButton type="button" value="Open" icon="pi pi-folder-open" styleClass="ui-button-success" />
+
+                <i class="pi pi-bars px-2"/>
+
+                <p:commandButton type="button" title="Save" icon="pi pi-save" styleClass="ui-button-help mr-2" />
+                <p:commandButton type="button" title="Print" icon="pi pi-print" styleClass="ui-button-warning mr-2"/>
+                <p:commandButton type="button" title="Delete" icon="pi pi-trash" styleClass="ui-button-danger"/>
+            </p:toolbarGroup>
+
+            <p:toolbarGroup align="right">
+                <p:menuButton value="Options">
+					<h5 class="mt-0">Single</h5>
+                    <p:menuitem value="Save" action="#{toolbarView.save}" update="messages" icon="pi pi-save"/>
+                    <p:menuitem value="Update" action="#{toolbarView.update}" update="messages" icon="pi pi-refresh"/>
+                    <p:menuitem value="Delete" action="#{toolbarView.logout}" ajax="false" icon="pi pi-times"/>					
+                    <p:menuitem value="Homepage" url="http://www.primefaces.org" icon="pi-power-off"/>
+                </p:menuButton>
+            </p:toolbarGroup>
+        </p:toolbar>
+		
+    </h:form>
+</div>
+		<div class="card">
+    <h:form>
+        <h:panelGrid columns="4" cellpadding="5">
+            <p:photoCam widgetVar="pc" listener="#{photoCamView.oncapture}" update="photo"/>
+            <p:commandButton type="button" value="Capture" onclick="PF('pc').capture()"/>
+            <p:outputPanel id="photo">
+                <p:graphicImage name="demo/images/photocam/#{photoCamView.filename}.jpeg"
+                                rendered="#{not empty photoCamView.filename}"/>
+							
+            </p:outputPanel>
+			<p:skeleton shape="circle"  size="20rem" class="mr-2" id="phot" >
+			<p:graphicImage name="demo/images/photocam/#{photoCamView.filename}.jpeg"
+                                rendered="#{not empty photoCamView.filename}"/>
+			
+			</p:skeleton>
+					
+                
+        </h:panelGrid>
+    </h:form>
+	
+	
+<div class="content-section implementation">
+	<div class="card" style="width: 100%">
+    <h:form>
+
+        <div class="grid ui-fluid mt-3 floatlabel-demo">
+            <div class="col-12 md:col-6">
+<div class="field">
+                    <span class="ui-float-label">
+					
+                       <p:selectOneMenu id="cities" autoWidth="false"  editable="true" maxlength="10">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItem itemLabel="New York" itemValue="New York" />
+                            <f:selectItem itemLabel="Rome" itemValue="Rome" />
+                            <f:selectItem itemLabel="London" itemValue="London" />
+                            <f:selectItem itemLabel="Istanbul" itemValue="Istanbul" />
+                            <f:selectItem itemLabel="Paris" itemValue="Paris" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="@previous" value="MOBILE NO." />
+                    </span>
+                </div>
+						
+				
+				<div class="field">
+                    <span class="ui-float-label">
+                       <p:datePicker />
+                       <p:outputLabel for="@previous" value="DATE" />
+                    </span>
+                </div>
+				
+				<div class="field">
+                    <span class="ui-float-label ui-input-icon-left">
+                        <i class="pi pi-search" />
+                        <p:inputText />
+                        <p:outputLabel for="@previous" value="VISITOR ID" styleClass="ml-4" />
+                    </span>
+                </div>
+				
+				<div class="field">
+                    <span class="ui-float-label">
+					
+                       <p:selectOneMenu id="cities1" autoWidth="false"  >
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItem itemLabel="New York" itemValue="New York" />
+                            <f:selectItem itemLabel="Rome" itemValue="Rome" />
+                            <f:selectItem itemLabel="London" itemValue="London" />
+                            <f:selectItem itemLabel="Istanbul" itemValue="Istanbul" />
+                            <f:selectItem itemLabel="Paris" itemValue="Paris" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="@previous" value="BADGE NO." />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                        <p:inputText />
+                        <p:outputLabel for="@previous" value="VISITOR NAME" />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                        <p:inputText />
+                        <p:outputLabel for="@previous" value="COMPANY" />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                        <p:inputText />
+                        <p:outputLabel for="@previous" value="ADDRESS" />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                        <p:inputText />
+                        <p:outputLabel for="@previous" value="NO.OF PERSONS" />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                       <p:selectOneMenu id="cities2" autoWidth="false">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItem itemLabel="INDIA" itemValue="INDIA" />
+                            <f:selectItem itemLabel="FOREIGN" itemValue="FOREIGN" />
+                                                    </p:selectOneMenu>
+                        <p:outputLabel for="@previous" value="NATIONALITY" />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                       <p:selectOneMenu id="cities3" autoWidth="false">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItem itemLabel="OFFICIAL" itemValue="OFFICIAL" />
+                            <f:selectItem itemLabel="PERSONAL" itemValue="PERSONAL" />
+                                                    </p:selectOneMenu>
+                        <p:outputLabel for="@previous" value="PURPOSE" />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                       <p:selectOneMenu id="cities4" autoWidth="false">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItem itemLabel="VISITING CARD" itemValue="Visiting Card" />
+                                        <f:selectItem itemLabel="ELECTION CARD" itemValue="Election Card" />
+                                        <f:selectItem itemLabel="DRIVING LICENCE" itemValue="Driving Licence" />
+                                        <f:selectItem itemLabel="AADHAR CARD" itemValue="Aadhar Card" />
+                                        <f:selectItem itemLabel="BANK PASSBOOK" itemValue="Bank Passbook" />
+                                        <f:selectItem itemLabel="RATION CARD" itemValue="Ration Card" />
+                                        <f:selectItem itemLabel="EMPLOYEE CARD" itemValue="Employee Card" />
+                                        <f:selectItem itemLabel="PASSPORT" itemValue="Passport" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="@previous" value="IDPROOF" />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                        <p:inputText />
+                        <p:outputLabel for="@previous" value="IDPROOF NO." />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                       <p:selectOneMenu id="cities5" autoWidth="false">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItem itemLabel="NO" itemValue="NO" />
+                                        <f:selectItem itemLabel="YES" itemValue="YES" /> 
+                                                    </p:selectOneMenu>
+                        <p:outputLabel for="@previous" value="LAPTOP TO BE PERMITTED" />
+                    </span>
+                </div>
+				
+				 <div class="field">
+                    <span class="ui-float-label">
+                        <p:inputText />
+                        <p:outputLabel for="@previous" value="OTHER MEDIA ITEMS" />
+                    </span>
+                </div>
+				
+				<div class="field">
+                    <span class="ui-float-label">
+					
+                       <p:selectOneMenu id="cities6" autoWidth="false"  >
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItem itemLabel="New York" itemValue="New York" />
+                            <f:selectItem itemLabel="Rome" itemValue="Rome" />
+                            <f:selectItem itemLabel="London" itemValue="London" />
+                            <f:selectItem itemLabel="Istanbul" itemValue="Istanbul" />
+                            <f:selectItem itemLabel="Paris" itemValue="Paris" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="@previous" value="VISITING DEPARTMENT" />
+                    </span>
+                </div>
+				
+				<div class="field">
+                    <span class="ui-float-label">
+					
+                       <p:selectOneMenu id="cities7" autoWidth="false"  >
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItem itemLabel="New York" itemValue="New York" />
+                            <f:selectItem itemLabel="Rome" itemValue="Rome" />
+                            <f:selectItem itemLabel="London" itemValue="London" />
+                            <f:selectItem itemLabel="Istanbul" itemValue="Istanbul" />
+                            <f:selectItem itemLabel="Paris" itemValue="Paris" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="@previous" value="VISITING EMPLOYEE" />
+                    </span>
+                </div>
+				
+				 
+				
+			
+				
+				 </div>
+        </div>
+
+    </h:form>
+</div>
+</div>
+	
+<div class="card">
+<h:form>
+<p:panel header="VISITOR DETAILS" style="background-image:url('../Images/back.jpg');background-repeat: repeat-x;background-position: bottom;" >
+ <h:panelGrid columns="4" cellpadding="5" cellspacing="5">
+  <h:outputLabel for="phno" value="TELEPHONE/MOBILE: *" style="font-weight: bolder ;font-size: larger" />
+  
+   <p:selectOneMenu value="" effect="fold" var="p" editable="true"  required="false" filter="true" filterMatchMode="startsWith" id="phno"  label="phno"  style="width: 200px;"  maxlength="12">
+                                        <f:selectItem itemLabel="SELECT MOBILENO" itemValue="" />
+                                        <f:selectItems value="" var="player" itemLabel="" itemValue=""/>
+                                                                            </p:selectOneMenu>
+									
+									<h:outputLabel for="tdate" value="DATE: *" style="font-weight: bolder ;font-size: larger" />
+																		<p:calendar   effect="explode" value="" 
+                                                  required="true" id="tdate"  label="vdate" /> 
+									
+                                   <h:outputLabel for="vid" value="VISITOR ID: *" style="font-weight: bolder ;font-size: larger" />
+                                    <p:inputText  value="" id="vid" required="true" label="vid" />
+									
+									 <h:outputLabel for="cardno" value="BADGE NO: *" style="font-weight: bolder ;font-size: larger" />                                            
+                                    <p:selectOneMenu value="" effect="fold" var="p" editable="true"  required="false" filter="true" filterMatchMode="startsWith" id="cardno"  label="Cardno"  style="width: 200px;"  maxlength="12">
+                                        <f:selectItem itemLabel="SELECT BADGENO" itemValue="" />
+                                        <f:selectItems value="" var="player" itemLabel="" itemValue=""/>                                        
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="vname" value="VISITOR NAME: *" style="font-weight: bolder ;font-size: larger"/>
+                                    <p:inputText  value=""    required="true" id="vname"  label="vname" />
+
+                                    <h:outputLabel for="company" value="COMPANY: *" style="font-weight: bolder ;font-size: larger" />
+                                    <p:inputText  value=""  required="true" id="company"  label="company" />
+
+                                    <h:outputLabel for="address" value="ADDRESS: *" style="font-weight: bolder ;font-size: larger"/>
+                                    <p:inputText  value=""    required="true" id="address"  label="address" maxlength="1000"/>
+
+                                    
+                                    <h:outputLabel for="vname1" value="NO OF PERSONS: " style="font-weight: bolder ;font-size: larger" />
+                                    <p:inputText  value=""    required="false" id="vname1"  label="vname1" />
+
+
+                                    <h:outputLabel for="nation" value="NATIONALITY: *" style="font-weight: bolder ;font-size: larger"/>
+                                    <p:selectOneMenu value="" style="width:200px" required="true"  id="nation"  label="nation">
+                                        <f:selectItem itemLabel="INDIA" itemValue="INDIA" />
+                                        <f:selectItem itemLabel="FOREIGN" itemValue="FOREIGN" />                                                   
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="purpose" value="PURPOSE: *" style="font-weight: bolder ;font-size: larger" />
+                                    <p:selectOneMenu value="" style="width:200px" required="true"  id="purpose"  label="purpose">
+                                        <f:selectItem itemLabel="OFFICIAL" itemValue="OFFICIAL" />
+                                        <f:selectItem itemLabel="PERSONAL" itemValue="PERSONAL" />                                                   
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="idproof" value="ID-PROOF: " style="font-weight: bolder ;font-size: larger" />
+                                    <p:selectOneMenu value="" style="width:200px" required="false"  id="idproof"  label="Idproof">
+                                        <f:selectItem itemLabel="SELECT ID-PROOF" itemValue="" />
+                                        <f:selectItem itemLabel="VISITING CARD" itemValue="Visiting Card" />
+                                        <f:selectItem itemLabel="ELECTION CARD" itemValue="Election Card" />
+                                        <f:selectItem itemLabel="DRIVING LICENCE" itemValue="Driving Licence" />
+                                        <f:selectItem itemLabel="AADHAR CARD" itemValue="Aadhar Card" />
+                                        <f:selectItem itemLabel="BANK PASSBOOK" itemValue="Bank Passbook" />
+                                        <f:selectItem itemLabel="RATION CARD" itemValue="Ration Card" />
+                                        <f:selectItem itemLabel="EMPLOYEE CARD" itemValue="Employee Card" />
+                                        <f:selectItem itemLabel="PASSPORT" itemValue="Passport" />
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="idproofno" value="ID-PROOF NO: " style="font-weight: bolder ;font-size: larger" />
+                                    <p:inputText  value=""    required="false" id="idproofno"  label="idproofno" maxlength="20"/>
+
+                                    <h:outputLabel for="laptop" value="LAPTOP TO BE PERMITTED: *" style="font-weight: bolder ;font-size: larger" />
+                                    <p:selectOneMenu value="" style="width:200px" required="true"  id="laptop"  label="laptop">
+                                        <f:selectItem itemLabel="NO" itemValue="NO" />
+                                        <f:selectItem itemLabel="YES" itemValue="YES" />                                                   
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="oitems" value="OTHER MEDIA ITEMS: " style="font-weight: bolder ;font-size: larger" />
+                                    <p:inputText  value=""    required="false" id="oitems"  label="oitems" />
+
+                                    <h:outputLabel for="Department" value="VISITING DEPARTMENT: *" style="font-weight: bolder ;font-size: larger" />                                            
+                                    <p:selectOneMenu value="" effect="fold" var="p" editable="false" required="true" filter="true" filterMatchMode="contains" id="Department"  label="Department"  style="width: 200px;">
+                                        <f:selectItem itemLabel="SELECT DEPARTMENT" itemValue="" />
+                                        <f:selectItems value="" var="player" itemLabel="" itemValue=""/>
+                                       
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel for="Empid" value="VISITING EMPLOYEE: *" style="font-weight: bolder ;font-size: larger"/>
+                                    <p:selectOneMenu value=""  panelStyle="width:120px"  editable="true"   required="true"
+                                                     id="Empid"    effect="fade" var="p" style="width:200px"  filter="true" filterMatchMode="contains">
+                                        <f:selectItem itemLabel="SELECT EMPLOYEE" itemValue="" />
+                                        <f:selectItems value=""  />
+                                    </p:selectOneMenu>   
+
+
+                                    <p:overlayPanel id="imagePanel" for="remarks" hideEffect="fade">
+                                        <p:inputText  value=""  required="false" id="remarks"  label="remarks" />
+                                    </p:overlayPanel>
+									
+                                    
+
+                                    
+ </h:panelGrid>
+</p:panel>
+</h:form>
+
+ 
+    <h5>PDF</h5>
+    <p:media value="/resources/demo/media/Anshul_resume.pdf" width="100%" height="300px">
+        Your browser can't display pdf, <h:outputLink
+            value="#{request.contextPath}/resources/demo/media/Anshul_resume.pdf">click</h:outputLink> to download pdf instead.
+    </p:media>
+	
+</div>
+
+
+
+	
+	 <h:form onsubmit="this.action='#{request.contextPath}/logout';"
+    class="logout-form">
+    <p:commandButton value="Logout" ajax="false" />
+  </h:form>
+</div>
+    </h:body>
+</html>

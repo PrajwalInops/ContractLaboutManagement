@@ -1,0 +1,332 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+    xmlns:composite="http://xmlns.jcp.org/jsf/composite/composite" template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">
+        Visitor Pass
+    </ui:define>
+
+    <ui:define name="description">
+        All input text components support floating labels by adding ( <mark>.ui-float-label</mark> ) to wrapper class.
+    </ui:define>
+
+    <ui:param name="documentationLink" value="/components/outputlabel" />
+
+    <ui:define name="implementation">
+        <div class="card" style="width: 100%">
+            <h:form>
+                <p:growl id="messages" />
+                <h:panelGrid columns="4" cellpadding="5">
+                    <p:photoCam widgetVar="pc" listener="#{visitorController.oncapture}" update="photo" />
+                    <p:commandButton type="button" value="Capture" onclick="PF('pc').capture()" />
+                    <p:outputPanel id="photo">
+                        <p:graphicImage name="demo/images/photocam/#{visitorController.filename}.jpeg"
+                            rendered="#{not empty visitorController.filename}" />
+
+                    </p:outputPanel>
+
+                </h:panelGrid>
+
+
+                <div class="card" style="width: 100%">
+
+                    <div class="grid ui-fluid mt-3 floatlabel-demo">
+                        <div class="col-12 md:col-6">
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-mobile" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu value="#{visitorController.mobileNo}" id="mobileNo"
+                                            autoWidth="false" editable="true" maxlength="10" filter="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="Please select" itemValue="" />
+                                            <f:selectItems value="#{visitorController.visitors}" var="player"
+                                                itemLabel="#{player.mobileNo}" itemValue="#{player.mobileNo}" />
+                                            <p:ajax
+                                                update="photo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks"
+                                                listener="#{visitorController.getVisitor}" />
+
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="MobileNumber" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-calendar" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:calendar value="#{visitorController.date}" id="date" />
+                                        <p:outputLabel for="@previous" value="Date" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-id-card" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.visitorId}" id="visitorId" />
+                                        <p:outputLabel for="@previous" value="VisitorId" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-id-card" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+
+                                        <p:selectOneMenu value="#{visitorController.badgeNo}" id="badgeNo"
+                                            autoWidth="false" editable="true" filter="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="Please select" itemValue="" />
+                                            <f:selectItems value="#{visitorController.badgeNo}" var="player"
+                                                itemLabel="#{player.badgeNo}" itemValue="#{player}" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="BadgeNumber" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.visitorName}" id="visitorName" />
+                                        <p:outputLabel for="@previous" value="VisitorName" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-building" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.company}" id="company" />
+                                        <p:outputLabel for="@previous" value="Company" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-map-marker" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputTextarea rows="2" cols="30" value="#{visitorController.address}"
+                                            id="address" />
+                                        <p:outputLabel for="@previous" value="Address" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-users" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.noOfPersons}" id="noOfPersons" />
+                                        <p:outputLabel for="@previous" value="NoOfPersons" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-flag" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu autoWidth="false" value="#{visitorController.nationality}"
+                                            id="nationality">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItem itemLabel="INDIA" itemValue="INDIA" />
+                                            <f:selectItem itemLabel="FOREIGN" itemValue="FOREIGN" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="Nationality" />
+                                    </span>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-12 md:col-6">
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-eye" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu autoWidth="false" value="#{visitorController.purpose}"
+                                            id="purpose">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItem itemLabel="OFFICIAL" itemValue="OFFICIAL" />
+                                            <f:selectItem itemLabel="PERSONAL" itemValue="PERSONAL" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="Purpose" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-id-card" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu autoWidth="false" value="#{visitorController.idProof}"
+                                            id="idProof">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItem itemLabel="VISITING CARD" itemValue="Visiting Card" />
+                                            <f:selectItem itemLabel="ELECTION CARD" itemValue="Election Card" />
+                                            <f:selectItem itemLabel="DRIVING LICENCE" itemValue="Driving Licence" />
+                                            <f:selectItem itemLabel="AADHAR CARD" itemValue="Aadhar Card" />
+                                            <f:selectItem itemLabel="BANK PASSBOOK" itemValue="Bank Passbook" />
+                                            <f:selectItem itemLabel="RATION CARD" itemValue="Ration Card" />
+                                            <f:selectItem itemLabel="EMPLOYEE CARD" itemValue="Employee Card" />
+                                            <f:selectItem itemLabel="PASSPORT" itemValue="Passport" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="IdProof" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-id-card" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.idProofNo}" id="idProofNo" />
+                                        <p:outputLabel for="@previous" value="IdProofNumber" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-desktop" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu autoWidth="false"
+                                            value="#{visitorController.laptopToBePermitted}" id="laptopToBePermitted">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItem itemLabel="NO" itemValue="NO" />
+                                            <f:selectItem itemLabel="YES" itemValue="YES" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="LaptopToBePermitted" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-cog" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.otherMediaItems}"
+                                            id="otherMediaItems" />
+                                        <p:outputLabel for="@previous" value="OtherMediaItems" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+
+                                        <p:selectOneMenu value="#{visitorController.visitingEmployee}"
+                                            id="visitingEmployee" autoWidth="false" filter="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{visitorController.employees}" var="player"
+                                                itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+                                            <p:ajax update="visitingDepartment"
+                                                listener="#{visitorController.getDepartment}" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="VisitingEmployee" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-users" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.visitingDepartment}"
+                                            id="visitingDepartment" />
+                                        <p:outputLabel for="@previous" value="VisitingDepartment" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-file-edit" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.remarks}" id="remarks" />
+                                        <p:outputLabel for="@previous" value="Remarks" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:media value="/resources/demo/media/guide.pdf" id="passPdf"
+                                            rendered="#{visitorController.renderPass}" width="100%" height="300px">
+                                            Your browser can't display pdf, <h:outputLink
+                                                value="#{request.contextPath}/resources/demo/media/Anshul_resume.pdf">
+                                                click
+                                            </h:outputLink> to download pdf instead.
+                                        </p:media>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:splitButton value="Save" action="#{visitorController.save}"
+                                            update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo,passPdf"
+                                            icon="pi pi-save">
+                                            <p:menuitem value="Update" action="#{visitorController.update}"
+                                                update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo,passPdf"
+                                                icon="pi pi-refresh" />
+                                            <p:menuitem value="Delete" action="#{visitorController.delete}"
+                                                update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo,passPdf"
+                                                icon="pi pi-times" />
+                                            <p:divider />
+                                            <p:menuitem value="Clear" action="#{visitorController.cleanUp}"
+                                                update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo,passPdf"
+                                                icon="pi pi-times-circle" />
+                                        </p:splitButton>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
