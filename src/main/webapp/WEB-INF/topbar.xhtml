@@ -7,7 +7,7 @@
             <i class="pi pi-bars"></i>
         </a>
         <h:link styleClass="logo" outcome="/index.xhtml">
-            <p:graphicImage name="images/primefaces-logo.svg" library="showcase" />
+            <p:graphicImage name="images/primefaces-logo.png" library="showcase" />
         </h:link>
         <p:outputPanel id="app-theme-logo" class="app-theme">
             <p:graphicImage id="app-theme-image" name="images/themes/#{app.themeImage}" library="showcase" />
@@ -16,8 +16,21 @@
 
         <h:form styleClass="topbar-form" onsubmit="this.action='#{request.contextPath}/logout';">
             <ul class="topbar-menu">
-             <!--   <li>
-                    <h:link outcome="/getstarted">Get Started</h:link>
+                <!-- <li>
+                    <h:link outcome="/ui/dataTable">Get Started</h:link>
+                </li>-->
+                <li class="topbar-submenu">
+
+                    <a tabindex="0">                        
+                        <h:link outcome="/ui/approvalPass">
+                            <p:badge value="#{visitorController.preApprovedVisitors.size()}+" rendered="#{appMenu.approval}" severity="danger"
+                                styleClass="inline">
+                                Approvals
+                            </p:badge>
+                        </h:link>
+
+                    </a>
+
                 </li>
                 <li class="topbar-submenu">
                     <a tabindex="0">
@@ -139,7 +152,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="topbar-submenu">
+                <!-- <li class="topbar-submenu">
                     <a tabindex="0">Templates</a>
                     <ul class="connected-overlay-in">
                         <li class="topbar-submenu-header">PREMIUM ADMIN TEMPLATES</li>
@@ -277,9 +290,21 @@
                     </ul>
                 </li>-->
                 <li class="topbar-submenu">
-
-                    <p:commandButton value="Logout" ajax="false" />
-
+                    <a tabindex="0">
+                        <p:avatar icon="pi pi-user" styleClass="mr-2" size="large"
+                            style="background-color:#2196F3; color:#fff" shape="circle" />
+                    </a>
+                    <ul class="connected-overlay-in">
+                        <li class="topbar-submenu-header">
+                          #{appMenu.profileName}                        
+                        </li>
+                        <li>                                                       
+                            <p:commandLink ajax="false">
+                               <i class="pi pi-fw pi-power-off"></i><span>Log
+                                    Out</span>
+                            </p:commandLink>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </h:form>

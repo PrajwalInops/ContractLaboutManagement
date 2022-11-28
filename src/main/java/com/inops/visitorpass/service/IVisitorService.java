@@ -12,6 +12,8 @@ public interface IVisitorService {
 
 	Optional<Visitor> findByMobileNo(String mobileNo);
 	
+	Optional<List<Visitor>> findAllByIsApproved();
+	
 	Optional<List<Visitor>> findAll();
 	
 	void save(Visitor visitor);

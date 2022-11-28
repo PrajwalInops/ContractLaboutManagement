@@ -55,4 +55,10 @@ public class VisitorServiceImpl implements IVisitorService {
 		visitorRepository.deleteById(id);		
 	}
 
+	@Override
+	public Optional<List<Visitor>> findAllByIsApproved() {
+		
+		return visitorRepository.findAllByIsApproved(true);
+	}
+
 }

@@ -2,6 +2,7 @@ package com.inops.visitorpass.entity;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,6 +30,7 @@ public class Visitor {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
+	@Column(unique = true)
 	private String mobileNo;
 	private Date date;
 	private String visitorId;
@@ -47,4 +49,5 @@ public class Visitor {
 	private String visitingEmployee;
 	private String remarks;
 	private String visitorPhoto;
+	private boolean isApproved;
 }

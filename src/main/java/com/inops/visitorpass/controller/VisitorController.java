@@ -1,8 +1,10 @@
 package com.inops.visitorpass.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,9 @@ import javax.faces.context.FacesContext;
 import javax.imageio.stream.FileImageOutputStream;
 
 import org.primefaces.event.CaptureEvent;
+import org.primefaces.event.DragDropEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +27,7 @@ import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Visitor;
 import com.inops.visitorpass.service.IEmployee;
 import com.inops.visitorpass.service.IVisitorService;
+import com.inops.visitorpass.service.impl.ReportGenerationService;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -29,19 +35,25 @@ import lombok.Setter;
 @Getter
 @Setter
 @Component("visitorController")
-@Scope("view")
+@Scope("session")
 public class VisitorController implements Serializable {
 
 	private IVisitorService visitorService;
 	private IEmployee employeeService;
+	private ReportGenerationService reportGenerationService;
 
-	public VisitorController(IVisitorService visitorService, IEmployee employeeService) {
+	public VisitorController(IVisitorService visitorService, IEmployee employeeService,
+			ReportGenerationService reportGenerationService) {
 		super();
 		this.visitorService = visitorService;
 		this.employeeService = employeeService;
+		this.reportGenerationService = reportGenerationService;
 	}
 
 	private List<Visitor> visitors;
+	private List<Visitor> preApprovedVisitors;
+	private List<Visitor> droppedVisitors;
+	private Visitor selectedVisitor;
 	private List<Employee> employees;
 
 	private String filename;
@@ -62,11 +74,13 @@ public class VisitorController implements Serializable {
 	private String visitingDepartment;
 	private String visitingEmployee;
 	private String remarks;
-	private boolean renderPass = true;
+	private StreamedContent file;
 
 	@PostConstruct
-	public void init() {
+	public void init() {		
 		getAllVisitors();
+		getAllPreApprovedVisitors();
+		droppedVisitors = new ArrayList<>();
 		Optional<List<Employee>> employees = employeeService.findAll();
 		setEmployees(employees.get());
 	}
@@ -123,21 +137,23 @@ public class VisitorController implements Serializable {
 	public void save() {
 		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, company, address, noOfPersons,
 				nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems, visitingDepartment,
-				visitingEmployee, remarks,filename);
+				visitingEmployee, remarks, filename, false);
 		visitorService.save(visitor);
 		visitors.add(visitor);
+		byte[] pass = reportGenerationService.generateReport(visitor, filename);
+		fileDownload(pass);
 		cleanUp();
-		setRenderPass(true);
 		addMessage("Visitor saved successfully!");
 	}
 
 	public void update() {
 		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, company, address, noOfPersons,
 				nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems, visitingDepartment,
-				visitingEmployee, remarks, filename);
+				visitingEmployee, remarks, filename, false);
+		byte[] pass = reportGenerationService.generateReport(visitor, filename);
+		fileDownload(pass);
 		visitorService.update(visitor);
 		cleanUp();
-		//setRenderPass(true);
 		addMessage("Visitor updated successfully!");
 	}
 
@@ -145,7 +161,6 @@ public class VisitorController implements Serializable {
 		visitorService.delete(mobileNo);
 		getAllVisitors();
 		cleanUp();
-		setRenderPass(true);
 		addMessage("Visitor deleted successfully!");
 	}
 
@@ -158,11 +173,26 @@ public class VisitorController implements Serializable {
 		Optional<List<Visitor>> visitors = visitorService.findAll();
 		setVisitors(visitors.get());
 	}
+	
+	private void getAllPreApprovedVisitors()
+	{
+		Optional<List<Visitor>> visitors = visitorService.findAllByIsApproved();
+		setPreApprovedVisitors(visitors.get());
+	}
 
 	public void getDepartment() {
 		Employee employee = employees.stream().filter(employees -> employees.getEmployeeId().equals(visitingEmployee))
 				.findAny().orElse(null);
 		setVisitingDepartment(employee.getDepartment().getDepartmentName());
+	}
+
+	public void fileDownload(byte[] buffer) {
+		file = DefaultStreamedContent.builder().name("visitorpass.pdf").contentType("application/pdf")
+				.stream(() -> new ByteArrayInputStream(buffer))
+				// .stream(() ->
+				// FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("C:\\Users\\User\\Prajwal\\source
+				// code\\Visitorpass\\src\\main\\webapp\\resources\\demo\\media\\2515655.pdf"))
+				.build();
 	}
 
 	public void cleanUp() {
@@ -184,8 +214,14 @@ public class VisitorController implements Serializable {
 		setVisitingEmployee(null);
 		setRemarks(null);
 		setFilename(null);
-		setRenderPass(false);
 
 	}
+	
+	 public void onProductDrop(DragDropEvent<Visitor> vEvent) {
+	        Visitor visitor = vEvent.getData();
+
+	        droppedVisitors.add(visitor);
+	        preApprovedVisitors.remove(visitor);
+	    }
 
 }

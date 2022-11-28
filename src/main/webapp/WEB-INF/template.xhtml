@@ -9,12 +9,32 @@
       >
 
     <h:head>
-       
+        <f:facet name="first">
+            <ui:fragment rendered="#{facesContext.application.projectStage eq 'Production'}">
+                <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-93461466-1"></script>
+                <script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', 'UA-93461466-1');
+                </script>
+            </ui:fragment>
+            <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes"/>
+            <link href="#{resource['showcase/images/favicon-32x32.png']}" rel="icon" type="image/png" sizes="32x32"/>
+            <link href="#{resource['showcase/images/favicon-16x16.png']}" rel="icon" type="image/png" sizes="16x16"/>
+        </f:facet>
         <title>VisitorPass Showcase</title>
 
         <h:outputStylesheet name="css/primeflex2.css" library="showcase"/><!-- classic PrimeFlex 2 for backward-compatibility -->
         <h:outputStylesheet name="css/primeflex3.css" library="showcase"/><!-- latest primeflex -->
         <h:outputStylesheet name="css/flags/flags.css" library="showcase"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces"/>
+        <h:outputScript name="jquery/jquery-plugins.js" library="primefaces"/>
+        <h:outputScript name="locales/locale-#{app.locale.language}.js" library="primefaces"/>       
 
         <ui:insert name="head"/>
         
@@ -22,7 +42,7 @@
 
     <h:body>
         <f:view>
-        <div class="layout-wrapper ui-input-filled">
+        <div class="layout-wrapper #{app.inputStyleClass}">
             <ui:fragment rendered="false">
                 <div class="layout-news">
                     <div class="layout-news-container">
@@ -40,6 +60,7 @@
             
             <ui:include src="./topbar.xhtml"></ui:include>
             <ui:include src="./menu.xhtml"></ui:include>
+            <ui:include src="./config.xhtml"></ui:include>
             
             <div class="layout-mask"></div>
 
