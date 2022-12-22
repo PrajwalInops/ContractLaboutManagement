@@ -1,0 +1,205 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+    xmlns:composite="http://xmlns.jcp.org/jsf/composite/composite" template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">
+       PreApproval Pass
+    </ui:define>
+
+    <ui:define name="description">
+        All input text components support floating labels by adding ( <mark>.ui-float-label</mark> ) to wrapper class.
+    </ui:define>
+
+    <ui:param name="documentationLink" value="/components/outputlabel" />
+
+    <ui:define name="implementation">
+        <div class="card" style="width: 100%">
+            <h:form>
+              <p:growl id="messages" />
+              <div class="card" style="width: 100%">
+
+                <div class="grid ui-fluid mt-3 floatlabel-demo">
+                    <div class="col-12 md:col-6">
+
+                      <div class="field">
+                        <div class="ui-inputgroup">
+                            <span class="ui-inputgroup-addon">
+                                <i class="pi pi-user" />
+                            </span>
+                            <span class="ui-float-label" style="width: 100%">
+                                <p:inputText value="#{visitorController.visitorName}" id="visitorName" />
+                                <p:outputLabel for="@previous" value="VisitorName" />
+                            </span>
+                        </div>
+                    </div>
+
+                        <div class="field">
+                            <div class="ui-inputgroup">
+                                <span class="ui-inputgroup-addon">
+                                    <i class="pi pi-mobile" />
+                                </span>
+                                <span class="ui-float-label" style="width: 100%">
+                                    <p:selectOneMenu value="#{visitorController.mobileNo}" id="mobileNo"
+                                        autoWidth="false" editable="true" maxlength="10" filter="true"
+                                        filterMatchMode="startsWith">
+                                        <f:selectItem itemLabel="Please select" itemValue="" />
+                                        <f:selectItems value="#{visitorController.visitors}" var="player"
+                                            itemLabel="#{player.mobileNo}" itemValue="#{player.mobileNo}" />
+                                        
+                                    </p:selectOneMenu>
+                                    <p:outputLabel for="@previous" value="MobileNumber" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui-inputgroup">
+                                <span class="ui-inputgroup-addon">
+                                    <i class="pi pi-calendar" />
+                                </span>
+                                <span class="ui-float-label" style="width: 100%">
+                                    <p:calendar value="#{visitorController.date}" id="date" />
+                                    <p:outputLabel for="@previous" value="Date" />
+                                </span>
+                            </div>
+                        </div>
+
+                       
+                       
+                        <div class="field">
+                            <div class="ui-inputgroup">
+                                <span class="ui-inputgroup-addon">
+                                    <i class="pi pi-building" />
+                                </span>
+                                <span class="ui-float-label" style="width: 100%">
+                                    <p:inputText value="#{visitorController.company}" id="company" />
+                                    <p:outputLabel for="@previous" value="Company" />
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                          <div class="ui-inputgroup">
+                              <span class="ui-inputgroup-addon">
+                                  <i class="pi pi-map-marker" />
+                              </span>
+                              <span class="ui-float-label" style="width: 100%">
+                                  <p:inputTextarea rows="2" cols="30" value="#{visitorController.address}"
+                                      id="address" />
+                                  <p:outputLabel for="@previous" value="Address" />
+                              </span>
+                          </div>
+                      </div>
+                        
+                       
+
+
+                    </div>
+
+                    <div class="col-12 md:col-6">
+
+                      
+                    <div class="field">
+                        <div class="ui-inputgroup">
+                            <span class="ui-inputgroup-addon">
+                                <i class="pi pi-users" />
+                            </span>
+                            <span class="ui-float-label" style="width: 100%">
+                                <p:inputText value="#{visitorController.noOfPersons}" id="noOfPersons" />
+                                <p:outputLabel for="@previous" value="NoOfPersons" />
+                            </span>
+                        </div>
+                    </div>
+
+                        <div class="field">
+                            <div class="ui-inputgroup">
+                                <span class="ui-inputgroup-addon">
+                                    <i class="pi pi-eye" />
+                                </span>
+                                <span class="ui-float-label" style="width: 100%">
+                                    <p:selectOneMenu autoWidth="false" value="#{visitorController.purpose}"
+                                        id="purpose">
+                                        <f:selectItem itemLabel="" itemValue="" />
+                                        <f:selectItem itemLabel="OFFICIAL" itemValue="OFFICIAL" />
+                                        <f:selectItem itemLabel="PERSONAL" itemValue="PERSONAL" />
+                                    </p:selectOneMenu>
+                                    <p:outputLabel for="@previous" value="Purpose" />
+                                </span>
+                            </div>
+                        </div>
+                        
+                       
+                        
+                        
+                        <div class="field">
+                            <div class="ui-inputgroup">
+                                <span class="ui-inputgroup-addon">
+                                    <i class="pi pi-user" />
+                                </span>
+                                <span class="ui-float-label" style="width: 100%">
+
+                                    <p:selectOneMenu value="#{visitorController.visitingEmployee}"
+                                        id="visitingEmployee" autoWidth="false" filter="true"
+                                        filterMatchMode="startsWith">
+                                        <f:selectItem itemLabel="" itemValue="" />
+                                        <f:selectItems value="#{visitorController.employees}" var="player"
+                                            itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+                                        <p:ajax update="visitingDepartment"
+                                            listener="#{visitorController.getDepartment}" />
+                                    </p:selectOneMenu>
+                                    <p:outputLabel for="@previous" value="VisitingEmployee" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui-inputgroup">
+                                <span class="ui-inputgroup-addon">
+                                    <i class="pi pi-users" />
+                                </span>
+                                <span class="ui-float-label" style="width: 100%">
+                                    <p:inputText value="#{visitorController.visitingDepartment}"
+                                        id="visitingDepartment" />
+                                    <p:outputLabel for="@previous" value="VisitingDepartment" />
+                                </span>
+                            </div>
+                        </div>
+
+                        
+                        
+
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <div class="field">
+                            <div class="ui-inputgroup">
+                                <span class="ui-float-label" style="width: 100%">
+                                    <p:splitButton value="Save" action="#{visitorController.save}"
+                                        update="mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                        icon="pi pi-save">
+                                        <p:menuitem value="Update" action="#{visitorController.update}"
+                                            update="mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                            icon="pi pi-refresh" />
+                                        <p:menuitem value="Delete" action="#{visitorController.delete}"
+                                            update="mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                            icon="pi pi-times" />
+                                        <p:divider />
+                                        <p:menuitem value="Clear" action="#{visitorController.cleanUp}"
+                                            update="mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                            icon="pi pi-times-circle" />
+                                    </p:splitButton>
+                                </span>
+                            </div>
+                        </div>
+                                                </div>
+                </div>
+
+            </div>
+  
+
+  
+
+  
+  </h:form>
+
+</div>
+</ui:define>
+
+</ui:composition>

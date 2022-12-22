@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.FacesException;
@@ -20,9 +21,11 @@ import org.primefaces.event.CaptureEvent;
 import org.primefaces.event.DragDropEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.inops.visitorpass.entity.Department;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Visitor;
 import com.inops.visitorpass.service.IEmployee;
@@ -40,7 +43,7 @@ public class VisitorController implements Serializable {
 
 	private IVisitorService visitorService;
 	private IEmployee employeeService;
-	private ReportGenerationService reportGenerationService;
+	private ReportGenerationService reportGenerationService;	
 
 	public VisitorController(IVisitorService visitorService, IEmployee employeeService,
 			ReportGenerationService reportGenerationService) {
@@ -48,8 +51,9 @@ public class VisitorController implements Serializable {
 		this.visitorService = visitorService;
 		this.employeeService = employeeService;
 		this.reportGenerationService = reportGenerationService;
-	}
+		}
 
+	
 	private List<Visitor> visitors;
 	private List<Visitor> preApprovedVisitors;
 	private List<Visitor> droppedVisitors;
@@ -77,7 +81,7 @@ public class VisitorController implements Serializable {
 	private StreamedContent file;
 
 	@PostConstruct
-	public void init() {		
+	public void init() {
 		getAllVisitors();
 		getAllPreApprovedVisitors();
 		droppedVisitors = new ArrayList<>();
@@ -109,7 +113,13 @@ public class VisitorController implements Serializable {
 		}
 	}
 
+	public List<Visitor> completeVisitors(String mobileNo) {
+		return visitors.stream().filter(visitor -> visitor.getMobileNo().contains(mobileNo))
+				.collect(Collectors.toList());
+	}
+
 	public void getVisitor() {
+
 		Optional<Visitor> visitor = Optional.ofNullable(
 				visitors.stream().filter(visitors -> visitors.getMobileNo().equals(mobileNo)).findAny().orElse(null));
 		if (visitor.isPresent()) {
@@ -173,9 +183,8 @@ public class VisitorController implements Serializable {
 		Optional<List<Visitor>> visitors = visitorService.findAll();
 		setVisitors(visitors.get());
 	}
-	
-	private void getAllPreApprovedVisitors()
-	{
+
+	private void getAllPreApprovedVisitors() {
 		Optional<List<Visitor>> visitors = visitorService.findAllByIsApproved();
 		setPreApprovedVisitors(visitors.get());
 	}
@@ -216,12 +225,12 @@ public class VisitorController implements Serializable {
 		setFilename(null);
 
 	}
-	
-	 public void onProductDrop(DragDropEvent<Visitor> vEvent) {
-	        Visitor visitor = vEvent.getData();
 
-	        droppedVisitors.add(visitor);
-	        preApprovedVisitors.remove(visitor);
-	    }
+	public void onProductDrop(DragDropEvent<Visitor> vEvent) {
+		Visitor visitor = vEvent.getData();
+
+		droppedVisitors.add(visitor);
+		preApprovedVisitors.remove(visitor);
+	}
 
 }

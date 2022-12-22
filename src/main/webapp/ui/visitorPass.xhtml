@@ -22,7 +22,7 @@
         <div class="card" style="width: 100%">
             <h:form>
                 <p:growl id="messages" />
-                
+
                 <h:panelGrid columns="4" cellpadding="5">
                     <p:photoCam widgetVar="pc" listener="#{visitorController.oncapture}" update="photo" />
                     <p:commandButton type="button" value="Capture" onclick="PF('pc').capture()" />
@@ -46,17 +46,34 @@
                                         <i class="pi pi-mobile" />
                                     </span>
                                     <span class="ui-float-label" style="width: 100%">
-                                        <p:selectOneMenu value="#{visitorController.mobileNo}" id="mobileNo"
-                                            autoWidth="false" editable="true" maxlength="10" filter="true"
-                                            filterMatchMode="startsWith">
-                                            <f:selectItem itemLabel="Please select" itemValue="" />
-                                            <f:selectItems value="#{visitorController.visitors}" var="player"
-                                                itemLabel="#{player.mobileNo}" itemValue="#{player.mobileNo}" />
-                                            <p:ajax
-                                                update="photo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks"
-                                                listener="#{visitorController.getVisitor}" />
+                                       
 
-                                        </p:selectOneMenu>
+
+                                        <p:autoComplete value="#{visitorController.mobileNo}" id="mobileNo"
+                                            completeMethod="#{visitorController.completeVisitors}" var="visitor"
+                                            itemLabel="#{visitor.mobileNo}" itemValue="#{visitor.mobileNo}" 
+                                             scrollHeight="250">
+                                            <f:facet name="itemtip">
+                                                <h:panelGrid columns="2" cellpadding="5">
+                                                    <f:facet name="header">
+                                                        <p:graphicImage name="demo/images/photocam/#{visitor.visitorPhoto}.jpeg"  style="width: 30px; height: 20px" 
+                                                        rendered="#{not empty visitor.visitorPhoto}" />
+                                                           
+                                                    </f:facet>
+
+                                                    <h:outputText value="Name" />
+                                                    <h:outputText value="#{visitor.visitorName}" />
+
+                                                    <h:outputText value="Company" />
+                                                    <h:outputText value="#{visitor.company}" />
+                                                   
+                                                </h:panelGrid>
+                                            </f:facet>
+                                            <p:ajax
+                                            update="photo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks"
+                                            listener="#{visitorController.getVisitor}" />
+                                        </p:autoComplete>
+
                                         <p:outputLabel for="@previous" value="MobileNumber" />
                                     </span>
                                 </div>

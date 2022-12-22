@@ -22,23 +22,21 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Employee")
+@Table(name = "tblempmast")
 public class Employee {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-
-	@Column(name = "employeeId")
+	@Column(name = "empid")
 	private String employeeId;
 	
-	@Column(name = "employeeName")
+	@Column(name = "empname")
 	private String employeeName;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "departmentId")
+    @JoinColumn(name = "deptid")
     private Department department;
 
 }

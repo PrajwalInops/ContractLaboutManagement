@@ -1,6 +1,7 @@
 package com.inops.visitorpass.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.inops.visitorpass.entity.Visitor;
@@ -21,4 +22,6 @@ public interface IVisitorService {
 	void update(Visitor visitor);
 	
 	void delete(String mobileNumber);
+	
+	Map<String, Visitor> getCountriesAsMap();
 }

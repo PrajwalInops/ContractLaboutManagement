@@ -1,7 +1,9 @@
 package com.inops.visitorpass.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -60,5 +62,11 @@ public class VisitorServiceImpl implements IVisitorService {
 		
 		return visitorRepository.findAllByIsApproved(true);
 	}
+	
+	public Map<String, Visitor> getCountriesAsMap() {
+        
+		return visitorRepository.findAll().stream().collect(Collectors.toMap(Visitor::getMobileNo, visitor -> visitor));
+        
+    }
 
 }

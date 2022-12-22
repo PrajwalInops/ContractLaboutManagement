@@ -36,6 +36,12 @@
                         <p:outputLabel for="title" value="Titles" styleClass="font-bold"/>
                         <p:inputText id="title" value="#{scheduleJava8View.event.title}" required="true"/>
 
+                        <p:outputLabel for="visitorName" value="Visitor Name" styleClass="font-bold"/>
+                        <p:inputText id="visitorName" value="#{scheduleJava8View.event.title}" required="true"/>
+
+                        <p:outputLabel for="visitorNumber" value="Phone Number" styleClass="font-bold"/>
+                        <p:inputText id="visitorNumber" value="#{scheduleJava8View.event.title}" required="true"/>
+
                         <p:outputLabel for="from" value="From" styleClass="font-bold"/>
                         <p:datePicker id="from" value="#{scheduleJava8View.event.startDate}" pattern="dd/MM/yyyy"
                                       showTime="true" appendTo="@(body)"/>

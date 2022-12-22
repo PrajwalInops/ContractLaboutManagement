@@ -47,7 +47,7 @@ public class VisitorPassApplication implements ServletContextAware {
 		servletContext.setInitParameter("javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL", "true");
 		servletContext.setInitParameter("primefaces.CLIENT_SIDE_VALIDATION", "true");
 		servletContext.setInitParameter("primefaces.FONT_AWESOME", "true");
-		servletContext.setInitParameter("com.sun.faces.expressionFactory", "com.sun.el.ExpressionFactoryImpl");
+		//servletContext.setInitParameter("com.sun.faces.expressionFactory", "com.sun.el.ExpressionFactoryImpl");
 		
 	}
 

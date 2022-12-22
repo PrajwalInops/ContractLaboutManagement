@@ -2,6 +2,7 @@ package com.inops.visitorpass.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -19,6 +20,7 @@ import com.inops.visitorpass.service.impl.UserServiceImpl;
 
 @Configuration
 @EnableWebSecurity
+@ComponentScan(basePackages = "com.inops.visitorpass")
 public class SecurityConfig {
 
 	    @Autowired

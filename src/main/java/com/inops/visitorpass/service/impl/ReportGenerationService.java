@@ -3,9 +3,13 @@ package com.inops.visitorpass.service.impl;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +23,15 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
+import com.inops.visitorpass.domain.AttendanceRegister;
+import com.inops.visitorpass.domain.ContinousAbsenteesim;
+import com.inops.visitorpass.domain.Punch;
 import com.inops.visitorpass.entity.Visitor;
+import com.inops.visitorpass.service.DataExtractionService;
+import com.inops.visitorpass.service.IReport;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -30,6 +40,19 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service("reportGenerationService")
 public class ReportGenerationService {
+
+	private final DataExtractionService attendanceRegister;
+	private final DataExtractionService continousAbsenteesim;
+	private final DataExtractionService allPunch;
+	ZoneId defaultZoneId = ZoneId.systemDefault();
+
+	public ReportGenerationService(DataExtractionService attendanceRegister, DataExtractionService continousAbsenteesim,
+			DataExtractionService allPunch) {
+		super();
+		this.attendanceRegister = attendanceRegister;
+		this.continousAbsenteesim = continousAbsenteesim;
+		this.allPunch = allPunch;
+	}
 
 	public byte[] generateReport(Visitor visitor, String fileName) {
 		try {
@@ -99,6 +122,89 @@ public class ReportGenerationService {
 		}
 
 		return null;
+	}
+
+	public IReport getAttendanceRegister() {
+		return (from, to, id) -> {
+			try {
+
+				List<AttendanceRegister> attRegister = (List<AttendanceRegister>) attendanceRegister
+						.dataExtraction(from, to, id);
+
+				return generateFinalReport(from, to, attRegister, "AttendanceRegister.jrxml", "attendanceRegister");
+				// return new ResponseEntity<byte[]>
+				// (JasperExportManager.exportReportToPdf(empReport), headers, HttpStatus.OK);
+
+			} catch (Exception e) {
+				// return new ResponseEntity<byte[]>(HttpStatus.INTERNAL_SERVER_ERROR);
+				System.out.println(e);
+			}
+			return null;
+		};
+
+	}
+
+	public IReport getContinousAbsenteesim() {
+		return (from, to, id) -> {
+			try {
+
+				List<ContinousAbsenteesim> continuoursAbsentees = (List<ContinousAbsenteesim>) continousAbsenteesim
+						.dataExtraction(from, to, id);
+
+				return generateFinalReport(from, to, continuoursAbsentees, "ContinousAbsenteesim.jrxml",
+						"continousAbsenteesim");
+				// return new ResponseEntity<byte[]>
+				// (JasperExportManager.exportReportToPdf(empReport), headers, HttpStatus.OK);
+
+			} catch (Exception e) {
+				// return new ResponseEntity<byte[]>(HttpStatus.INTERNAL_SERVER_ERROR);
+				System.out.println(e);
+			}
+			return null;
+		};
+	}
+
+	public IReport getAllPunches() {
+		return (from, to, id) -> {
+			try {
+
+				List<Punch> allPunches = (List<Punch>) allPunch.dataExtraction(from, to, id);
+
+				return generateFinalReport(from, to, allPunches, "Allpunches.jrxml", "Allpunches");
+				// return new ResponseEntity<byte[]>
+				// (JasperExportManager.exportReportToPdf(empReport), headers, HttpStatus.OK);
+
+			} catch (Exception e) {
+				// return new ResponseEntity<byte[]>(HttpStatus.INTERNAL_SERVER_ERROR);
+				System.out.println(e);
+			}
+			return null;
+		};
+	}
+
+	private byte[] generateFinalReport(LocalDate from, LocalDate to, Collection<?> beanCollection, String jrxmlFileName,
+			String type) throws JRException, FileNotFoundException {
+		// dynamic parameters required for report
+		Map<String, Object> empParams = new HashMap<String, Object>();
+		empParams.put("CompanyName", "NATIONAL AEROSPACE LABORATORIES");
+		empParams.put("fromDate", Date.from(from.atStartOfDay(defaultZoneId).toInstant()));
+		empParams.put("toDate", Date.from(to.atStartOfDay(defaultZoneId).toInstant()));
+
+		empParams.put(type, new JRBeanCollectionDataSource(beanCollection));
+
+		JasperPrint extractReport = JasperFillManager.fillReport(JasperCompileManager
+				.compileReport(ResourceUtils.getFile("classpath:" + jrxmlFileName).getAbsolutePath()) // path
+																										// of
+		// the
+		// jasper
+		// report
+				, empParams // dynamic parameters
+				, new JREmptyDataSource());
+
+		// the report in PDF format
+		// JasperExportManager.exportReportToPdfFile(visitorReport, newPdfFileName);
+
+		return JasperExportManager.exportReportToPdf(extractReport);
 	}
 
 }

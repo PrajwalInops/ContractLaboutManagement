@@ -22,6 +22,8 @@ import org.primefaces.model.ScheduleModel;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.inops.visitorpass.domain.SchedulerEvents;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -108,7 +110,15 @@ public class ScheduleJava8View implements Serializable {
     }
 
     private void addEvents2EventModel(LocalDateTime referenceDate) {
-        DefaultScheduleEvent<?> event = DefaultScheduleEvent.builder()
+		/*
+		 * DefaultScheduleEvent<?> event = DefaultScheduleEvent.builder()
+		 * .title("Champions League Match") .startDate(previousDay8Pm(referenceDate))
+		 * .endDate(previousDay11Pm(referenceDate)) .description("Team A vs. Team B")
+		 * .url("https://www.uefa.com/uefachampionsleague/") .borderColor("orange")
+		 * .build(); eventModel.addEvent(event);
+		 */
+        
+        DefaultScheduleEvent<?> event = SchedulerEvents.builder()
                 .title("Champions League Match")
                 .startDate(previousDay8Pm(referenceDate))
                 .endDate(previousDay11Pm(referenceDate))
@@ -118,6 +128,7 @@ public class ScheduleJava8View implements Serializable {
                 .build();
         eventModel.addEvent(event);
 
+        
         event = DefaultScheduleEvent.builder()
                 .startDate(referenceDate.minusDays(6))
                 .endDate(referenceDate.minusDays(3))
