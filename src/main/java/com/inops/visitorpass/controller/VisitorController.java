@@ -73,7 +73,9 @@ public class VisitorController implements Serializable {
 	private List<Visitor> preApprovedVisitors;
 	private List<Visitor> droppedVisitors;
 	private Visitor selectedVisitor;
+	private List<Visitor> selectedVisitors;
 	private List<Employee> employees;
+
 
 	private String photoPath;
 	private StreamedContent visitorPhoto;
@@ -102,16 +104,14 @@ public class VisitorController implements Serializable {
 	public void init() throws UnsupportedEncodingException {
 		getAllPreApprovedVisitors();
 		droppedVisitors = new ArrayList<>();
+		
 
 		getVisitorIdByDate();
 		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
 		visitors = ((Optional<List<Visitor>>) ctx.getBean("getVisitors")).get();
 		setDate(new Date());
-		Company companyDetails = company.findAll().get().get(0);
-		setPhotoPath(companyDetails.getVisitorsPhotoPath());
 		fileDownload(null, "VisitorPass");
 		
-		visitorPhoto = getGraphicText();
 	}
 
 	private String getRandomImageName() {
@@ -125,34 +125,18 @@ public class VisitorController implements Serializable {
 		byte[] data = captureEvent.getData();
 
 		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-		String newFileName = photoPath + File.separator + filename + ".jpeg";
+		String newFileName = externalContext.getRealPath("") + File.separator + "resources" + File.separator + "demo"
+				+ File.separator + "images" + File.separator + "photocam" + File.separator + filename + ".jpeg";
 
 		FileImageOutputStream imageOutput;
 		try {
 			imageOutput = new FileImageOutputStream(new File(newFileName));
 			imageOutput.write(data, 0, data.length);
 			imageOutput.close();
-			
-			
-			visitorPhoto =	DefaultStreamedContent.builder()
-            .contentType("image/jpeg")
-            .stream(() -> {
-                try {
-					 File chartFile = new File("C:\\Users\\User\\Prajwal\\pass\\20758.jpeg");
-                    return new FileInputStream(chartFile);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            })
-            .build();
-
 		} catch (IOException e) {
 			throw new FacesException("Error in writing captured image.", e);
 		}
 	}
-
 	public List<Visitor> completeVisitors(String mobileNo) {
 		return visitors.stream().filter(visitor -> visitor.getMobileNo().contains(mobileNo))
 				.collect(Collectors.toList());
@@ -328,31 +312,5 @@ public class VisitorController implements Serializable {
 		visitorId = String.valueOf(visitorService.countByDate(new java.sql.Date(getdateCount.getTime())) + 1);
 
 	}
-	
-	 public StreamedContent getGraphicText() {
-	        try {
-	            return DefaultStreamedContent.builder()
-	                    .contentType("image/png")
-	                    .stream(() -> {
-	                        try {
-	                            BufferedImage bufferedImg = new BufferedImage(100, 25, BufferedImage.TYPE_INT_RGB);
-	                            Graphics2D g2 = bufferedImg.createGraphics();
-	                            g2.drawString("I love you", 0, 10);
-	                            ByteArrayOutputStream os = new ByteArrayOutputStream();
-	                            ImageIO.write(bufferedImg, "png", os);
-	                            return new ByteArrayInputStream(os.toByteArray());
-	                        }
-	                        catch (Exception e) {
-	                            e.printStackTrace();
-	                            return null;
-	                        }
-	                    })
-	                    .build();
-	        }
-	        catch (Exception e) {
-	            e.printStackTrace();
-	            return null;
-	        }
-	    }
 
 }

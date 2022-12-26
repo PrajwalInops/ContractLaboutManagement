@@ -39,7 +39,7 @@ dependencies {
 	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
 	implementation 'javax.xml.bind:jaxb-api:2.3.0'
 	implementation 'org.primefaces:primefaces:12.0.0'
-	implementation 'org.glassfish:javax.faces:2.3.5'
+	//implementation 'org.glassfish:javax.faces:2.4.0'
 	implementation 'com.google.guava:guava:29.0-jre' 
 	implementation 'org.joinfaces:joinfaces-dependencies:3.3.0-rc2'
 	implementation 'org.springframework.security:spring-security-taglibs'
@@ -60,9 +60,12 @@ dependencies {
 	implementation 'javax.el:el-api:2.2'
 	implementation 'org.glassfish.web:el-impl:2.2'
 	
-// https://mvnrepository.com/artifact/javax.enterprise/cdi-api
-	compileOnly 'javax.enterprise:cdi-api:2.0'
+	implementation 'org.glassfish:jakarta.faces:2.3.18'
 	
+		
+// https://mvnrepository.com/artifact/javax.enterprise/cdi-api
+	compileOnly 'javax.enterprise:cdi-api:1.2'
+	runtimeOnly 'javax.enterprise:cdi-api:1.2'
 	implementation 'org.apache.poi:poi:5.2.3'
 	
             implementation ('org.apache.poi:poi-ooxml:5.2.3'){
@@ -76,6 +79,8 @@ dependencies {
             
 // https://mvnrepository.com/artifact/com.rometools/rome
 implementation 'com.rometools:rome:1.5.0'
+
+
 
 	implementation 'com.microsoft.sqlserver:mssql-jdbc:11.2.0.jre8'
 	compileOnly 'org.projectlombok:lombok'

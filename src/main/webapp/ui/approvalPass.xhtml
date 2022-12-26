@@ -1,129 +1,193 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core"
-                xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
-
-    <ui:define name="head">
-        <script>
-            function handleDrop(event, ui) {
-                var droppedProduct = ui.draggable;
-
-                droppedProduct.fadeOut('fast');
-            }
-        </script>
-    </ui:define>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
     <ui:define name="title">
-        Approvals for <span class="subitem">Visitors</span>
+        DataTable <span class="subitem">Crud</span>
     </ui:define>
 
     <ui:define name="description">
-        DragDrop components have special integration with data components. Drag the products using the drag icon to the drop area.
+        This samples demonstrates a CRUD implementation using various PrimeFaces components.
     </ui:define>
 
+    <ui:param name="documentationLink" value="/components/datatable" />
+    <ui:param name="widgetLink" value="DataTable-1" />
+
     <ui:define name="implementation">
-        <div class="card">
-            <h:form id="productForm">
-                <h5 class="mt-0">Available Products</h5>
-                <p:dataTable id="availableProducts" var="product" value="#{visitorController.preApprovedVisitors}">
-                        <p:column style="width:20px">
-                            <h:outputText id="dragIcon" styleClass="ui-icon pi pi-plus"/>
-                            <p:draggable for="dragIcon" revert="true" helper="clone"/>
-                        </p:column>
 
-                        <p:column headerText="Mobile No">
-                            <h:outputText value="#{product.mobileNo}"/>
-                        </p:column>
+        <div class="card crud-demo">
+            <h:form id="form">
+                <p:growl id="messages" showDetail="true" />
 
-                        <p:column headerText="Visitor Name">
-                            <h:outputText value="#{product.visitorName}"/>
-                        </p:column>
+               
+                <p:dataTable id="dt-products" widgetVar="dtProducts" var="product"
+                    value="#{visitorController.preApprovedVisitors}" reflow="true" styleClass="products-table"
+                    selection="#{visitorController.selectedVisitors}" rowKey="#{product.id}" paginator="true" rows="10"
+                    rowSelectMode="add" paginatorPosition="bottom">
+                    <f:facet name="header">
+                        <div class="products-table-header">
+                            <span style="font-weight: bold">PRODUCTS</span>
+                            <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                                <p:inputText id="globalFilter" onkeyup="PF('dtProducts').filter()"
+                                    placeholder="Search" />
+                            </span>
+                        </div>
+                    </f:facet>
 
-                        <p:column headerText="Company">
-                            <h:outputText value="#{product.company}"/>
-                        </p:column>
+                   <!-- <p:ajax event="rowSelect" update=":form:delete-products-button" />
+                    <p:ajax event="rowUnselect" update=":form:delete-products-button" />
+                    <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button" />
+                    <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button" />
+                    <p:ajax event="toggleSelect" update=":form:delete-products-button" />
+                    -->
+                    <p:column selectionMode="multiple" exportable="false"></p:column>
 
-                        <p:column headerText="Address">
-                            <h:outputText value="#{product.address}"/>
-                        </p:column>
-                    </p:dataTable>
+                    <p:column headerText="MobileNo" sortBy="#{product.mobileNo}" filterBy="#{product.mobileNo}">
+                        <h:outputText value="#{product.mobileNo}" />
+                    </p:column>
+                    <p:column headerText="Name" sortBy="#{product.visitorName}" filterBy="#{product.visitorName}">
+                        <h:outputText value="#{product.visitorName}" />
+                    </p:column>
+                    <p:column headerText="Company" sortBy="#{product.company}">
+                        <h:outputText value="#{product.company}" />
+                    </p:column>
+                    <p:column headerText="Address" sortBy="#{product.address}" filterBy="#{product.address}">
+                        <h:outputText value="#{product.address}" />
+                    </p:column>
 
-                <p:fieldset id="selectedProducts" legend="Selected Visitors" style="margin-top:20px">
-                    <p:outputPanel id="dropArea">
-                        <h:outputText value="Drop here" rendered="#{empty visitorController.droppedVisitors}"
-                                      style="font-size:1.5rem"/>
-                        <p:dataTable id="selectedProductsTable" var="product" value="#{visitorController.droppedVisitors}"
-                                     rendered="#{not empty visitorController.droppedVisitors}">
-                            <p:column headerText="Mobile No">
-                                <h:outputText value="#{product.mobileNo}"/>
-                            </p:column>
+                    <p:column exportable="false">
+                        <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
+                            oncomplete="PF('manageProductDialog').show()"
+                            styleClass="edit-button rounded-button ui-button-success" process="@this">
+                            <f:setPropertyActionListener value="#{product}"
+                                target="#{visitorController.selectedVisitor}" />
+                            <p:resetInput target=":dialogs:manage-product-content" />
+                        </p:commandButton>
+                        <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash" process="@this"
+                            oncomplete="PF('deleteProductDialog').show()">
+                            <f:setPropertyActionListener value="#{product}"
+                                target="#{visitorController.selectedVisitor}" />
+                        </p:commandButton>
+                    </p:column>
 
-                            <p:column headerText="Visitor Name">
-                                <h:outputText value="#{product.visitorName}"/>
-                            </p:column>
-
-                            <p:column headerText="Company">
-                                <h:outputText value="#{product.company}"/>
-                            </p:column>
-
-                            <p:column headerText="Address">
-                                <h:outputText value="#{product.address}"/>
-                            </p:column>
-
-                            <p:column style="width:32px">
-                                <p:commandButton update=":productForm:display" oncomplete="PF('productDialog').show()"
-                                                 icon="pi pi-search">
-                                    <f:setPropertyActionListener value="#{product}"
-                                                                 target="#{visitorController.selectedVisitor}"/>
-                                </p:commandButton>
-                            </p:column>
-                        </p:dataTable>
-                    </p:outputPanel>
-                </p:fieldset>
-
-                <p:droppable for="selectedProducts" tolerance="touch" activeStyleClass="ui-state-highlight"
-                             datasource="availableProducts" onDrop="handleDrop">
-                    <p:ajax listener="#{visitorController.onProductDrop}" update="dropArea availableProducts"/>
-                </p:droppable>
-
-                <p:dialog header="Visitor Detail" widgetVar="productDialog" resizable="false" draggable="false"
-                          showEffect="fade" hideEffect="fade" modal="true">
-                    <p:outputPanel id="display">
-                        <p:column rendered="#{not empty visitorController.selectedVisitor}">
-                            <div class="product">
-                                <div class="product-grid-item card" style="margin-bottom: 0">
-                                    <div class="product-grid-item-top">
-                                        <div>
-                                            <i class="pi pi-tag product-category-icon"/>
-                                            <span class="product-category">#{visitorController.selectedVisitor.company}</span>
-                                        </div>
-                                        <span class="product-badge status-#{visitorController.visitorName.toLowerCase()}">#{visitorController.visitorName.toLowerCase()}</span>
-                                    </div>
-                                    <div class="product-grid-item-content">
-                                        <p:graphicImage
-                                                name="demo/images/photocam/#{visitorController.visitorPhoto}"/>
-                                        <div class="product-name">#{visitorController.visitorName}</div>
-                                        <div class="product-description"><div id="">visitorController.address</div></div>
-                                        <p:rating readonly="true" value="3"/>
-                                    </div>
-                                    <div class="product-grid-item-bottom">
-                                        <h:outputText value="#{visitorController.company}"
-                                                      styleClass="product-price">
-                                            <f:convertNumber currencySymbol="$" type="currency"/>
-                                        </h:outputText>
-                                        <p:commandButton value="Add To Cart" icon="pi pi-shopping-cart"
-                                                         >
-                                        </p:commandButton>
-                                    </div>
-                                </div>
-                            </div>
-                        </p:column>
-                    </p:outputPanel>
-                </p:dialog>
+                </p:dataTable>
             </h:form>
+
+            <h:form id="dialogs">
+                <p:dialog header="Visitor Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"  width="800" height="500"
+                    responsive="true">
+                    <p:outputPanel id="manage-product-content" class="ui-fluid">
+                        <p:outputPanel rendered="#{not empty visitorController.selectedVisitor}">
+                            
+                            <h:panelGrid columns="4" cellpadding="5">
+                                <p:photoCam widgetVar="pc" listener="#{visitorController.oncapture}" update="photo" />
+                                <p:commandButton type="button" value="Capture" onclick="PF('pc').capture()" />
+                                <p:outputPanel id="photo">
+                                    <p:graphicImage name="demo/images/photocam/#{visitorController.filename}.jpeg"
+                                        rendered="#{not empty visitorController.filename}" />
+
+                                </p:outputPanel>
+
+                            </h:panelGrid>
+                           
+                            <div class="field">
+                                <p:outputLabel for="name">Name</p:outputLabel>
+                                <p:inputText id="name" value="#{visitorController.selectedVisitor.visitorName}"
+                                    required="true" />
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="mobileNo">Mobile No</p:outputLabel>
+                                <p:inputText id="mobileNo" value="#{visitorController.selectedVisitor.mobileNo}"
+                                    required="true" />
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="badgeNo">BadgeNumber</p:outputLabel>
+                                <p:selectOneMenu value="#{visitorController.selectedVisitor.badgeNo}" id="badgeNo"
+                                    autoWidth="false" editable="true" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItem itemLabel="Please select" itemValue="" />
+                                    <f:selectItems value="#{visitorController.badgeNo}" var="player"
+                                        itemLabel="#{player.badgeNo}" itemValue="#{player}" />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="nationality">Nationality</p:outputLabel>
+                                <p:selectOneMenu autoWidth="false"
+                                    value="#{visitorController.selectedVisitor.nationality}" id="nationality">
+                                    <f:selectItem itemLabel="" itemValue="" />
+                                    <f:selectItem itemLabel="INDIA" itemValue="INDIA" />
+                                    <f:selectItem itemLabel="FOREIGN" itemValue="FOREIGN" />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="noOfPersons">No Of Persons</p:outputLabel>
+                                <p:inputText value="#{visitorController.selectedVisitor.noOfPersons}"
+                                    id="noOfPersons" />
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="otherMediaItems">Other Media Items</p:outputLabel>
+                                <p:inputText value="#{visitorController.selectedVisitor.otherMediaItems}"
+                                    id="otherMediaItems" />
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="laptopToBePermitted">Laptop To BePermitted</p:outputLabel>
+                                <p:selectOneMenu autoWidth="false"
+                                    value="#{visitorController.selectedVisitor.laptopToBePermitted}"
+                                    id="laptopToBePermitted">
+                                    <f:selectItem itemLabel="" itemValue="" />
+                                    <f:selectItem itemLabel="NO" itemValue="NO" />
+                                    <f:selectItem itemLabel="YES" itemValue="YES" />
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="field">
+                                <p:outputLabel for="idProof">Id Proof</p:outputLabel>
+                                <p:selectOneMenu autoWidth="false" value="#{visitorController.selectedVisitor.idProof}"
+                                    id="idProof">
+                                    <f:selectItem itemLabel="" itemValue="" />
+                                    <f:selectItem itemLabel="VISITING CARD" itemValue="Visiting Card" />
+                                    <f:selectItem itemLabel="ELECTION CARD" itemValue="Election Card" />
+                                    <f:selectItem itemLabel="DRIVING LICENCE" itemValue="Driving Licence" />
+                                    <f:selectItem itemLabel="AADHAR CARD" itemValue="Aadhar Card" />
+                                    <f:selectItem itemLabel="BANK PASSBOOK" itemValue="Bank Passbook" />
+                                    <f:selectItem itemLabel="RATION CARD" itemValue="Ration Card" />
+                                    <f:selectItem itemLabel="EMPLOYEE CARD" itemValue="Employee Card" />
+                                    <f:selectItem itemLabel="PASSPORT" itemValue="Passport" />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="idProofNo">Id Proof No</p:outputLabel>
+                                <p:inputText value="#{visitorController.selectedVisitor.idProofNo}" id="idProofNo" />
+                            </div>
+
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Save" icon="pi pi-check"
+                            actionListener="#{visitorController.savePreApproval}" update="manage-product-content"
+                            process="manage-product-content @this" />
+                        <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                            class="ui-button-secondary" type="button" />
+                    </f:facet>
+                </p:dialog>
+                <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+                    message="Delete the product?" header="Confirm" severity="warn">
+                    <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{crudView.deletePreApproval}"
+                        process="@this" 
+                        oncomplete="PF('deleteProductDialog').hide()" />
+                    <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                        onclick="PF('deleteProductDialog').hide()" />
+                </p:confirmDialog>
+
+                <p:confirmDialog global="true" showEffect="fade" width="300">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                        icon="pi pi-times" />
+                </p:confirmDialog>
+            </h:form>
+
         </div>
+
     </ui:define>
 
 </ui:composition>

@@ -68,14 +68,13 @@ public class ReportGenerationService {
 			// empLst.add(emp2);
 
 			ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-			/*
-			 * String newFileName = externalContext.getRealPath("") + File.separator +
-			 * "resources" + File.separator + "demo" + File.separator + "images" +
-			 * File.separator + "photocam" + File.separator + fileName + ".jpeg";
-			 */
+
+			String newFileName = externalContext.getRealPath("") + File.separator + "resources" + File.separator
+					+ "demo" + File.separator + "images" + File.separator + "photocam" + File.separator + fileName
+					+ ".jpeg";
 
 			Company companyDetails = company.findAll().get().get(0);
-			String newFileName = companyDetails.getVisitorsPhotoPath() + File.separator + fileName + ".jpeg";
+			//String newFileName = companyDetails.getVisitorsPhotoPath() + File.separator + fileName + ".jpeg";
 
 			// dynamic parameters required for report
 			Map<String, Object> empParams = new HashMap<String, Object>();
