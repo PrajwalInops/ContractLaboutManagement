@@ -78,10 +78,10 @@ public class ReportController implements Serializable {
 		reportTypes = new ArrayList<>();
 
 		SelectItemGroup attendanceReports = new SelectItemGroup("Attendance Reports");
-		attendanceReports
-				.setSelectItems(new SelectItem[] { new SelectItem("Attendance Register", "Attendance Register"),
-						new SelectItem("Continous Absenteesim", "Continous Absenteesim"),
-						new SelectItem("All Punches", "All Punches") });
+		attendanceReports.setSelectItems(new SelectItem[] {
+				new SelectItem("Attendance Register", "Attendance Register"),
+				new SelectItem("Continous Absenteesim", "Continous Absenteesim"),
+				new SelectItem("All Punches", "All Punches"), new SelectItem("Daily Summary", "Daily Summary") });
 
 		SelectItemGroup leaveReports = new SelectItemGroup("Leave Reports");
 		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("United States", "United States"),
@@ -96,6 +96,7 @@ public class ReportController implements Serializable {
 		pickSelectedTypes = new DualListModel<>(pickSource, pickTarget);
 
 		getEmployees = (Optional<List<Employee>>) ctx.getBean("getEmployees");
+		fileDownload(null, "Reports");
 
 	}
 
@@ -168,6 +169,11 @@ public class ReportController implements Serializable {
 
 		case "All Punches":
 			buffer = reportGenerationService.getAllPunches().generate(report.getDateRange().get(0),
+					report.getDateRange().get(1), filteredList);
+			break;
+
+		case "Daily Summary":
+			buffer = reportGenerationService.getDailySummary().generate(report.getDateRange().get(0),
 					report.getDateRange().get(1), filteredList);
 			break;
 

@@ -1,5 +1,6 @@
 package com.inops.visitorpass.service.impl;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,5 +69,10 @@ public class VisitorServiceImpl implements IVisitorService {
 		return visitorRepository.findAll().stream().collect(Collectors.toMap(Visitor::getMobileNo, visitor -> visitor));
         
     }
+
+	@Override
+	public long countByDate(Date date) {
+		return visitorRepository.countByDateGreaterThan(date);
+	}
 
 }

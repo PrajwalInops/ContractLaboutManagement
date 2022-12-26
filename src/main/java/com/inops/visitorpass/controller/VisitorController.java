@@ -1,9 +1,17 @@
 package com.inops.visitorpass.controller;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +23,7 @@ import javax.faces.FacesException;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 
 import org.primefaces.event.CaptureEvent;
@@ -22,12 +31,14 @@ import org.primefaces.event.DragDropEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.inops.visitorpass.entity.Department;
+import com.inops.visitorpass.entity.Company;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Visitor;
+import com.inops.visitorpass.service.ICompany;
 import com.inops.visitorpass.service.IEmployee;
 import com.inops.visitorpass.service.IVisitorService;
 import com.inops.visitorpass.service.impl.ReportGenerationService;
@@ -41,32 +52,38 @@ import lombok.Setter;
 @Scope("session")
 public class VisitorController implements Serializable {
 
-	private IVisitorService visitorService;
-	private IEmployee employeeService;
-	private ReportGenerationService reportGenerationService;	
+	private final IVisitorService visitorService;
+	private final IEmployee employeeService;
+	private final ReportGenerationService reportGenerationService;
+	private final ICompany company;
+
+	@Autowired
+	ApplicationContext ctx;
 
 	public VisitorController(IVisitorService visitorService, IEmployee employeeService,
-			ReportGenerationService reportGenerationService) {
+			ReportGenerationService reportGenerationService, ICompany company) {
 		super();
 		this.visitorService = visitorService;
 		this.employeeService = employeeService;
 		this.reportGenerationService = reportGenerationService;
-		}
+		this.company = company;
+	}
 
-	
 	private List<Visitor> visitors;
 	private List<Visitor> preApprovedVisitors;
 	private List<Visitor> droppedVisitors;
 	private Visitor selectedVisitor;
 	private List<Employee> employees;
 
+	private String photoPath;
+	private StreamedContent visitorPhoto;
 	private String filename;
 	private String mobileNo;
 	private Date date;
 	private String visitorId;
 	private String badgeNo;
 	private String visitorName;
-	private String company;
+	private String visitorCompany;
 	private String address;
 	private String noOfPersons;
 	private String nationality;
@@ -79,14 +96,22 @@ public class VisitorController implements Serializable {
 	private String visitingEmployee;
 	private String remarks;
 	private StreamedContent file;
+	ZoneId defaultZoneId = ZoneId.systemDefault();
 
 	@PostConstruct
-	public void init() {
-		getAllVisitors();
+	public void init() throws UnsupportedEncodingException {
 		getAllPreApprovedVisitors();
 		droppedVisitors = new ArrayList<>();
-		Optional<List<Employee>> employees = employeeService.findAll();
-		setEmployees(employees.get());
+
+		getVisitorIdByDate();
+		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
+		visitors = ((Optional<List<Visitor>>) ctx.getBean("getVisitors")).get();
+		setDate(new Date());
+		Company companyDetails = company.findAll().get().get(0);
+		setPhotoPath(companyDetails.getVisitorsPhotoPath());
+		fileDownload(null, "VisitorPass");
+		
+		visitorPhoto = getGraphicText();
 	}
 
 	private String getRandomImageName() {
@@ -100,14 +125,29 @@ public class VisitorController implements Serializable {
 		byte[] data = captureEvent.getData();
 
 		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-		String newFileName = externalContext.getRealPath("") + File.separator + "resources" + File.separator + "demo"
-				+ File.separator + "images" + File.separator + "photocam" + File.separator + filename + ".jpeg";
+		String newFileName = photoPath + File.separator + filename + ".jpeg";
 
 		FileImageOutputStream imageOutput;
 		try {
 			imageOutput = new FileImageOutputStream(new File(newFileName));
 			imageOutput.write(data, 0, data.length);
 			imageOutput.close();
+			
+			
+			visitorPhoto =	DefaultStreamedContent.builder()
+            .contentType("image/jpeg")
+            .stream(() -> {
+                try {
+					 File chartFile = new File("C:\\Users\\User\\Prajwal\\pass\\20758.jpeg");
+                    return new FileInputStream(chartFile);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            })
+            .build();
+
 		} catch (IOException e) {
 			throw new FacesException("Error in writing captured image.", e);
 		}
@@ -124,11 +164,11 @@ public class VisitorController implements Serializable {
 				visitors.stream().filter(visitors -> visitors.getMobileNo().equals(mobileNo)).findAny().orElse(null));
 		if (visitor.isPresent()) {
 			setMobileNo(visitor.get().getMobileNo());
-			setDate(visitor.get().getDate());
-			setVisitorId(visitor.get().getVisitorId());
+			// setDate(visitor.get().getDate());
+			// setVisitorId(visitor.get().getVisitorId());
 			setBadgeNo(visitor.get().getBadgeNo());
 			setVisitorName(visitor.get().getVisitorName());
-			setCompany(visitor.get().getCompany());
+			setVisitorCompany(visitor.get().getCompany());
 			setAddress(visitor.get().getAddress());
 			setNoOfPersons(visitor.get().getNoOfPersons());
 			setNationality(visitor.get().getNationality());
@@ -145,38 +185,86 @@ public class VisitorController implements Serializable {
 	}
 
 	public void save() {
-		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, company, address, noOfPersons,
-				nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems, visitingDepartment,
-				visitingEmployee, remarks, filename, false);
-		visitorService.save(visitor);
-		visitors.add(visitor);
-		byte[] pass = reportGenerationService.generateReport(visitor, filename);
-		fileDownload(pass);
+		try {
+			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
+					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
+					visitingDepartment, visitingEmployee, remarks, filename, false);
+			if (filename == null) {
+				addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
+						"Please capture the photo for visitor: " + visitorName);
+			} else {
+				visitorService.save(visitor);
+				visitors.add(visitor);
+				byte[] pass = reportGenerationService.generateReport(visitor, filename);
+				fileDownload(pass, mobileNo);
+				addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+						"Visitorpass generated successfully for: " + visitorName);
+
+				cleanUp();
+			}
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
+					"Visitor details already exist, update the details : " + visitorName);
+		}
+
+	}
+
+	public void savePreApproval() {
+		try {
+			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
+					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
+					visitingDepartment, visitingEmployee, remarks, filename, true);
+
+			visitorService.save(visitor);
+			visitors.add(visitor);
+
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+					"Visitor pre-approval pass generated successfully for: " + visitorName);
+			cleanUp();
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
+					"Visitor details already exist, update the details : " + visitorName);
+		}
+	}
+
+	public void updatePreApproval() {
+		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
+				noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
+				visitingDepartment, visitingEmployee, remarks, filename, false);
+		visitorService.update(visitor);
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+				"Visitor pre-approval pass updated successfully for: " + visitorName);
 		cleanUp();
-		addMessage("Visitor saved successfully!");
 	}
 
 	public void update() {
-		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, company, address, noOfPersons,
-				nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems, visitingDepartment,
-				visitingEmployee, remarks, filename, false);
+		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
+				noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
+				visitingDepartment, visitingEmployee, remarks, filename, false);
 		byte[] pass = reportGenerationService.generateReport(visitor, filename);
-		fileDownload(pass);
+		fileDownload(pass, mobileNo);
 		visitorService.update(visitor);
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Visitorpass updated successfully for: " + visitorName);
 		cleanUp();
-		addMessage("Visitor updated successfully!");
+	}
+
+	public void deletePreApproval() {
+		visitorService.delete(mobileNo);
+		getAllVisitors();
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+				"Visitor pre-approval pass deleted successfully for: " + visitorName);
+		cleanUp();
 	}
 
 	public void delete() {
 		visitorService.delete(mobileNo);
 		getAllVisitors();
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Visitorpass deleted successfully for: " + visitorName);
 		cleanUp();
-		addMessage("Visitor deleted successfully!");
 	}
 
-	private void addMessage(String summary) {
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, summary, null);
-		FacesContext.getCurrentInstance().addMessage(null, message);
+	public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
 	}
 
 	private void getAllVisitors() {
@@ -195,8 +283,9 @@ public class VisitorController implements Serializable {
 		setVisitingDepartment(employee.getDepartment().getDepartmentName());
 	}
 
-	public void fileDownload(byte[] buffer) {
-		file = DefaultStreamedContent.builder().name("visitorpass.pdf").contentType("application/pdf")
+	public void fileDownload(byte[] buffer, String mobileno) {
+
+		file = DefaultStreamedContent.builder().name(mobileno + ".pdf").contentType("application/pdf")
 				.stream(() -> new ByteArrayInputStream(buffer))
 				// .stream(() ->
 				// FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("C:\\Users\\User\\Prajwal\\source
@@ -206,11 +295,10 @@ public class VisitorController implements Serializable {
 
 	public void cleanUp() {
 		setMobileNo(null);
-		setDate(null);
-		setVisitorId(null);
+		getVisitorIdByDate();
 		setBadgeNo(null);
 		setVisitorName(null);
-		setCompany(null);
+		setVisitorCompany(null);
 		setAddress(null);
 		setNoOfPersons(null);
 		setNationality(null);
@@ -232,5 +320,39 @@ public class VisitorController implements Serializable {
 		droppedVisitors.add(visitor);
 		preApprovedVisitors.remove(visitor);
 	}
+
+	private void getVisitorIdByDate() {
+
+		Date getdateCount = Date.from(LocalDate.now().minusDays(1).atStartOfDay(defaultZoneId).toInstant());
+		new java.sql.Date(getdateCount.getTime());
+		visitorId = String.valueOf(visitorService.countByDate(new java.sql.Date(getdateCount.getTime())) + 1);
+
+	}
+	
+	 public StreamedContent getGraphicText() {
+	        try {
+	            return DefaultStreamedContent.builder()
+	                    .contentType("image/png")
+	                    .stream(() -> {
+	                        try {
+	                            BufferedImage bufferedImg = new BufferedImage(100, 25, BufferedImage.TYPE_INT_RGB);
+	                            Graphics2D g2 = bufferedImg.createGraphics();
+	                            g2.drawString("I love you", 0, 10);
+	                            ByteArrayOutputStream os = new ByteArrayOutputStream();
+	                            ImageIO.write(bufferedImg, "png", os);
+	                            return new ByteArrayInputStream(os.toByteArray());
+	                        }
+	                        catch (Exception e) {
+	                            e.printStackTrace();
+	                            return null;
+	                        }
+	                    })
+	                    .build();
+	        }
+	        catch (Exception e) {
+	            e.printStackTrace();
+	            return null;
+	        }
+	    }
 
 }

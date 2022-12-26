@@ -1,5 +1,6 @@
 package com.inops.visitorpass.service;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,4 +25,6 @@ public interface IVisitorService {
 	void delete(String mobileNumber);
 	
 	Map<String, Visitor> getCountriesAsMap();
+	
+	long countByDate(Date date);
 }

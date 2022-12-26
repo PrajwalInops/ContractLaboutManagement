@@ -1,65 +1,194 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core"
-                xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
 
     <ui:define name="title">
         PreApproval <span class="subitem">Pass request</span>
     </ui:define>
 
     <ui:define name="description">
-        Schedule provides an Outlook, iCal like JSF component to manage events which is based on FullCalendar. Schedule is highly customizable featuring various views (month, day, week), built-in I18N, drag-drop, resize, customizable event dialog, ajax listeners for every user interaction and more.
+       employees are allowed to raise pre-approval for the visitors by provideing below information.
     </ui:define>
 
-    <ui:param name="documentationLink" value="/components/schedule"/>
-    <ui:param name="widgetLink" value="Schedule-1"/>
+    <ui:param name="documentationLink" value="/components/schedule" />
+    <ui:param name="widgetLink" value="Schedule-1" />
 
     <ui:define name="implementation">
         <div class="card">
             <h:form>
-                <p:growl id="messages" showDetail="true"/>
+                <p:growl id="messages" showDetail="true" />
 
-                <p:schedule id="schedule" value="#{scheduleJava8View.eventModel}" widgetVar="myschedule"
-                            timeZone="#{scheduleJava8View.serverTimeZone}" clientTimeZone="#{scheduleJava8View.serverTimeZone}">
-                    <p:ajax event="dateSelect" listener="#{scheduleJava8View.onDateSelect}" update="eventDetails"
-                            oncomplete="PF('eventDialog').show();"/>
-                    <p:ajax event="eventSelect" listener="#{scheduleJava8View.onEventSelect}" update="eventDetails"
-                            oncomplete="PF('eventDialog').show();"/>
-                    <p:ajax event="eventMove" listener="#{scheduleJava8View.onEventMove}" update="messages"/>
-                    <p:ajax event="eventResize" listener="#{scheduleJava8View.onEventResize}" update="messages"/>
-                </p:schedule>
+                
+                <div class="card" style="width: 100%">
 
-                <p:dialog widgetVar="eventDialog" header="Visitor Details" showEffect="fade" hideEffect="fade">
-                    <h:panelGrid id="eventDetails" columns="2" cellpadding="7">
-                        <p:outputLabel for="title" value="Titles" styleClass="font-bold"/>
-                        <p:inputText id="title" value="#{scheduleJava8View.event.title}" required="true"/>
+                    <div class="grid ui-fluid mt-3 floatlabel-demo">
+                        <div class="col-12 md:col-6">
 
-                        <p:outputLabel for="visitorName" value="Visitor Name" styleClass="font-bold"/>
-                        <p:inputText id="visitorName" value="#{scheduleJava8View.event.title}" required="true"/>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-mobile" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
 
-                        <p:outputLabel for="visitorNumber" value="Phone Number" styleClass="font-bold"/>
-                        <p:inputText id="visitorNumber" value="#{scheduleJava8View.event.title}" required="true"/>
+                                        <p:selectOneMenu value="#{visitorController.mobileNo}" id="mobileNo"
+                                            autoWidth="false" editable="true" maxlength="10" filter="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="Please select" itemValue="" />
+                                            <f:selectItems value="#{visitorController.visitors}" var="player"
+                                                itemLabel="#{player.mobileNo}" itemValue="#{player.mobileNo}" />
+                                            <p:ajax
+                                                update="visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                                listener="#{visitorController.getVisitor}" />
 
-                        <p:outputLabel for="from" value="From" styleClass="font-bold"/>
-                        <p:datePicker id="from" value="#{scheduleJava8View.event.startDate}" pattern="dd/MM/yyyy"
-                                      showTime="true" appendTo="@(body)"/>
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="MobileNumber" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-calendar" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:calendar value="#{visitorController.date}" id="date" />
+                                        <p:outputLabel for="@previous" value="Date" />
+                                    </span>
+                                </div>
+                            </div>
+                        
 
-                        <p:outputLabel for="to" value="To" styleClass="font-bold"/>
-                        <p:datePicker id="to" value="#{scheduleJava8View.event.endDate}" pattern="dd/MM/yyyy"
-                                      showTime="true" appendTo="@(body)"/>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.visitorName}" id="visitorName" />
+                                        <p:outputLabel for="@previous" value="VisitorName" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-building" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.visitorCompany}" id="company" />
+                                        <p:outputLabel for="@previous" value="Company" />
+                                    </span>
+                                </div>
+                            </div>
 
-                        <p:outputLabel for="allDay" value="All Day" styleClass="font-bold"/>
-                        <h:selectBooleanCheckbox id="allDay" value="#{scheduleJava8View.event.allDay}"/>
-                    </h:panelGrid>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-users" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.noOfPersons}" id="noOfPersons" />
+                                        <p:outputLabel for="@previous" value="NoOfPersons" />
+                                    </span>
+                                </div>
+                            </div>                            
+                        </div>
 
-                    <div class="flex justify-content-between mt-3">
-                        <p:commandButton type="reset" value="Reset" styleClass="font-bold ui-button-outlined"/>
-                        <p:commandButton id="addButton" value="Save" action="#{scheduleJava8View.addEvent}" 
-                                    oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
-                    </div>               
-                </p:dialog>
+                        <div class="col-12 md:col-6">
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-eye" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu autoWidth="false" value="#{visitorController.purpose}"
+                                            id="purpose">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItem itemLabel="OFFICIAL" itemValue="OFFICIAL" />
+                                            <f:selectItem itemLabel="PERSONAL" itemValue="PERSONAL" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="Purpose" />
+                                    </span>
+                                </div>
+                            </div>
+                           
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+
+                                        <p:selectOneMenu value="#{visitorController.visitingEmployee}"
+                                            id="visitingEmployee" autoWidth="false" filter="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{visitorController.employees}" var="player"
+                                                itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+                                            <p:ajax update="visitingDepartment"
+                                                listener="#{visitorController.getDepartment}" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="VisitingEmployee" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-users" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.visitingDepartment}"
+                                            id="visitingDepartment" />
+                                        <p:outputLabel for="@previous" value="VisitingDepartment" />
+                                    </span>
+                                </div>
+                            </div>
+                          
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-map-marker" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputTextarea rows="2" cols="30" value="#{visitorController.address}"
+                                            id="address" />
+                                        <p:outputLabel for="@previous" value="Address" />
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:splitButton value="Save" action="#{visitorController.savePreApproval}"
+                                            update="messages,mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                            icon="pi pi-save">
+                                            <p:menuitem value="Update" action="#{visitorController.updatePreApproval}"
+                                                update="messages,mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                                icon="pi pi-refresh">                                                
+                                            </p:menuitem>
+                                            <p:menuitem value="Delete" action="#{visitorController.deletePreApproval}"
+                                                update="messages,mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                                icon="pi pi-times" />
+                                            <p:divider />
+                                            <p:menuitem value="Clear" action="#{visitorController.cleanUp}"
+                                                update="messages,mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                                icon="pi pi-times-circle" />
+                                        </p:splitButton>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
             </h:form>
         </div>
     </ui:define>

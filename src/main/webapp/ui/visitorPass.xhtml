@@ -21,7 +21,7 @@
     <ui:define name="implementation">
         <div class="card" style="width: 100%">
             <h:form>
-                <p:growl id="messages" />
+                <p:growl id="messages" showDetail="true" />
 
                 <h:panelGrid columns="4" cellpadding="5">
                     <p:photoCam widgetVar="pc" listener="#{visitorController.oncapture}" update="photo" />
@@ -31,7 +31,9 @@
                             rendered="#{not empty visitorController.filename}" />
 
                     </p:outputPanel>
-
+                    <p:outputPanel id="photo1">
+                    <p:graphicImage value="C:/Users/User/Prajwal/pass/20758.jpeg"/>
+                </p:outputPanel>
                 </h:panelGrid>
 
 
@@ -46,34 +48,18 @@
                                         <i class="pi pi-mobile" />
                                     </span>
                                     <span class="ui-float-label" style="width: 100%">
-                                       
 
-
-                                        <p:autoComplete value="#{visitorController.mobileNo}" id="mobileNo"
-                                            completeMethod="#{visitorController.completeVisitors}" var="visitor"
-                                            itemLabel="#{visitor.mobileNo}" itemValue="#{visitor.mobileNo}" 
-                                             scrollHeight="250">
-                                            <f:facet name="itemtip">
-                                                <h:panelGrid columns="2" cellpadding="5">
-                                                    <f:facet name="header">
-                                                        <p:graphicImage name="demo/images/photocam/#{visitor.visitorPhoto}.jpeg"  style="width: 30px; height: 20px" 
-                                                        rendered="#{not empty visitor.visitorPhoto}" />
-                                                           
-                                                    </f:facet>
-
-                                                    <h:outputText value="Name" />
-                                                    <h:outputText value="#{visitor.visitorName}" />
-
-                                                    <h:outputText value="Company" />
-                                                    <h:outputText value="#{visitor.company}" />
-                                                   
-                                                </h:panelGrid>
-                                            </f:facet>
+                                        <p:selectOneMenu value="#{visitorController.mobileNo}" id="mobileNo"
+                                            autoWidth="false" editable="true" maxlength="10" filter="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="Please select" itemValue="" />
+                                            <f:selectItems value="#{visitorController.visitors}" var="player"
+                                                itemLabel="#{player.mobileNo}" itemValue="#{player.mobileNo}" />
                                             <p:ajax
-                                            update="photo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks"
-                                            listener="#{visitorController.getVisitor}" />
-                                        </p:autoComplete>
+                                                update="photo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks"
+                                                listener="#{visitorController.getVisitor}" />
 
+                                        </p:selectOneMenu>
                                         <p:outputLabel for="@previous" value="MobileNumber" />
                                     </span>
                                 </div>
@@ -137,7 +123,7 @@
                                         <i class="pi pi-building" />
                                     </span>
                                     <span class="ui-float-label" style="width: 100%">
-                                        <p:inputText value="#{visitorController.company}" id="company" />
+                                        <p:inputText value="#{visitorController.visitorCompany}" id="company" />
                                         <p:outputLabel for="@previous" value="Company" />
                                     </span>
                                 </div>
@@ -309,17 +295,6 @@
                                     </span>
                                 </div>
                             </div>
-                            <div class="field">
-                                <div class="ui-inputgroup">
-                                    <span class="ui-float-label" style="width: 100%">
-                                        <p:media value="#{visitorController.file}" player="pdf" cache="false"
-                                            width="100%" height="800px">
-                                            Your browser can't display pdf, click to download pdf instead.
-                                        </p:media>
-                                    </span>
-                                </div>
-                            </div>
-
 
                         </div>
                         <div class="col-12 md:col-6">
@@ -329,9 +304,12 @@
                                         <p:splitButton value="Save" action="#{visitorController.save}"
                                             update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo"
                                             icon="pi pi-save">
+                                            <p:fileDownload value="#{visitorController.file}" />
                                             <p:menuitem value="Update" action="#{visitorController.update}"
                                                 update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo"
-                                                icon="pi pi-refresh" />
+                                                icon="pi pi-refresh">
+                                                <p:fileDownload value="#{visitorController.file}" />
+                                            </p:menuitem>
                                             <p:menuitem value="Delete" action="#{visitorController.delete}"
                                                 update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo"
                                                 icon="pi pi-times" />
@@ -343,16 +321,7 @@
                                     </span>
                                 </div>
                             </div>
-                            <div class="field">
-                                <div class="ui-inputgroup">
-                                    <span class="ui-float-label" style="width: 100%">
 
-                                        <p:commandButton value="Download" icon="pi pi-arrow-down" id="download">
-                                            <p:fileDownload value="#{visitorController.file}" />
-                                        </p:commandButton>
-                                    </span>
-                                </div>
-                            </div>
                         </div>
                     </div>
 

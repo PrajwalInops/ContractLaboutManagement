@@ -1,5 +1,6 @@
 package com.inops.visitorpass.repository;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +15,6 @@ public interface VisitorRepository extends JpaRepository<Visitor, Long> {
 	Optional<List<Visitor>> findAllByIsApproved(Boolean mobileNo);
 	
 	void deleteByMobileNo(String mobileNo);
+	
+	long countByDateGreaterThan(Date date);
 }
