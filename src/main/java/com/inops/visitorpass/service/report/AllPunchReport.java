@@ -15,7 +15,6 @@ import com.inops.visitorpass.entity.Transaction;
 import com.inops.visitorpass.service.DataExtractionService;
 import com.inops.visitorpass.service.IDailyTransaction;
 
-
 @Service("allPunch")
 public class AllPunchReport implements DataExtractionService {
 
@@ -28,7 +27,7 @@ public class AllPunchReport implements DataExtractionService {
 	}
 
 	@Override
-	public Collection<Punch> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds) {
+	public Collection<Punch> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds, String type) {
 
 		Optional<List<Transaction>> dailyTransaction = dailyTransactionService
 				.findAllByAttendanceDateBetweenAndTransactionIdEmployeeIdIn(from, to,

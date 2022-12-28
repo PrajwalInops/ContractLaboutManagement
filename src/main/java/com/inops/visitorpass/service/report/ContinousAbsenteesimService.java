@@ -30,7 +30,8 @@ public class ContinousAbsenteesimService implements DataExtractionService {
 	}
 
 	@Override
-	public Collection<ContinousAbsenteesim> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds) {
+	public Collection<ContinousAbsenteesim> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds,
+			String type) {
 		// TODO Auto-generated method stub
 
 		Optional<List<Muster>> muster = musterService.findAllByAttendanceDateBetweenAndEmployeeId(from, to,
@@ -44,7 +45,8 @@ public class ContinousAbsenteesimService implements DataExtractionService {
 		List<ContinousAbsenteesim> continousAbsenteesims = new ArrayList<>();
 
 		absentees.entrySet().stream().forEach(att -> {
-			Employee emp = employeeIds.stream().filter(empId -> att.getKey().equals(empId.getEmployeeId())).findAny().orElse(null);
+			Employee emp = employeeIds.stream().filter(empId -> att.getKey().equals(empId.getEmployeeId())).findAny()
+					.orElse(null);
 
 			continousAbsenteesims
 					.add(new ContinousAbsenteesim(emp.getEmployeeName(), emp.getDepartment().getDepartmentName(),

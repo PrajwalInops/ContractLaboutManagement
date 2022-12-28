@@ -26,7 +26,8 @@ public class DailySummaryService implements DataExtractionService {
 	}
 
 	@Override
-	public Collection<DailySummary> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds) {
+	public Collection<DailySummary> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds,
+			String type) {
 
 		Optional<List<Muster>> muster = musterService.findAllByAttendanceDateBetweenAndEmployeeId(from, to,
 				employeeIds.stream().map(Employee::getEmployeeId).collect(Collectors.toList()));

@@ -1,13 +1,8 @@
 package com.inops.visitorpass.controller;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
@@ -23,7 +18,6 @@ import javax.faces.FacesException;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 
 import org.primefaces.event.CaptureEvent;
@@ -35,7 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.inops.visitorpass.entity.Company;
+import com.inops.visitorpass.constant.InopsConstant;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Visitor;
 import com.inops.visitorpass.service.ICompany;
@@ -76,7 +70,6 @@ public class VisitorController implements Serializable {
 	private List<Visitor> selectedVisitors;
 	private List<Employee> employees;
 
-
 	private String photoPath;
 	private StreamedContent visitorPhoto;
 	private String filename;
@@ -104,14 +97,13 @@ public class VisitorController implements Serializable {
 	public void init() throws UnsupportedEncodingException {
 		getAllPreApprovedVisitors();
 		droppedVisitors = new ArrayList<>();
-		
 
 		getVisitorIdByDate();
 		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
 		visitors = ((Optional<List<Visitor>>) ctx.getBean("getVisitors")).get();
 		setDate(new Date());
 		fileDownload(null, "VisitorPass");
-		
+
 	}
 
 	private String getRandomImageName() {
@@ -127,7 +119,9 @@ public class VisitorController implements Serializable {
 		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 		String newFileName = externalContext.getRealPath("") + File.separator + "resources" + File.separator + "demo"
 				+ File.separator + "images" + File.separator + "photocam" + File.separator + filename + ".jpeg";
-
+		if (selectedVisitor != null) {
+			selectedVisitor.setVisitorPhoto(filename);
+		}
 		FileImageOutputStream imageOutput;
 		try {
 			imageOutput = new FileImageOutputStream(new File(newFileName));
@@ -137,6 +131,7 @@ public class VisitorController implements Serializable {
 			throw new FacesException("Error in writing captured image.", e);
 		}
 	}
+
 	public List<Visitor> completeVisitors(String mobileNo) {
 		return visitors.stream().filter(visitor -> visitor.getMobileNo().contains(mobileNo))
 				.collect(Collectors.toList());
@@ -172,7 +167,7 @@ public class VisitorController implements Serializable {
 		try {
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-					visitingDepartment, visitingEmployee, remarks, filename, false);
+					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS);
 			if (filename == null) {
 				addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
 						"Please capture the photo for visitor: " + visitorName);
@@ -183,7 +178,7 @@ public class VisitorController implements Serializable {
 				fileDownload(pass, mobileNo);
 				addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 						"Visitorpass generated successfully for: " + visitorName);
-
+				getAllPreApprovedVisitors();
 				cleanUp();
 			}
 		} catch (Exception e) {
@@ -197,7 +192,7 @@ public class VisitorController implements Serializable {
 		try {
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-					visitingDepartment, visitingEmployee, remarks, filename, true);
+					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS);
 
 			visitorService.save(visitor);
 			visitors.add(visitor);
@@ -214,17 +209,36 @@ public class VisitorController implements Serializable {
 	public void updatePreApproval() {
 		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 				noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-				visitingDepartment, visitingEmployee, remarks, filename, false);
+				visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS);
 		visitorService.update(visitor);
 		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 				"Visitor pre-approval pass updated successfully for: " + visitorName);
+		getAllPreApprovedVisitors();
+		cleanUp();
+	}
+
+	public void updateApproval() {
+		Visitor visitor = new Visitor(0, selectedVisitor.getMobileNo(), selectedVisitor.getDate(),
+				selectedVisitor.getVisitorId(), selectedVisitor.getBadgeNo(), selectedVisitor.getVisitorName(),
+				selectedVisitor.getCompany(), selectedVisitor.getAddress(), selectedVisitor.getNoOfPersons(),
+				selectedVisitor.getNationality(), selectedVisitor.getPurpose(), selectedVisitor.getIdProof(),
+				selectedVisitor.getIdProofNo(), selectedVisitor.getLaptopToBePermitted(),
+				selectedVisitor.getOtherMediaItems(), selectedVisitor.getVisitingDepartment(),
+				selectedVisitor.getVisitingEmployee(), selectedVisitor.getRemarks(), selectedVisitor.getVisitorPhoto(),
+				false, InopsConstant.IN_PASS);
+		byte[] pass = reportGenerationService.generateReport(visitor, selectedVisitor.getVisitorPhoto());
+		fileDownload(pass, selectedVisitor.getMobileNo());
+		visitorService.update(visitor);
+		getAllPreApprovedVisitors();
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+				"Visitor pre-approval pass updated successfully for: " + selectedVisitor.getVisitorName());
 		cleanUp();
 	}
 
 	public void update() {
 		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 				noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-				visitingDepartment, visitingEmployee, remarks, filename, false);
+				visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS);
 		byte[] pass = reportGenerationService.generateReport(visitor, filename);
 		fileDownload(pass, mobileNo);
 		visitorService.update(visitor);
@@ -233,10 +247,20 @@ public class VisitorController implements Serializable {
 	}
 
 	public void deletePreApproval() {
-		visitorService.delete(mobileNo);
+		visitorService.delete(selectedVisitor.getMobileNo());
 		getAllVisitors();
 		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 				"Visitor pre-approval pass deleted successfully for: " + visitorName);
+		cleanUp();
+	}
+
+	public void deleteApproval() {
+		visitorService.delete(selectedVisitor.getMobileNo());
+		getPreApprovedVisitors().remove(selectedVisitor);
+		getAllPreApprovedVisitors();
+		// selectedVisitors.remove(selectedVisitor);
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+				"Visitor pre-approval pass deleted successfully for: " + selectedVisitor.getVisitorName());
 		cleanUp();
 	}
 
@@ -310,6 +334,14 @@ public class VisitorController implements Serializable {
 		Date getdateCount = Date.from(LocalDate.now().minusDays(1).atStartOfDay(defaultZoneId).toInstant());
 		new java.sql.Date(getdateCount.getTime());
 		visitorId = String.valueOf(visitorService.countByDate(new java.sql.Date(getdateCount.getTime())) + 1);
+
+	}
+	
+	public void updateOutPass(long id) {
+		Visitor visitor = visitors.stream().filter(visit->visit.getId()==id).findAny().orElse(null);
+		visitor.setOutOrInPass(InopsConstant.OUT_PASS);
+		visitorService.update(visitor);
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Visitorpass updated successfully for: " + visitor.getVisitorName());
 
 	}
 

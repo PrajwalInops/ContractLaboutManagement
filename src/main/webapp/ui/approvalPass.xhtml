@@ -3,11 +3,12 @@
     xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
     <ui:define name="title">
-        DataTable <span class="subitem">Crud</span>
+        Approved Passes <span class="subitem">Generation</span>
     </ui:define>
 
     <ui:define name="description">
-        This samples demonstrates a CRUD implementation using various PrimeFaces components.
+        This is to generate and edit the pre-approved pass by clicking on the pencil of each row of the table, to delete 
+        click on delete button.
     </ui:define>
 
     <ui:param name="documentationLink" value="/components/datatable" />
@@ -74,6 +75,7 @@
             </h:form>
 
             <h:form id="dialogs">
+                <p:growl id="messages" showDetail="true" />
                 <p:dialog header="Visitor Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"  width="800" height="500"
                     responsive="true">
                     <p:outputPanel id="manage-product-content" class="ui-fluid">
@@ -83,8 +85,8 @@
                                 <p:photoCam widgetVar="pc" listener="#{visitorController.oncapture}" update="photo" />
                                 <p:commandButton type="button" value="Capture" onclick="PF('pc').capture()" />
                                 <p:outputPanel id="photo">
-                                    <p:graphicImage name="demo/images/photocam/#{visitorController.filename}.jpeg"
-                                        rendered="#{not empty visitorController.filename}" />
+                                    <p:graphicImage name="demo/images/photocam/#{visitorController.selectedVisitor.visitorPhoto}.jpeg"
+                                        rendered="#{not empty visitorController.selectedVisitor.visitorPhoto}" />
 
                                 </p:outputPanel>
 
@@ -164,18 +166,21 @@
 
                     <f:facet name="footer">
                         <p:commandButton value="Save" icon="pi pi-check"
-                            actionListener="#{visitorController.savePreApproval}" update="manage-product-content"
-                            process="manage-product-content @this" />
+                            actionListener="#{visitorController.updateApproval}" update="manage-product-content,messages"
+                            process="manage-product-content @this" >
+                            <p:fileDownload value="#{visitorController.file}" />
+                        </p:commandButton>
+
                         <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
                             class="ui-button-secondary" type="button" />
                     </f:facet>
                 </p:dialog>
                 <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
-                    message="Delete the product?" header="Confirm" severity="warn">
-                    <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{crudView.deletePreApproval}"
+                    message="Delete the Visitor?" header="Confirm" severity="warn">
+                    <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{visitorController.deleteApproval}"
                         process="@this" 
                         oncomplete="PF('deleteProductDialog').hide()" />
-                    <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                    <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" update="messages"
                         onclick="PF('deleteProductDialog').hide()" />
                 </p:confirmDialog>
 

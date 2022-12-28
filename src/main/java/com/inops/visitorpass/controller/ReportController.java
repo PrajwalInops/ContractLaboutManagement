@@ -27,6 +27,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.inops.visitorpass.constant.InopsConstant;
 import com.inops.visitorpass.domain.Kvp;
 import com.inops.visitorpass.domain.Report;
 import com.inops.visitorpass.entity.Employee;
@@ -80,6 +81,9 @@ public class ReportController implements Serializable {
 		SelectItemGroup attendanceReports = new SelectItemGroup("Attendance Reports");
 		attendanceReports.setSelectItems(new SelectItem[] {
 				new SelectItem("Attendance Register", "Attendance Register"),
+				new SelectItem("Late In Register", "Late In Register"),
+				new SelectItem("Early Out Register", "Early Out Register"),
+				new SelectItem("Extra Hours Register", "Extra Hours Register"),
 				new SelectItem("Continous Absenteesim", "Continous Absenteesim"),
 				new SelectItem("All Punches", "All Punches"), new SelectItem("Daily Summary", "Daily Summary") });
 
@@ -158,23 +162,26 @@ public class ReportController implements Serializable {
 		}
 		byte[] buffer = null;
 		switch (report.getReportName()) {
-		case "Attendance Register":
-			buffer = reportGenerationService.getAttendanceRegister().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList);
+		case InopsConstant.ATTENDANCE_REGISTER:
+		case InopsConstant.LATEIN_REGISTER:
+		case InopsConstant.EARLYOUT_REGISTER:
+		case InopsConstant.EXTRAHOURS_REGISTER:	
+			buffer = reportGenerationService.getRegistery().generate(report.getDateRange().get(0),
+					report.getDateRange().get(1), filteredList, report.getReportName());
 			break;
 		case "Continous Absenteesim":
 			buffer = reportGenerationService.getContinousAbsenteesim().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList);
+					report.getDateRange().get(1), filteredList, report.getReportName());
 			break;
 
 		case "All Punches":
 			buffer = reportGenerationService.getAllPunches().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList);
+					report.getDateRange().get(1), filteredList, report.getReportName());
 			break;
 
 		case "Daily Summary":
 			buffer = reportGenerationService.getDailySummary().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList);
+					report.getDateRange().get(1), filteredList, report.getReportName());
 			break;
 
 		default:

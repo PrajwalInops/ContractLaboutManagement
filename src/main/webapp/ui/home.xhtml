@@ -1,25 +1,52 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core"
-                xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
 
     <ui:define name="title">
         Welcome <span class="subitem">Unified solution</span>
     </ui:define>
 
     <ui:define name="description">
-        Tool provides an Outlook for endusers who is pertinant to operate the Visitor pass genereation and pre-approval request process.
+        Tool provides an Outlook for endusers who is pertinant to operate the Visitor pass genereation and pre-approval
+        request process.
     </ui:define>
 
-    <ui:param name="documentationLink" value="/components/schedule"/>
-    <ui:param name="widgetLink" value="Schedule-1"/>
+    <ui:param name="documentationLink" value="/components/schedule" />
+    <ui:param name="widgetLink" value="Schedule-1" />
 
     <ui:define name="implementation">
         <div class="card">
-            <h:form>
-                
+            <h:form id="form">
+                <p:growl id="messages" showDetail="true" />
+                <p:dataScroller value="#{visitorController.visitors}" var="product" chunkSize="10" id="visitors"
+                    rendered="#{appMenu.approval}">
+                    <f:facet name="header">
+                        Scroll Down to Load More visitors
+                    </f:facet>
+
+                    <div class="product">
+                        <div class="product-list-item p-5">
+                            <p:graphicImage name="demo/images/photocam/#{product.visitorPhoto}.jpeg" />
+                            <div class="product-list-detail">
+                                <div class="product-name">#{product.visitorName}</div>
+                                <div class="product-description">#{product.company}</div>
+                                <div class="product-address">#{product.date}</div>
+                                <i class="pi pi-tag product-category-icon" /><span
+                                    class="product-category">#{product.mobileNo}</span>
+                            </div>
+                            <div class="product-list-action">
+                                <h:outputText value="#{product.badgeNo}" styleClass="product-price">
+                                    <f:convertNumber currencySymbol="$" type="currency" />
+                                </h:outputText>
+                                <p:commandButton value="Out Pass" icon="pi pi-eject"
+                                    action="#{visitorController.updateOutPass(product.id)}" process="@form"
+                                    disabled="#{product.outOrInPass == 'OUT'}" update="visitors,:form:messages">
+                                </p:commandButton>
+                                <div class="product-description">#{product.address}</div>
+                            </div>
+                        </div>
+                    </div>
+                </p:dataScroller>
             </h:form>
         </div>
     </ui:define>

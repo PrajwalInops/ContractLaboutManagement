@@ -7,5 +7,5 @@ import com.inops.visitorpass.entity.Employee;
 
 public interface IReport {
 
-	public byte[] generate(LocalDate from, LocalDate to , List<Employee> id);
+	public byte[] generate(LocalDate from, LocalDate to , List<Employee> id , String type);
 }

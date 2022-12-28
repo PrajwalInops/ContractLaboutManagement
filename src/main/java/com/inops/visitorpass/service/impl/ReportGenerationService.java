@@ -17,12 +17,14 @@ import java.util.Map;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
+import com.inops.visitorpass.constant.InopsConstant;
 import com.inops.visitorpass.domain.AttendanceRegister;
 import com.inops.visitorpass.domain.ContinousAbsenteesim;
 import com.inops.visitorpass.domain.Punch;
@@ -43,17 +45,17 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 @Service("reportGenerationService")
 public class ReportGenerationService {
 
-	private final DataExtractionService attendanceRegister;
+	private final DataExtractionService registery;
 	private final DataExtractionService continousAbsenteesim;
 	private final DataExtractionService allPunch;
 	private final DataExtractionService dailySummary;
 	private final ICompany company;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 
-	public ReportGenerationService(DataExtractionService attendanceRegister, DataExtractionService continousAbsenteesim,
+	public ReportGenerationService(DataExtractionService registery, DataExtractionService continousAbsenteesim,
 			DataExtractionService allPunch, DataExtractionService dailySummary, ICompany company) {
 		super();
-		this.attendanceRegister = attendanceRegister;
+		this.registery = registery;
 		this.continousAbsenteesim = continousAbsenteesim;
 		this.allPunch = allPunch;
 		this.dailySummary = dailySummary;
@@ -74,7 +76,8 @@ public class ReportGenerationService {
 					+ ".jpeg";
 
 			Company companyDetails = company.findAll().get().get(0);
-			//String newFileName = companyDetails.getVisitorsPhotoPath() + File.separator + fileName + ".jpeg";
+			// String newFileName = companyDetails.getVisitorsPhotoPath() + File.separator +
+			// fileName + ".jpeg";
 
 			// dynamic parameters required for report
 			Map<String, Object> empParams = new HashMap<String, Object>();
@@ -134,14 +137,36 @@ public class ReportGenerationService {
 		return null;
 	}
 
-	public IReport getAttendanceRegister() {
-		return (from, to, id) -> {
+	public IReport getRegistery() {
+		return (from, to, id, type) -> {
 			try {
+				String jrxmlFile = null;
+				String reportParameter = null;
+				switch (type) {
+				case InopsConstant.ATTENDANCE_REGISTER:
+					jrxmlFile = "AttendanceRegister.jrxml";
+					reportParameter = "attendanceRegister";
+					break;
+				case InopsConstant.LATEIN_REGISTER:
+					jrxmlFile = "LateInRegister.jrxml";
+					reportParameter = "lateInRegister";
+					break;
+				case InopsConstant.EARLYOUT_REGISTER:
+					jrxmlFile = "EarlyOutRegister.jrxml";
+					reportParameter = "earlyOutRegister";
+					break;
+				case InopsConstant.EXTRAHOURS_REGISTER:
+					jrxmlFile = "ExtraHoutsRegister.jrxml";
+					reportParameter = "extrahoursRegister";
+					break;
 
-				List<AttendanceRegister> attRegister = (List<AttendanceRegister>) attendanceRegister
-						.dataExtraction(from, to, id);
+				default:
+					break;
+				}
+				List<AttendanceRegister> attRegister = (List<AttendanceRegister>) registery.dataExtraction(from, to, id,
+						type);
 
-				return generateFinalReport(from, to, attRegister, "AttendanceRegister.jrxml", "attendanceRegister");
+				return generateFinalReport(from, to, attRegister, jrxmlFile, reportParameter);
 
 			} catch (Exception e) {
 				System.out.println(e);
@@ -152,11 +177,11 @@ public class ReportGenerationService {
 	}
 
 	public IReport getContinousAbsenteesim() {
-		return (from, to, id) -> {
+		return (from, to, id, type) -> {
 			try {
 
 				List<ContinousAbsenteesim> continuoursAbsentees = (List<ContinousAbsenteesim>) continousAbsenteesim
-						.dataExtraction(from, to, id);
+						.dataExtraction(from, to, id, type);
 
 				return generateFinalReport(from, to, continuoursAbsentees, "ContinousAbsenteesim.jrxml",
 						"continousAbsenteesim");
@@ -169,10 +194,10 @@ public class ReportGenerationService {
 	}
 
 	public IReport getAllPunches() {
-		return (from, to, id) -> {
+		return (from, to, id, type) -> {
 			try {
 
-				List<Punch> allPunches = (List<Punch>) allPunch.dataExtraction(from, to, id);
+				List<Punch> allPunches = (List<Punch>) allPunch.dataExtraction(from, to, id, type);
 
 				return generateFinalReport(from, to, allPunches, "Allpunches.jrxml", "Allpunches");
 
@@ -184,10 +209,10 @@ public class ReportGenerationService {
 	}
 
 	public IReport getDailySummary() {
-		return (from, to, id) -> {
+		return (from, to, id, type) -> {
 			try {
 
-				List<Punch> allPunches = (List<Punch>) dailySummary.dataExtraction(from, to, id);
+				List<Punch> allPunches = (List<Punch>) dailySummary.dataExtraction(from, to, id, type);
 
 				return generateFinalReport(from, to, allPunches, "DailySummary.jrxml", "dailySummary");
 

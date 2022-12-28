@@ -70,12 +70,11 @@ public class AppMenu {
 		//supportMenuItems.add(new MenuItem("Discord Chat", "https://discord.gg/gzKFYnpmCY"));
 		//supportMenuItems.add(new MenuItem("PRO Support", "/support"));
 		if(user.getRole().name().equals("ADMIN")){
-		supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));
-		supportMenuItems.add(new MenuItem("Approvals Pass","/ui/approvalPass"));
+		supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));		
 		supportMenuItems.add(new MenuItem("Reports","/ui/reporting"));
 		approval = true;
 		}else {
-		supportMenuItems.add(new MenuItem("Pre Approvals","Visitorpass/ui/preApproval"));
+		supportMenuItems.add(new MenuItem("Pre Approvals","/ui/preApproval"));
 		}
 		menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
 		// SUPPORT CATEGORY END

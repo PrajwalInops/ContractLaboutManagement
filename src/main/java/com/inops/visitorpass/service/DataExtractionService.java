@@ -8,6 +8,6 @@ import com.inops.visitorpass.entity.Employee;
 
 public interface DataExtractionService {
 	
-	public Collection<?> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds);
+	public Collection<?> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds, String type);
 
 }

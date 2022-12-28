@@ -16,7 +16,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
-@Setter
+//@Setter
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,7 +29,7 @@ public class Visitor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	
+
 	@Column(unique = true)
 	private String mobileNo;
 	private Date date;
@@ -50,4 +50,92 @@ public class Visitor {
 	private String remarks;
 	private String visitorPhoto;
 	private boolean isApproved;
+	private String outOrInPass;
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public void setVisitorId(String visitorId) {
+		this.visitorId = visitorId;
+	}
+
+	public void setBadgeNo(String badgeNo) {
+		this.badgeNo = badgeNo;
+	}
+
+	public void setVisitorName(String visitorName) {
+		this.visitorName = visitorName;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public void setNoOfPersons(String noOfPersons) {
+		this.noOfPersons = noOfPersons;
+	}
+
+	public void setNationality(String nationality) {
+		this.nationality = nationality;
+	}
+
+	public void setPurpose(String purpose) {
+		this.purpose = purpose;
+	}
+
+	public void setIdProof(String idProof) {
+		this.idProof = idProof;
+	}
+
+	public void setIdProofNo(String idProofNo) {
+		this.idProofNo = idProofNo;
+	}
+
+	public void setLaptopToBePermitted(String laptopToBePermitted) {
+		this.laptopToBePermitted = laptopToBePermitted;
+	}
+
+	public void setOtherMediaItems(String otherMediaItems) {
+		this.otherMediaItems = otherMediaItems;
+	}
+
+	public void setVisitingDepartment(String visitingDepartment) {
+		this.visitingDepartment = visitingDepartment;
+	}
+
+	public void setVisitingEmployee(String visitingEmployee) {
+		this.visitingEmployee = visitingEmployee;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+
+	public void setVisitorPhoto(String visitorPhoto) {
+		this.visitorPhoto = visitorPhoto;
+	}
+
+	public void setApproved(boolean isApproved) {
+		this.isApproved = isApproved;
+	}
+
+	public void setOutOrInPass(String outOrInPass) {
+		this.outOrInPass = outOrInPass;
+	}
+	
+	
+
 }
