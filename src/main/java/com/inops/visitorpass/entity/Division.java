@@ -1,13 +1,14 @@
 package com.inops.visitorpass.entity;
 
-import javax.persistence.Column;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -22,25 +23,16 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tblempmast")
-public class Employee {
-
-	private static final long serialVersionUID = 1L;
+@Table(name = "divisions")
+public class Division {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "empid")
-	private String employeeId;
+	private long divisionId;
 	
-	@Column(name = "empname")
-	private String employeeName;
-	
-	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "deptid")
-    private Department department;
-	
-	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "divisionId")
-    private Division division;
+	private String divisionName;
+
+	@OneToMany(mappedBy = "division", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Cards> cards;
 
 }

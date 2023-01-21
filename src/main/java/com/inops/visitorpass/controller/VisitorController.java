@@ -1,3 +1,4 @@
+
 package com.inops.visitorpass.controller;
 
 import java.io.ByteArrayInputStream;
@@ -5,9 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -27,21 +31,38 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import com.inops.visitorpass.constant.InopsConstant;
+import com.inops.visitorpass.domain.CardDetails;
+import com.inops.visitorpass.entity.Cards;
+import com.inops.visitorpass.entity.Division;
 import com.inops.visitorpass.entity.Employee;
+import com.inops.visitorpass.entity.ReaderIpAddress;
+import com.inops.visitorpass.entity.User;
 import com.inops.visitorpass.entity.Visitor;
+import com.inops.visitorpass.service.ICard;
 import com.inops.visitorpass.service.ICompany;
+import com.inops.visitorpass.service.IDivision;
 import com.inops.visitorpass.service.IEmployee;
+import com.inops.visitorpass.service.IReaderIpAddress;
 import com.inops.visitorpass.service.IVisitorService;
 import com.inops.visitorpass.service.impl.ReportGenerationService;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 @Getter
 @Setter
+@Log4j2
 @Component("visitorController")
 @Scope("session")
 public class VisitorController implements Serializable {
@@ -50,17 +71,27 @@ public class VisitorController implements Serializable {
 	private final IEmployee employeeService;
 	private final ReportGenerationService reportGenerationService;
 	private final ICompany company;
+	private final IReaderIpAddress readerIpAddress;
+	private final ICard card;
+	private final IDivision division;
+
+	@Autowired
+	RestTemplate restTemplate;
 
 	@Autowired
 	ApplicationContext ctx;
 
 	public VisitorController(IVisitorService visitorService, IEmployee employeeService,
-			ReportGenerationService reportGenerationService, ICompany company) {
+			ReportGenerationService reportGenerationService, ICompany company, IReaderIpAddress readerIpAddress,
+			ICard card, IDivision division) {
 		super();
 		this.visitorService = visitorService;
 		this.employeeService = employeeService;
 		this.reportGenerationService = reportGenerationService;
 		this.company = company;
+		this.readerIpAddress = readerIpAddress;
+		this.card = card;
+		this.division = division;
 	}
 
 	private List<Visitor> visitors;
@@ -69,6 +100,9 @@ public class VisitorController implements Serializable {
 	private Visitor selectedVisitor;
 	private List<Visitor> selectedVisitors;
 	private List<Employee> employees;
+	private List<ReaderIpAddress> readerIpAddresses;
+	private List<Cards> badgeNumbers;
+	private List<Division> divisions;
 
 	private String photoPath;
 	private StreamedContent visitorPhoto;
@@ -90,19 +124,34 @@ public class VisitorController implements Serializable {
 	private String visitingDepartment;
 	private String visitingEmployee;
 	private String remarks;
+	private long divisionId;
 	private StreamedContent file;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
+	private User user;
+
+	DateFormat fromDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	DateFormat toDateFormat = new SimpleDateFormat("dd/MM/yyyy 18:00");
 
 	@PostConstruct
 	public void init() throws UnsupportedEncodingException {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		user = (User) auth.getPrincipal();
 		getAllPreApprovedVisitors();
 		droppedVisitors = new ArrayList<>();
 
 		getVisitorIdByDate();
 		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
 		visitors = ((Optional<List<Visitor>>) ctx.getBean("getVisitors")).get();
+		divisions = division.findAll().get();
+		readerIpAddresses = readerIpAddress.findAll().get();
 		setDate(new Date());
 		fileDownload(null, "VisitorPass");
+
+		if (user.getRole().getValue().equals("User")) {
+			employees = employees.stream().filter(emp -> emp.getEmployeeId().equals(user.getEmployee().getEmployeeId()))
+					.collect(Collectors.toList());
+		}
+		getCards();
 
 	}
 
@@ -160,6 +209,7 @@ public class VisitorController implements Serializable {
 			setVisitingEmployee(visitor.get().getVisitingEmployee());
 			setRemarks(visitor.get().getRemarks());
 			setFilename(visitor.get().getVisitorPhoto());
+			log.info("Fetching the visitor data {}", visitor);
 		}
 	}
 
@@ -167,7 +217,8 @@ public class VisitorController implements Serializable {
 		try {
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS);
+					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS,
+					user.getEmployee().getDivision().getDivisionId());
 			if (filename == null) {
 				addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
 						"Please capture the photo for visitor: " + visitorName);
@@ -179,11 +230,15 @@ public class VisitorController implements Serializable {
 				addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 						"Visitorpass generated successfully for: " + visitorName);
 				getAllPreApprovedVisitors();
+				writeCardToDevise();
+				getCards();
 				cleanUp();
+				log.info("saving the visitor data {}", visitor);
 			}
 		} catch (Exception e) {
 			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
 					"Visitor details already exist, update the details : " + visitorName);
+			log.error("exception at the time of saving visitor data {}", e);
 		}
 
 	}
@@ -192,7 +247,7 @@ public class VisitorController implements Serializable {
 		try {
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS);
+					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS, divisionId);
 
 			visitorService.save(visitor);
 			visitors.add(visitor);
@@ -203,47 +258,73 @@ public class VisitorController implements Serializable {
 		} catch (Exception e) {
 			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
 					"Visitor details already exist, update the details : " + visitorName);
+			log.error("exception at the time of saving PreApproval visitor data {}", e);
 		}
 	}
 
 	public void updatePreApproval() {
-		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
-				noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-				visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS);
-		visitorService.update(visitor);
-		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
-				"Visitor pre-approval pass updated successfully for: " + visitorName);
-		getAllPreApprovedVisitors();
-		cleanUp();
+		try {
+			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
+					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
+					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS, divisionId);
+			visitorService.update(visitor);
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+					"Visitor pre-approval pass updated successfully for: " + visitorName);
+			getAllPreApprovedVisitors();
+			cleanUp();
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
+					"error while updating pre-approval , update the details : " + visitorName);
+			log.error("exception at the time of update PreApproval visitor data {}", e);
+		}
 	}
 
 	public void updateApproval() {
-		Visitor visitor = new Visitor(0, selectedVisitor.getMobileNo(), selectedVisitor.getDate(),
-				selectedVisitor.getVisitorId(), selectedVisitor.getBadgeNo(), selectedVisitor.getVisitorName(),
-				selectedVisitor.getCompany(), selectedVisitor.getAddress(), selectedVisitor.getNoOfPersons(),
-				selectedVisitor.getNationality(), selectedVisitor.getPurpose(), selectedVisitor.getIdProof(),
-				selectedVisitor.getIdProofNo(), selectedVisitor.getLaptopToBePermitted(),
-				selectedVisitor.getOtherMediaItems(), selectedVisitor.getVisitingDepartment(),
-				selectedVisitor.getVisitingEmployee(), selectedVisitor.getRemarks(), selectedVisitor.getVisitorPhoto(),
-				false, InopsConstant.IN_PASS);
-		byte[] pass = reportGenerationService.generateReport(visitor, selectedVisitor.getVisitorPhoto());
-		fileDownload(pass, selectedVisitor.getMobileNo());
-		visitorService.update(visitor);
-		getAllPreApprovedVisitors();
-		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
-				"Visitor pre-approval pass updated successfully for: " + selectedVisitor.getVisitorName());
-		cleanUp();
+
+		try {
+			Visitor visitor = new Visitor(0, selectedVisitor.getMobileNo(), selectedVisitor.getDate(),
+					selectedVisitor.getVisitorId(), selectedVisitor.getBadgeNo(), selectedVisitor.getVisitorName(),
+					selectedVisitor.getCompany(), selectedVisitor.getAddress(), selectedVisitor.getNoOfPersons(),
+					selectedVisitor.getNationality(), selectedVisitor.getPurpose(), selectedVisitor.getIdProof(),
+					selectedVisitor.getIdProofNo(), selectedVisitor.getLaptopToBePermitted(),
+					selectedVisitor.getOtherMediaItems(), selectedVisitor.getVisitingDepartment(),
+					selectedVisitor.getVisitingEmployee(), selectedVisitor.getRemarks(),
+					selectedVisitor.getVisitorPhoto(), false, InopsConstant.IN_PASS, selectedVisitor.getDivision());
+			byte[] pass = reportGenerationService.generateReport(visitor, selectedVisitor.getVisitorPhoto());
+			fileDownload(pass, selectedVisitor.getMobileNo());
+			visitorService.update(visitor);
+			getAllPreApprovedVisitors();
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+					"Visitor pre-approval pass updated successfully for: " + selectedVisitor.getVisitorName());
+			writeCardToDevise();
+			getCards();
+			cleanUp();
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
+					"exception at the time of update Approval visitor data, update the details : " + visitorName);
+			log.error("exception at the time of update Approval visitor data {}", e);
+		}
 	}
 
 	public void update() {
-		Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
-				noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-				visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS);
-		byte[] pass = reportGenerationService.generateReport(visitor, filename);
-		fileDownload(pass, mobileNo);
-		visitorService.update(visitor);
-		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Visitorpass updated successfully for: " + visitorName);
-		cleanUp();
+		try {
+			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
+					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
+					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS,
+					user.getEmployee().getDivision().getDivisionId());
+			byte[] pass = reportGenerationService.generateReport(visitor, filename);
+			fileDownload(pass, mobileNo);
+			visitorService.update(visitor);
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+					"Visitorpass updated successfully for: " + visitorName);
+			writeCardToDevise();
+			getCards();
+			cleanUp();
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
+					"exception at the time of update  visitor data, update the details : " + visitorName);
+			log.error("exception at the time of update  visitor data {}", e);
+		}
 	}
 
 	public void deletePreApproval() {
@@ -281,13 +362,15 @@ public class VisitorController implements Serializable {
 	}
 
 	private void getAllPreApprovedVisitors() {
-		Optional<List<Visitor>> visitors = visitorService.findAllByIsApproved();
+		Optional<List<Visitor>> visitors = visitorService.findAllByIsApprovedAndDivision(true,
+				user.getEmployee().getDivision().getDivisionId());
 		setPreApprovedVisitors(visitors.get());
 	}
 
 	public void getDepartment() {
 		Employee employee = employees.stream().filter(employees -> employees.getEmployeeId().equals(visitingEmployee))
 				.findAny().orElse(null);
+		setVisitingEmployee(employee.getEmployeeName());
 		setVisitingDepartment(employee.getDepartment().getDepartmentName());
 	}
 
@@ -336,13 +419,42 @@ public class VisitorController implements Serializable {
 		visitorId = String.valueOf(visitorService.countByDate(new java.sql.Date(getdateCount.getTime())) + 1);
 
 	}
-	
+
 	public void updateOutPass(long id) {
-		Visitor visitor = visitors.stream().filter(visit->visit.getId()==id).findAny().orElse(null);
+		Visitor visitor = visitors.stream().filter(visit -> visit.getId() == id).findAny().orElse(null);
 		visitor.setOutOrInPass(InopsConstant.OUT_PASS);
 		visitorService.update(visitor);
-		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Visitorpass updated successfully for: " + visitor.getVisitorName());
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+				"Visitorpass updated successfully for: " + visitor.getVisitorName());
 
+	}
+
+	private void getCards() {
+		List<Cards> cardsList = card.findAllByDivisionId(user.getEmployee().getDivision()).get();
+		Date getdateCount = Date.from(LocalDate.now().minusDays(1).atStartOfDay(defaultZoneId).toInstant());
+		List<String> badgeNo = visitors.stream().filter(vis -> vis.getDate().after(getdateCount))
+				.map(vis -> vis.getBadgeNo()).collect(Collectors.toList());
+
+		badgeNumbers = cardsList.stream().filter(card -> !badgeNo.contains(card.getCardNo()))
+				.collect(Collectors.toList());
+
+	}
+
+	private String writeCardToDevise() {
+		try {
+			CardDetails cardDetails = new CardDetails(badgeNo, visitorName, fromDateFormat.format(new Date()),
+					toDateFormat.format(new Date()));
+			HttpHeaders headers = new HttpHeaders();
+			headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			HttpEntity<CardDetails> entity = new HttpEntity<CardDetails>(cardDetails, headers);
+
+			return restTemplate.exchange("http://" + user.getSystemIpAddress() + ":8080/writecarddata", HttpMethod.POST,
+					entity, String.class).getBody();
+
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 
 }

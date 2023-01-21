@@ -7,7 +7,7 @@
     </ui:define>
 
     <ui:define name="description">
-       employees are allowed to raise pre-approval for the visitors by provideing below information.
+        employees are allowed to raise pre-approval for the visitors by provideing below information.
     </ui:define>
 
     <ui:param name="documentationLink" value="/components/schedule" />
@@ -18,7 +18,7 @@
             <h:form>
                 <p:growl id="messages" showDetail="true" />
 
-                
+
                 <div class="card" style="width: 100%">
 
                     <div class="grid ui-fluid mt-3 floatlabel-demo">
@@ -38,7 +38,7 @@
                                             <f:selectItems value="#{visitorController.visitors}" var="player"
                                                 itemLabel="#{player.mobileNo}" itemValue="#{player.mobileNo}" />
                                             <p:ajax
-                                                update="visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                                update="visitorName,company,address,Division,noOfPersons,purpose,visitingEmployee,visitingDepartment"
                                                 listener="#{visitorController.getVisitor}" />
 
                                         </p:selectOneMenu>
@@ -57,7 +57,7 @@
                                     </span>
                                 </div>
                             </div>
-                        
+
 
                             <div class="field">
                                 <div class="ui-inputgroup">
@@ -92,7 +92,7 @@
                                         <p:outputLabel for="@previous" value="NoOfPersons" />
                                     </span>
                                 </div>
-                            </div>                            
+                            </div>
                         </div>
 
                         <div class="col-12 md:col-6">
@@ -113,7 +113,7 @@
                                     </span>
                                 </div>
                             </div>
-                           
+
                             <div class="field">
                                 <div class="ui-inputgroup">
                                     <span class="ui-inputgroup-addon">
@@ -153,31 +153,48 @@
                                         <i class="pi pi-map-marker" />
                                     </span>
                                     <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu value="#{visitorController.divisionId}"
+                                            id="Division" autoWidth="false" filter="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{visitorController.divisions}" var="player"
+                                                itemLabel="#{player.divisionName}" itemValue="#{player.divisionId}" />                                           
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="Division" />
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-map-marker" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
                                         <p:inputTextarea rows="2" cols="30" value="#{visitorController.address}"
                                             id="address" />
                                         <p:outputLabel for="@previous" value="Address" />
                                     </span>
                                 </div>
                             </div>
-
                         </div>
                         <div class="col-12 md:col-6">
                             <div class="field">
                                 <div class="ui-inputgroup">
                                     <span class="ui-float-label" style="width: 100%">
                                         <p:splitButton value="Save" action="#{visitorController.savePreApproval}"
-                                            update="messages,mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                            update="messages,mobileNo,date,visitorName,company,address,Division,noOfPersons,purpose,visitingEmployee,visitingDepartment"
                                             icon="pi pi-save">
                                             <p:menuitem value="Update" action="#{visitorController.updatePreApproval}"
-                                                update="messages,mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
-                                                icon="pi pi-refresh">                                                
+                                                update="messages,mobileNo,date,visitorName,company,address,Division,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                                icon="pi pi-refresh">
                                             </p:menuitem>
                                             <p:menuitem value="Delete" action="#{visitorController.deletePreApproval}"
-                                                update="messages,mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                                update="messages,mobileNo,date,visitorName,company,address,Division,noOfPersons,purpose,visitingEmployee,visitingDepartment"
                                                 icon="pi pi-times" />
                                             <p:divider />
                                             <p:menuitem value="Clear" action="#{visitorController.cleanUp}"
-                                                update="messages,mobileNo,date,visitorName,company,address,noOfPersons,purpose,visitingEmployee,visitingDepartment"
+                                                update="messages,mobileNo,date,visitorName,company,address,Division,noOfPersons,purpose,visitingEmployee,visitingDepartment"
                                                 icon="pi pi-times-circle" />
                                         </p:splitButton>
                                     </span>

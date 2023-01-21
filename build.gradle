@@ -33,6 +33,7 @@ war {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
@@ -52,6 +53,8 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-taglibs:5.8.0'
 	// https://mvnrepository.com/artifact/org.springframework.webflow/spring-faces
 	implementation 'org.springframework.webflow:spring-faces:2.5.1.RELEASE'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 	
 	
 	// https://mvnrepository.com/artifact/com.github.librepdf/openpdf
@@ -88,6 +91,13 @@ implementation 'com.rometools:rome:1.5.0'
 		
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
+}
+
+configurations {
+    
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 tasks.named('test') {

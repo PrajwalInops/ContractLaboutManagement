@@ -1,6 +1,5 @@
 package com.inops.visitorpass.entity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -22,25 +21,17 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tblempmast")
-public class Employee {
-
-	private static final long serialVersionUID = 1L;
+@Table(name = "tblcards")
+public class Cards {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "empid")
-	private String employeeId;
-	
-	@Column(name = "empname")
-	private String employeeName;
-	
-	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "deptid")
-    private Department department;
-	
-	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "divisionId")
-    private Division division;
+	private Long id;
+
+	private String cardNo;
+
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "divisionId", nullable = false)
+	private Division division;
 
 }

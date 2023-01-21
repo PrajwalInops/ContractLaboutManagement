@@ -12,11 +12,12 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Getter
 //@Setter
+@ToString
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,6 +52,7 @@ public class Visitor {
 	private String visitorPhoto;
 	private boolean isApproved;
 	private String outOrInPass;
+	private long division;
 
 	public void setId(long id) {
 		this.id = id;
@@ -135,7 +137,9 @@ public class Visitor {
 	public void setOutOrInPass(String outOrInPass) {
 		this.outOrInPass = outOrInPass;
 	}
-	
-	
+
+	public void setDivision(long division) {
+		this.division = division;
+	}
 
 }

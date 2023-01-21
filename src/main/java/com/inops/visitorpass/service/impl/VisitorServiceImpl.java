@@ -1,6 +1,8 @@
 package com.inops.visitorpass.service.impl;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +18,7 @@ import com.inops.visitorpass.service.IVisitorService;
 public class VisitorServiceImpl implements IVisitorService {
 
 	private VisitorRepository visitorRepository;
+	ZoneId defaultZoneId = ZoneId.systemDefault();
 
 	public VisitorServiceImpl(VisitorRepository visitorRepository) {
 		super();
@@ -46,33 +49,44 @@ public class VisitorServiceImpl implements IVisitorService {
 
 	@Override
 	public void update(Visitor visitor) {
-		
+
 		visitor.setId(visitorRepository.findByMobileNo(visitor.getMobileNo()).get().getId());
-		
+
 		visitorRepository.save(visitor);
 	}
 
 	@Override
 	public void delete(String mobileNumber) {
 		long id = visitorRepository.findByMobileNo(mobileNumber).get().getId();
-		visitorRepository.deleteById(id);		
+		visitorRepository.deleteById(id);
 	}
 
 	@Override
 	public Optional<List<Visitor>> findAllByIsApproved() {
-		
+
 		return visitorRepository.findAllByIsApproved(true);
 	}
-	
+
 	public Map<String, Visitor> getCountriesAsMap() {
-        
+
 		return visitorRepository.findAll().stream().collect(Collectors.toMap(Visitor::getMobileNo, visitor -> visitor));
-        
-    }
+
+	}
 
 	@Override
 	public long countByDate(Date date) {
 		return visitorRepository.countByDateGreaterThan(date);
+	}
+
+	@Override
+	public Optional<List<Visitor>> findAllByDateBetween(LocalDate start, LocalDate end) {
+		return visitorRepository.findAllByDateBetween(Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
+				Date.from(end.atStartOfDay(defaultZoneId).toInstant()));
+	}
+
+	@Override
+	public Optional<List<Visitor>> findAllByIsApprovedAndDivision(Boolean isApproved, long divisionId) {
+		return visitorRepository.findAllByIsApprovedAndDivision(isApproved, divisionId);
 	}
 
 }

@@ -18,6 +18,9 @@ import com.inops.visitorpass.entity.Muster;
 import com.inops.visitorpass.service.DataExtractionService;
 import com.inops.visitorpass.service.IMuster;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Service("continousAbsenteesim")
 public class ContinousAbsenteesimService implements DataExtractionService {
 
@@ -54,7 +57,7 @@ public class ContinousAbsenteesimService implements DataExtractionService {
 							Date.from(to.atStartOfDay(defaultZoneId).toInstant()), att.getValue().get("AA")));
 
 		});
-
+		log.info("Data is extracted successfully from Muster");
 		return continousAbsenteesims;
 	}
 

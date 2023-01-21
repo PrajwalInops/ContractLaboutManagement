@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">
+        User <span class="subitem">Management</span>
+    </ui:define>
+
+    <ui:define name="description">
+        User can change the password and Admin can manage the users.
+    </ui:define>
+
+    <ui:param name="documentationLink" value="/components/schedule" />
+    <ui:param name="widgetLink" value="Schedule-1" />
+
+    <ui:define name="implementation">
+        <div class="card">
+            <h:form id="form">
+                <p:growl id="messages" showDetail="true" />
+
+                <h5 class="mt-0">Change Password</h5>
+                <div class="field grid">
+                    <p:outputLabel for="mailId" styleClass="col-fixed" style="width:100px" value="Mail-Id" />
+                    <div class="col">
+                        <p:inputText id="mailId" value="#{userController.emailId}" />
+
+                    </div>
+                </div>
+
+                <div class="field grid">
+                    <p:outputLabel for="oldPassword" styleClass="col-fixed" style="width:100px" value="Old Password" />
+                    <div class="col">
+                        <p:password id="oldPassword" value="#{userController.oldPassword}" redisplay="true"
+                            label="Old Password" required="true" />
+                    </div>
+                </div>
+
+                <div class="field grid">
+                    <p:outputLabel for="newPassword" styleClass="col-fixed" style="width:100px" value="New Password" />
+                    <div class="col">
+                        <p:password id="newPassword" value="#{userController.newPassword}" match="confirmNewPassword"
+                            toggleMask="true" redisplay="true" label="new Password" required="true" />
+                    </div>
+                </div>
+
+                <div class="field grid">
+                    <p:outputLabel for="confirmNewPassword" styleClass="col-fixed" style="width:100px"
+                        value="Confirm New Password" />
+                    <div class="col">
+                        <p:password id="confirmNewPassword" value="#{userController.newPassword}"
+                            label="Confirm New Password " redisplay="true" required="true" />
+                    </div>
+                </div>
+
+                <p:commandButton update="@form,messages,mailId,oldPassword,newPassword,confirmNewPassword"
+                    value="Reset Password" action="#{userController.resetPassword}" styleClass="mr-2" />
+
+
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>

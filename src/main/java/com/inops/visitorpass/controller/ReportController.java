@@ -91,8 +91,12 @@ public class ReportController implements Serializable {
 		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("United States", "United States"),
 				new SelectItem("Brazil", "Brazil"), new SelectItem("Mexico", "Mexico") });
 
-		reportTypes.add(attendanceReports);
-		reportTypes.add(leaveReports);
+		SelectItemGroup visitorReports = new SelectItemGroup("Visitors Reports");
+		visitorReports.setSelectItems(new SelectItem[] { new SelectItem("Visitors Register", "Visitors Register"), });
+
+		//reportTypes.add(attendanceReports);
+		//reportTypes.add(leaveReports);
+		reportTypes.add(visitorReports);
 
 		List<Kvp> pickSource = new ArrayList<>();
 		List<Kvp> pickTarget = new ArrayList<>();
@@ -144,28 +148,30 @@ public class ReportController implements Serializable {
 
 	public void generate() throws IOException {
 		List<Employee> filteredList = null;
-		if (report.getSelectionType().equals("Departments")) {
+		if (report.getSelectionType() != null) {
+			if (report.getSelectionType().equals("Departments")) {
 
-			filteredList = getEmployees.get().stream()
-					.filter(empl -> pickSelectedTypes.getTarget().stream().anyMatch(dept ->
+				filteredList = getEmployees.get().stream()
+						.filter(empl -> pickSelectedTypes.getTarget().stream().anyMatch(dept ->
 
-					empl.getDepartment().getId().equals(dept.getKey()))).collect(Collectors.toList());
-		} else if (report.getSelectionType().equals("Employees")) {
+						empl.getDepartment().getId().equals(dept.getKey()))).collect(Collectors.toList());
+			} else if (report.getSelectionType().equals("Employees")) {
 
-			filteredList = getEmployees.get().stream()
-					.filter(empl -> pickSelectedTypes.getTarget().stream().anyMatch(employee ->
+				filteredList = getEmployees.get().stream()
+						.filter(empl -> pickSelectedTypes.getTarget().stream().anyMatch(employee ->
 
-					employee.getKey().equals(empl.getEmployeeId()))).collect(Collectors.toList());
+						employee.getKey().equals(empl.getEmployeeId()))).collect(Collectors.toList());
 
-		} else if (report.getSelectionType().equals("Caders")) {
+			} else if (report.getSelectionType().equals("Caders")) {
 
+			}
 		}
 		byte[] buffer = null;
 		switch (report.getReportName()) {
 		case InopsConstant.ATTENDANCE_REGISTER:
 		case InopsConstant.LATEIN_REGISTER:
 		case InopsConstant.EARLYOUT_REGISTER:
-		case InopsConstant.EXTRAHOURS_REGISTER:	
+		case InopsConstant.EXTRAHOURS_REGISTER:
 			buffer = reportGenerationService.getRegistery().generate(report.getDateRange().get(0),
 					report.getDateRange().get(1), filteredList, report.getReportName());
 			break;
@@ -181,6 +187,11 @@ public class ReportController implements Serializable {
 
 		case "Daily Summary":
 			buffer = reportGenerationService.getDailySummary().generate(report.getDateRange().get(0),
+					report.getDateRange().get(1), filteredList, report.getReportName());
+			break;
+
+		case "Visitors Register":
+			buffer = reportGenerationService.getDailyVisitors().generate(report.getDateRange().get(0),
 					report.getDateRange().get(1), filteredList, report.getReportName());
 			break;
 

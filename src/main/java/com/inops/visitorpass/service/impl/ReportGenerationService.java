@@ -17,7 +17,6 @@ import java.util.Map;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
 
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import com.inops.visitorpass.constant.InopsConstant;
+import com.inops.visitorpass.controller.VisitorController;
 import com.inops.visitorpass.domain.AttendanceRegister;
 import com.inops.visitorpass.domain.ContinousAbsenteesim;
 import com.inops.visitorpass.domain.Punch;
@@ -34,6 +34,7 @@ import com.inops.visitorpass.service.DataExtractionService;
 import com.inops.visitorpass.service.ICompany;
 import com.inops.visitorpass.service.IReport;
 
+import lombok.extern.log4j.Log4j2;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -42,6 +43,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+@Log4j2
 @Service("reportGenerationService")
 public class ReportGenerationService {
 
@@ -49,16 +51,19 @@ public class ReportGenerationService {
 	private final DataExtractionService continousAbsenteesim;
 	private final DataExtractionService allPunch;
 	private final DataExtractionService dailySummary;
+	private final DataExtractionService dailyVisitors;
 	private final ICompany company;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
-
+	
 	public ReportGenerationService(DataExtractionService registery, DataExtractionService continousAbsenteesim,
-			DataExtractionService allPunch, DataExtractionService dailySummary, ICompany company) {
+			DataExtractionService allPunch, DataExtractionService dailySummary, DataExtractionService dailyVisitors,
+			ICompany company) {
 		super();
 		this.registery = registery;
 		this.continousAbsenteesim = continousAbsenteesim;
 		this.allPunch = allPunch;
 		this.dailySummary = dailySummary;
+		this.dailyVisitors = dailyVisitors;
 		this.company = company;
 	}
 
@@ -86,7 +91,9 @@ public class ReportGenerationService {
 			empParams.put("VisitorImage", newFileName);
 			empParams.put("VisitorId", visitor.getVisitorId());
 			empParams.put("BadgeNo", visitor.getBadgeNo());
+			empParams.put("location", visitor.getDivision());
 			empParams.put("visitorData", new JRBeanCollectionDataSource(visitors));
+			empParams.put("otherDetails", new JRBeanCollectionDataSource(visitors));
 
 			JasperPrint visitorReport = JasperFillManager.fillReport(JasperCompileManager
 					// .compileReport(ResourceUtils.getFile("classpath:VisitorPass2.jrxml").getAbsolutePath())
@@ -109,7 +116,7 @@ public class ReportGenerationService {
 
 		} catch (Exception e) {
 			// return new ResponseEntity<byte[]>(HttpStatus.INTERNAL_SERVER_ERROR);
-			System.out.println(e);
+			log.error("GenerateReport for visitor data exception {}", e);
 		}
 		return null;
 
@@ -169,7 +176,7 @@ public class ReportGenerationService {
 				return generateFinalReport(from, to, attRegister, jrxmlFile, reportParameter);
 
 			} catch (Exception e) {
-				System.out.println(e);
+				log.error("GetRegistery for {} data exception {}", type, e);
 			}
 			return null;
 		};
@@ -187,7 +194,7 @@ public class ReportGenerationService {
 						"continousAbsenteesim");
 
 			} catch (Exception e) {
-				System.out.println(e);
+				log.error("GetContinousAbsenteesim for {} data exception {}",type, e);
 			}
 			return null;
 		};
@@ -202,7 +209,7 @@ public class ReportGenerationService {
 				return generateFinalReport(from, to, allPunches, "Allpunches.jrxml", "Allpunches");
 
 			} catch (Exception e) {
-				System.out.println(e);
+				log.error("GetAllPunches for {} data exception {}",type, e);
 			}
 			return null;
 		};
@@ -217,7 +224,22 @@ public class ReportGenerationService {
 				return generateFinalReport(from, to, allPunches, "DailySummary.jrxml", "dailySummary");
 
 			} catch (Exception e) {
-				System.out.println(e);
+				log.error("GetDailySummary for {} data exception {}",type, e);
+			}
+			return null;
+		};
+	}
+	
+	public IReport getDailyVisitors() {
+		return (from, to, id, type) -> {
+			try {
+
+				List<Visitor> visitorsData = (List<Visitor>) dailyVisitors.dataExtraction(from, to, id, type);
+
+				return generateFinalReport(from, to, visitorsData, "DailyVisitors.jrxml", "dailyVisitor");
+
+			} catch (Exception e) {
+				log.error("GetDailyVisitors for {} data exception {}",type, e);
 			}
 			return null;
 		};

@@ -107,8 +107,8 @@
                                 <p:selectOneMenu value="#{visitorController.selectedVisitor.badgeNo}" id="badgeNo"
                                     autoWidth="false" editable="true" filter="true" filterMatchMode="startsWith">
                                     <f:selectItem itemLabel="Please select" itemValue="" />
-                                    <f:selectItems value="#{visitorController.badgeNo}" var="player"
-                                        itemLabel="#{player.badgeNo}" itemValue="#{player}" />
+                                    <f:selectItems value="#{visitorController.badgeNumbers}" var="player"
+                                        itemLabel="#{player.cardNo}" itemValue="#{player.cardNo}" />
                                 </p:selectOneMenu>
                             </div>
                             <div class="field">

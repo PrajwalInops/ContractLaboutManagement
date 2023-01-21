@@ -14,7 +14,11 @@ import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Transaction;
 import com.inops.visitorpass.service.DataExtractionService;
 import com.inops.visitorpass.service.IDailyTransaction;
+import com.inops.visitorpass.service.impl.ReportGenerationService;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Service("allPunch")
 public class AllPunchReport implements DataExtractionService {
 
@@ -25,13 +29,15 @@ public class AllPunchReport implements DataExtractionService {
 		super();
 		this.dailyTransactionService = dailyTransactionService;
 	}
-
+    
+	
 	@Override
 	public Collection<Punch> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds, String type) {
 
 		Optional<List<Transaction>> dailyTransaction = dailyTransactionService
 				.findAllByAttendanceDateBetweenAndTransactionIdEmployeeIdIn(from, to,
 						employeeIds.stream().map(Employee::getEmployeeId).collect(Collectors.toList()));
+		log.info("Data of AllPunches extracted successfully from DailyTransactions ");
 
 		return dailyTransaction.get().stream().map(trans -> {
 			Employee employee = employeeIds.stream()
@@ -41,6 +47,7 @@ public class AllPunchReport implements DataExtractionService {
 					employee.getEmployeeId(), trans.getAttendanceDate(), trans.getTransactionId().getTransactionTime(),
 					trans.getActualIOFlag());
 		}).collect(Collectors.toList());
+			
 
 	}
 

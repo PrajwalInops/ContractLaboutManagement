@@ -1,6 +1,7 @@
 package com.inops.visitorpass.service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +16,10 @@ public interface IVisitorService {
 	Optional<Visitor> findByMobileNo(String mobileNo);
 	
 	Optional<List<Visitor>> findAllByIsApproved();
+	
+	Optional<List<Visitor>> findAllByIsApprovedAndDivision(Boolean isApproved, long divisionId);
+	
+	Optional<List<Visitor>> findAllByDateBetween(LocalDate start, LocalDate end);
 	
 	Optional<List<Visitor>> findAll();
 	

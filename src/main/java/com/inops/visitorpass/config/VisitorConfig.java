@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.web.client.RestTemplate;
 
 import com.inops.visitorpass.entity.Department;
 import com.inops.visitorpass.entity.Employee;
@@ -43,5 +44,10 @@ public class VisitorConfig {
 	@DependsOn(value = "visitorService")
 	public Optional<List<Visitor>> getVisitors() {
 		return visitorService.findAll();
+	}
+
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
 }

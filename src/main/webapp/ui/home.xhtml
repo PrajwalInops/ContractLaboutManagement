@@ -18,6 +18,7 @@
         <div class="card">
             <h:form id="form">
                 <p:growl id="messages" showDetail="true" />
+                
                 <p:dataScroller value="#{visitorController.visitors}" var="product" chunkSize="10" id="visitors"
                     rendered="#{appMenu.approval}">
                     <f:facet name="header">

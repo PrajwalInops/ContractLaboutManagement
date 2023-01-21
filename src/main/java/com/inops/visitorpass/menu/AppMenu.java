@@ -69,6 +69,7 @@ public class AppMenu {
 		//supportMenuItems.add(new MenuItem("Forum", "https://forum.primefaces.org"));
 		//supportMenuItems.add(new MenuItem("Discord Chat", "https://discord.gg/gzKFYnpmCY"));
 		//supportMenuItems.add(new MenuItem("PRO Support", "/support"));
+		
 		if(user.getRole().name().equals("ADMIN")){
 		supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));		
 		supportMenuItems.add(new MenuItem("Reports","/ui/reporting"));
@@ -76,7 +77,9 @@ public class AppMenu {
 		}else {
 		supportMenuItems.add(new MenuItem("Pre Approvals","/ui/preApproval"));
 		}
+		supportMenuItems.add(new MenuItem("User Management","/ui/usersManagement"));
 		menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
+		
 		// SUPPORT CATEGORY END
 
 		/*
