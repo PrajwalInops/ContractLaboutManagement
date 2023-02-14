@@ -6,8 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-@Component
-@Scope("view")
+//@Component
+//@Scope("view")
 public class HelloWorld {
 
   private String firstName = "";

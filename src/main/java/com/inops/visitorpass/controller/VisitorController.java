@@ -225,7 +225,9 @@ public class VisitorController implements Serializable {
 			} else {
 				visitorService.save(visitor);
 				visitors.add(visitor);
-				byte[] pass = reportGenerationService.generateReport(visitor, filename);
+
+				byte[] pass = reportGenerationService.generateVisitorReport(visitor, filename,
+						setEmployeeAndDivision(visitor));
 				fileDownload(pass, mobileNo);
 				addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 						"Visitorpass generated successfully for: " + visitorName);
@@ -290,7 +292,8 @@ public class VisitorController implements Serializable {
 					selectedVisitor.getOtherMediaItems(), selectedVisitor.getVisitingDepartment(),
 					selectedVisitor.getVisitingEmployee(), selectedVisitor.getRemarks(),
 					selectedVisitor.getVisitorPhoto(), false, InopsConstant.IN_PASS, selectedVisitor.getDivision());
-			byte[] pass = reportGenerationService.generateReport(visitor, selectedVisitor.getVisitorPhoto());
+			byte[] pass = reportGenerationService.generateVisitorReport(visitor, selectedVisitor.getVisitorPhoto(),
+					setEmployeeAndDivision(visitor));
 			fileDownload(pass, selectedVisitor.getMobileNo());
 			visitorService.update(visitor);
 			getAllPreApprovedVisitors();
@@ -312,12 +315,12 @@ public class VisitorController implements Serializable {
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
 					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS,
 					user.getEmployee().getDivision().getDivisionId());
-			byte[] pass = reportGenerationService.generateReport(visitor, filename);
+			byte[] pass = reportGenerationService.generateVisitorReport(visitor, filename, setEmployeeAndDivision(visitor));
 			fileDownload(pass, mobileNo);
 			visitorService.update(visitor);
 			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 					"Visitorpass updated successfully for: " + visitorName);
-			writeCardToDevise();
+			//writeCardToDevise();
 			getCards();
 			cleanUp();
 		} catch (Exception e) {
@@ -455,6 +458,14 @@ public class VisitorController implements Serializable {
 		} catch (Exception e) {
 			throw e;
 		}
+	}
+
+	private String setEmployeeAndDivision(Visitor visitor) {
+		Employee employee = employees.stream().filter(emp -> emp.getEmployeeId().equals(visitor.getVisitingEmployee()))
+				.findAny().orElse(null);
+		visitor.setVisitingEmployee(employee.getEmployeeName());
+		visitor.setVisitingDepartment(employee.getDepartment().getDepartmentName());
+		return user.getEmployee().getDivision().getDivisionName();
 	}
 
 }

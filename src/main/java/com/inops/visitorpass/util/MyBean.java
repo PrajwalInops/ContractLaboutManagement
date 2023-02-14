@@ -5,8 +5,8 @@ import java.util.Date;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Component
-@Scope("view")
+//@Component
+//@Scope("view")
 public class MyBean {
 
 	public MyBean() {

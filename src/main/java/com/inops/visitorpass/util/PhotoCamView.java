@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.service.IEmployee;
 
-@Component
-@Scope("view")
+//@Component
+///@Scope("view")
 public class PhotoCamView implements Serializable {
 
     private String filename;

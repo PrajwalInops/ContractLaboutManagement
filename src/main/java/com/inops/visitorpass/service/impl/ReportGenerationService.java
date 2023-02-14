@@ -54,7 +54,7 @@ public class ReportGenerationService {
 	private final DataExtractionService dailyVisitors;
 	private final ICompany company;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
-	
+
 	public ReportGenerationService(DataExtractionService registery, DataExtractionService continousAbsenteesim,
 			DataExtractionService allPunch, DataExtractionService dailySummary, DataExtractionService dailyVisitors,
 			ICompany company) {
@@ -67,7 +67,71 @@ public class ReportGenerationService {
 		this.company = company;
 	}
 
-	public byte[] generateReport(Visitor visitor, String fileName) {
+	public byte[] generateVisitorReport(Visitor visitor, String fileName, String divisionName) {
+		try {
+
+			List<Visitor> visitors = new ArrayList<Visitor>();
+			visitors.add(visitor);
+			// empLst.add(emp2);
+
+			ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+
+			String newFileName = externalContext.getRealPath("") + File.separator + "resources" + File.separator
+					+ "demo" + File.separator + "images" + File.separator + "photocam" + File.separator + fileName
+					+ ".jpeg";
+
+			Company companyDetails = company.findAll().get().get(0);
+			// String newFileName = companyDetails.getVisitorsPhotoPath() + File.separator +
+			// fileName + ".jpeg";
+
+			// dynamic parameters required for report
+			Map<String, Object> empParams = new HashMap<String, Object>();
+			empParams.put("CompanyName", companyDetails.getCompanyName());
+			empParams.put("VisitDate", new Date());
+			empParams.put("VisitorImage", newFileName);
+			empParams.put("VisitorId", visitor.getVisitorId());
+			empParams.put("BadgeNo", visitor.getBadgeNo());
+			empParams.put("location", divisionName);
+			empParams.put("nationality", visitor.getNationality());
+			empParams.put("company", visitor.getCompany());
+			empParams.put("address", visitor.getAddress());
+			empParams.put("VisitorName", visitor.getVisitorName());
+			empParams.put("mobileNo", visitor.getMobileNo());
+			empParams.put("visitingEmployee", visitor.getVisitingEmployee());
+			empParams.put("visitingDepartment", visitor.getVisitingDepartment());
+			empParams.put("noOfPersons", visitor.getNoOfPersons());
+			empParams.put("purpose", visitor.getPurpose());
+			empParams.put("visitorData", new JRBeanCollectionDataSource(visitors));
+			empParams.put("otherDetails", new JRBeanCollectionDataSource(visitors));
+
+			JasperPrint visitorReport = JasperFillManager.fillReport(JasperCompileManager
+					// .compileReport(ResourceUtils.getFile("classpath:VisitorPass2.jrxml").getAbsolutePath())
+					// // path of
+					.compileReport(ResourceUtils
+							.getFile(companyDetails.getReportsJRXMLFilePath() + File.separator + "VisitorPass4.jrxml")
+							.getAbsolutePath()) // path of
+			// the
+			// jasper
+			// report
+					, empParams // dynamic parameters
+					, new JREmptyDataSource());
+
+			// the report in PDF format
+			// JasperExportManager.exportReportToPdfFile(visitorReport, newPdfFileName);
+
+			return JasperExportManager.exportReportToPdf(visitorReport);
+			// return new ResponseEntity<byte[]>
+			// (JasperExportManager.exportReportToPdf(empReport), headers, HttpStatus.OK);
+
+		} catch (Exception e) {
+			// return new ResponseEntity<byte[]>(HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("GenerateReport for visitor data exception {}", e);
+		}
+		return null;
+
+	}
+
+	public byte[] generateReport(Visitor visitor, String fileName, String divisionName) {
 		try {
 
 			List<Visitor> visitors = new ArrayList<Visitor>();
@@ -194,7 +258,7 @@ public class ReportGenerationService {
 						"continousAbsenteesim");
 
 			} catch (Exception e) {
-				log.error("GetContinousAbsenteesim for {} data exception {}",type, e);
+				log.error("GetContinousAbsenteesim for {} data exception {}", type, e);
 			}
 			return null;
 		};
@@ -209,7 +273,7 @@ public class ReportGenerationService {
 				return generateFinalReport(from, to, allPunches, "Allpunches.jrxml", "Allpunches");
 
 			} catch (Exception e) {
-				log.error("GetAllPunches for {} data exception {}",type, e);
+				log.error("GetAllPunches for {} data exception {}", type, e);
 			}
 			return null;
 		};
@@ -224,12 +288,12 @@ public class ReportGenerationService {
 				return generateFinalReport(from, to, allPunches, "DailySummary.jrxml", "dailySummary");
 
 			} catch (Exception e) {
-				log.error("GetDailySummary for {} data exception {}",type, e);
+				log.error("GetDailySummary for {} data exception {}", type, e);
 			}
 			return null;
 		};
 	}
-	
+
 	public IReport getDailyVisitors() {
 		return (from, to, id, type) -> {
 			try {
@@ -239,7 +303,7 @@ public class ReportGenerationService {
 				return generateFinalReport(from, to, visitorsData, "DailyVisitors.jrxml", "dailyVisitor");
 
 			} catch (Exception e) {
-				log.error("GetDailyVisitors for {} data exception {}",type, e);
+				log.error("GetDailyVisitors for {} data exception {}", type, e);
 			}
 			return null;
 		};

@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-@Component
-@Scope("view")
+//@Component
+//@Scope("view")
 //@RequestScoped
 public class ToolbarView {
 
