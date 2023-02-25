@@ -1,0 +1,326 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">
+        New Leave Policy
+    </ui:define>
+
+    <ui:define name="description">
+        TabView is a tabbed panel for leave management component.
+    </ui:define>
+
+    <ui:param name="documentationLink" value="/components/tabview" />
+    <ui:param name="widgetLink" value="TabView-1" />
+
+    <ui:define name="implementation">
+
+        <h:form id="form">
+
+            <p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true" />
+
+
+            <div class="card">
+                <h5>New Leave Type</h5>
+                <p:tabView>
+                    <p:ajax event="tabChange" listener="#{leaveTypeController.onTabChange}" update=":form:msgs" />
+                    <p:ajax event="tabClose" listener="#{leaveTypeController.onTabClose}" update=":form:msgs" />
+
+                    <p:tab title="Leave Entitlement">
+
+                        <div class="card">
+                            <h5>Leave Details</h5>
+                            <p:panelGrid columns="2" layout="flex"
+                                columnClasses="col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4, col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4"
+                                contentStyleClass="align-items-baseline ui-fluid">
+
+                                <p:outputLabel for="leaveName" value="Name :" />
+                                <p:selectOneMenu value="#{leaveTypeController.leaveTypeObject}" id="leaveName" var="c"
+                                    converter="#{leaveTypeConverter}" autoWidth="false" editable="true" maxlength="10"
+                                    filter="true" filterMatchMode="startsWith">
+
+                                    <p:ajax update="leaveCode" event="itemSelect"
+                                        listener="#{leaveTypeController.leaveDetails}" />
+                                    <f:selectItems value="#{leaveTypeController.leaveTypes}" var="player"
+                                        itemLabel="#{player.leaveName}" itemValue="#{player}" />
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.leaveName}" />
+                                    </p:column>
+
+
+                                </p:selectOneMenu>
+
+
+                                <p:outputLabel for="leaveCode" value="Code :" />
+                                <p:inputText id="leaveCode" value="#{leaveTypeController.leaveTypeObject.leaveCode}" />
+
+                                <p:outputLabel for="leaveType" value="Type :" />
+                                <p:selectOneMenu id="leaveType" value="#{leaveTypeController.leaveTypeObject.leaveType}">
+                                    <f:selectItem itemLabel="Select Type" itemValue="" />
+                                    <f:selectItem itemLabel="Paid" itemValue="1" />
+                                    <f:selectItem itemLabel="un-paid" itemValue="2" />
+                                    <f:selectItem itemLabel="on-duty" itemValue="3" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="leaveUnit" value="Leave Unit :" />
+                                <p:selectOneRadio id="leaveUnit" value="#{leaveTypeController.leaveTypeObject.leaveUnit}">
+                                    <f:selectItem itemLabel="Days" itemValue="1" />
+                                    <f:selectItem itemLabel="Hours" itemValue="2" />
+                                </p:selectOneRadio>
+
+                                <p:outputLabel for="description" value="Description :" />
+                                <p:inputTextarea id="description" rows="3" value="#{leaveTypeController.leaveTypeObject.leaveDescription}"/>
+
+                            </p:panelGrid>
+                        </div>
+                        <div class="card">
+
+                            <style>
+                                /* reset on the showcase style*/
+                                body .ui-panelgrid .ui-panelgrid-cell {
+                                    background-color: transparent;
+                                }
+
+                                /* example use of styles for your form */
+                                .my-heading-row {
+                                    background-color: var(--surface-c);
+                                    font-weight: bold;
+                                }
+                            </style>
+
+                            <!--
+                                Note: Rows and columns can have style, styleClass, and id.
+                                Note: A column with a defined styleClass will ignore the styleClass specified in the columnClasses list.
+                                Note: Note the use of ui-fluid to ensure that components are sized correctly and the use of ui-panelgrid-blank to remove borders.
+                                -->
+                            <p:panelGrid columns="2"
+                                columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4" layout="grid"
+                                styleClass="ui-panelgrid-blank ui-fluid"
+                                style="border:0px none; background-color:transparent;">
+
+                                <p:row styleClass="my-heading-row">
+                                    Applicable
+                                </p:row>
+
+                                <p:outputLabel for="@next" value="For Role:" />
+                                <p:selectOneMenu value="#{visitorController.visitingEmployee}" id="role"
+                                    autoWidth="false" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItem itemLabel="" itemValue="" />
+                                    <f:selectItems value="#{visitorController.employees}" var="player"
+                                        itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="@next" value="For Location:" />
+                                <p:selectOneMenu value="#{visitorController.visitingEmployee}" id="location"
+                                    autoWidth="false" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItem itemLabel="" itemValue="" />
+                                    <f:selectItems value="#{visitorController.employees}" var="player"
+                                        itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="@next" value="For Employee :" />
+                                <p:selectOneMenu value="#{visitorController.visitingEmployee}" id="employee"
+                                    autoWidth="false" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItem itemLabel="" itemValue="" />
+                                    <f:selectItems value="#{visitorController.employees}" var="player"
+                                        itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="@next" value="Gender :" />
+                                <p:selectOneRadio id="gender" value="">
+                                    <f:selectItem itemLabel="All" itemValue="All" />
+                                    <f:selectItem itemLabel="Male" itemValue="Male" />
+                                    <f:selectItem itemLabel="Female" itemValue="Female" />
+                                </p:selectOneRadio>
+
+                                <p:outputLabel for="@next" value="Marital Status :" />
+                                <p:selectOneRadio id="marital" value="">
+                                    <f:selectItem itemLabel="All" itemValue="All" />
+                                    <f:selectItem itemLabel="Married" itemValue="Married" />
+                                    <f:selectItem itemLabel="Un-Married" itemValue="Un-Married" />
+                                </p:selectOneRadio>
+
+
+                                <p:row id="my-row-id" styleClass="my-heading-row" style="font-weight: bold">
+                                    Entitlement
+                                </p:row>
+
+                                <p:outputLabel for="@next" value="Period" />
+                                <p:selectOneMenu id="period">
+                                    <f:selectItem itemLabel="Select Type" itemValue="" />
+                                    <f:selectItem itemLabel="Beginning Of Accrual Period" itemValue="1" />
+                                    <f:selectItem itemLabel="End Of Accrual Period" itemValue="2" />
+                                    <f:selectItem itemLabel="Based on Date of Joining" itemValue="3" />
+                                    <f:selectItem itemLabel="Annual Period" itemValue="4" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="@next" value="For :" />
+                                <p:selectOneRadio id="for" value="">
+                                    <f:selectItem itemLabel="All" itemValue="All" />
+                                    <f:selectItem itemLabel="Experienced based" itemValue="Experienced based" />
+                                </p:selectOneRadio>
+
+                                <p:outputLabel for="@next" value="Leave Count :" />
+                                <p:inputText />
+
+                                <p:outputLabel for="@next" value="For New Joinee" />
+                                <p:inputText />
+
+                                <p:outputLabel for="@next" value="After six months" />
+                                <p:inputText />
+
+                                <p:row>
+                                    <p:column styleClass="ui-grid-col-12">
+                                        <p>It should be noted that the use of @next is not possible for the
+                                            <u>Registration Number</u> outputLabel and the <u>for</u> attribute
+                                            should utilize an ID as shown in the example. The other outputLabel and
+                                            inputText fields do not require this
+                                            as they are the natural next element whereas
+                                            <u>Registration Number</u> is encapsulated in a column.
+                                        </p>
+                                    </p:column>
+                                </p:row>
+
+                                <p:row styleClass="my-heading-row">
+                                    Advanced Settings
+                                </p:row>
+
+                                <p:outputLabel for="@next" value="Enable" />
+                                <p:selectBooleanCheckbox id="checkbox1" itemLabel=" quarder day option" />
+
+                                <p:outputLabel for="@next" value="Enable" />
+                                <p:selectBooleanCheckbox id="checkbox2" itemLabel=" half-day option" />
+
+                                <p:outputLabel for="@next" value="Enable" />
+                                <p:selectBooleanCheckbox id="checkbox3"
+                                    itemLabel="Do not allow beyond permitted limit" />
+
+                                <p:outputLabel for="@next" value="Enable" />
+                                <p:selectBooleanCheckbox id="checkbox4" itemLabel="Round-off permitted leave count" />
+
+                                <p:outputLabel for="@next" value="Exclude" />
+                                <p:selectBooleanCheckbox id="checkbox5" itemLabel="holidays for leave" />
+
+                                <p:outputLabel for="@next" value="Exclude" />
+                                <p:selectBooleanCheckbox id="checkbox6" itemLabel=" week days for leave" />
+
+                                <p:outputLabel for="@next" value="Include" />
+                                <p:selectBooleanCheckbox id="checkbox7" itemLabel=" all holidays and weeklyoff's" />
+
+                                <p:outputLabel for="@next" value="For the consigutive days applied days exceeds" />
+                                <p:inputText />
+
+                                <p:outputLabel for="@next" value="Maximum number of consiguitive leave days allowed" />
+                                <p:inputText />
+
+                                <p:outputLabel for="@next" value="Leave application should be submitted before" />
+                                <p:inputText />
+
+                                <p:row styleClass="my-heading-row">
+                                    New Joinee
+                                </p:row>
+
+                                <p:outputLabel for="@next" value="Enable" />
+                                <p:selectBooleanCheckbox id="checkbox8" itemLabel="Consider date of joining" />
+
+                                <p:outputLabel for="@next" value="Probation Period :" />
+
+                                <p:selectOneRadio id="probationPeriod" value="">
+                                    <f:selectItem itemLabel="Calender days" itemValue="calanderDays" />
+                                    <f:selectItem itemLabel="Business period" itemValue="businessPeriod" />
+                                </p:selectOneRadio>
+
+                                <p:outputLabel for="@next" value="Mention period for Calander days/ Business period" />
+                                <p:inputText />
+
+                                <p:outputLabel for="@next" value="Inetial value during probation period" />
+                                <p:inputText />
+
+                                <p:outputLabel for="@next" value="Joining month leave count less than 15 days" />
+                                <p:inputText />
+
+                                <p:outputLabel for="@next" value="Joining month leave count > 15 days" />
+                                <p:inputText />
+
+                                <p:row styleClass="my-heading-row">
+                                    Roll over / Carry forword Settings
+                                </p:row>
+
+                                <p:outputLabel for="@next" value="Enable" />
+                                <p:selectBooleanCheckbox id="checkbox9" itemLabel="Roll over / Carry forword" />
+
+                                <p:outputLabel for="@next" value="Maximum roll over accumulation count" />
+                                <p:inputText />
+
+                                <p:outputLabel for="@next" value="Enable" />
+                                <p:selectBooleanCheckbox id="checkbox10" itemLabel="Reset " />
+
+                                <p:outputLabel for="@next" value="Based on reset type " />
+                                <p:selectOneMenu id="restType">
+                                    <f:selectItem itemLabel="Select Type" itemValue="" />
+                                    <f:selectItem itemLabel="Yearly" itemValue="1" />
+                                    <f:selectItem itemLabel="Half yearly" itemValue="2" />
+                                    <f:selectItem itemLabel="Quarterly" itemValue="3" />
+                                    <f:selectItem itemLabel="Monthly" itemValue="4" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="@next" value="Enable" />
+                                <p:selectBooleanCheckbox id="checkbox11" itemLabel="Encashement" />
+
+                                <p:outputLabel for="@next" value="Maximum Encashement count" />
+                                <p:inputText />
+
+                                <p:row styleClass="my-heading-row">
+                                    Expiry
+                                </p:row>
+
+                                <p:outputLabel for="@next" value="Start date" />
+                                <p:datePicker id="start" showIcon="true" style="width:auto" />
+
+                                <p:outputLabel for="@next" value="End date" />
+                                <p:datePicker id="end" showIcon="true" style="width:auto" />
+
+                                <p:row>
+                                    <p:column styleClass="ui-grid-col-12">
+                                        <span class="ui-float-label" style="width: 100%">
+                                            <p:splitButton value="Save" action="#{leaveTypeController.save}"
+                                                update="leaveCode" icon="pi pi-save">
+                                                <p:menuitem value="Update"
+                                                    action="#{visitorController.updatePreApproval}" update="leaveCode"
+                                                    icon="pi pi-refresh">
+                                                </p:menuitem>
+                                                <p:menuitem value="Delete"
+                                                    action="#{visitorController.deletePreApproval}" update="leaveCode"
+                                                    icon="pi pi-times" />
+                                                <p:divider />
+                                                <p:menuitem value="Clear" action="#{visitorController.cleanUp}"
+                                                    update="leaveCode" icon="pi pi-times-circle" />
+                                            </p:splitButton>
+                                        </span>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>
+                        </div>
+                    </p:tab>
+                    <p:tab title="Advanced Settings" closable="true">
+                        <p class="m-0">
+                            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+                            laudantium, totam rem aperiam, eaque ipsa quae ab
+                            illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
+                            ipsam voluptatem quia voluptas sit aspernatur aut
+                            odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi
+                            nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
+                        </p>
+                    </p:tab>
+
+                </p:tabView>
+            </div>
+
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>
