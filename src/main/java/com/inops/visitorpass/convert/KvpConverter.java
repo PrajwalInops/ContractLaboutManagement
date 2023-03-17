@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.inops.visitorpass.domain.Kvp;
+import com.inops.visitorpass.entity.Cadre;
 import com.inops.visitorpass.entity.Department;
 import com.inops.visitorpass.entity.Employee;
 
@@ -28,11 +29,13 @@ public class KvpConverter implements Converter<Kvp> {
 
 	Optional<List<Department>> getDepartments;
 	Optional<List<Employee>> getEmployees;
+	Optional<List<Cadre>> getCadres;
 
 	@PostConstruct
 	public void init() {
 		getDepartments = (Optional<List<Department>>) this.ctx.getBean("getDepartments");
 		getEmployees = (Optional<List<Employee>>) this.ctx.getBean("getEmployees");
+		getCadres = (Optional<List<Cadre>>) this.ctx.getBean("getCadres");
 	}
 
 	@Override
@@ -49,6 +52,12 @@ public class KvpConverter implements Converter<Kvp> {
 						.filter(emp -> emp.getEmployeeId().equals(value)).findAny().orElse(null));
 				if (employee.isPresent()) {
 					kvp = new Kvp(employee.get().getEmployeeId(), employee.get().getEmployeeName());
+				}
+				
+				Optional<Cadre> cadre = Optional.ofNullable(getCadres.get().stream()
+						.filter(cad -> cad.getCadreId().equals(value)).findAny().orElse(null));
+				if (cadre.isPresent()) {
+					kvp = new Kvp(cadre.get().getCadreId(), cadre.get().getCadre());
 				}
 				
 				return kvp;

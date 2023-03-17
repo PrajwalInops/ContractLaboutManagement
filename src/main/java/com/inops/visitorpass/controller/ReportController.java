@@ -31,16 +31,19 @@ import com.inops.visitorpass.constant.InopsConstant;
 import com.inops.visitorpass.domain.Kvp;
 import com.inops.visitorpass.domain.Report;
 import com.inops.visitorpass.entity.Employee;
+import com.inops.visitorpass.service.ICadre;
 import com.inops.visitorpass.service.IDepartment;
 import com.inops.visitorpass.service.IEmployee;
 import com.inops.visitorpass.service.impl.ReportGenerationService;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Component("reportController")
+@RequiredArgsConstructor
 @Scope("session")
 public class ReportController implements Serializable {
 
@@ -48,20 +51,11 @@ public class ReportController implements Serializable {
 	private List<SelectItem> reportTypes;
 	private final IEmployee employeeService;
 	private final IDepartment departmentService;
+	private final ICadre cadreService;
 	private final ReportGenerationService reportGenerationService;
 
 	@Autowired
 	ApplicationContext ctx;
-
-	public ReportController(IEmployee employeeService, IDepartment departmentService,
-			ReportGenerationService reportGenerationService) {
-		super();
-
-		this.employeeService = employeeService;
-		this.departmentService = departmentService;
-		this.reportGenerationService = reportGenerationService;
-
-	}
 
 	Report report = new Report();
 
@@ -81,22 +75,27 @@ public class ReportController implements Serializable {
 		SelectItemGroup attendanceReports = new SelectItemGroup("Attendance Reports");
 		attendanceReports.setSelectItems(new SelectItem[] {
 				new SelectItem("Attendance Register", "Attendance Register"),
+				new SelectItem("Absenteesm Register", "Absenteesm Register"),
+				new SelectItem("Physical Days", "Physical Days"),
 				new SelectItem("Late In Register", "Late In Register"),
+				new SelectItem("Over Time Summary", "Over Time Summary"), 
 				new SelectItem("Early Out Register", "Early Out Register"),
 				new SelectItem("Extra Hours Register", "Extra Hours Register"),
 				new SelectItem("Continous Absenteesim", "Continous Absenteesim"),
-				new SelectItem("All Punches", "All Punches"), new SelectItem("Daily Summary", "Daily Summary") });
+				new SelectItem("All Punches", "All Punches"), 
+				new SelectItem("Daily Summary", "Daily Summary") });
 
 		SelectItemGroup leaveReports = new SelectItemGroup("Leave Reports");
-		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("United States", "United States"),
-				new SelectItem("Brazil", "Brazil"), new SelectItem("Mexico", "Mexico") });
+		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("Leave Transaction", "Leave Transaction"),
+				new SelectItem("Leave Encashment", "Leave Encashment"),
+				new SelectItem("Leave Register", "Leave Register"), new SelectItem("Leave Balance", "Leave Balance") });
 
 		SelectItemGroup visitorReports = new SelectItemGroup("Visitors Reports");
 		visitorReports.setSelectItems(new SelectItem[] { new SelectItem("Visitors Register", "Visitors Register"), });
 
-		//reportTypes.add(attendanceReports);
-		//reportTypes.add(leaveReports);
-		reportTypes.add(visitorReports);
+		reportTypes.add(attendanceReports);
+		reportTypes.add(leaveReports);
+		// reportTypes.add(visitorReports);
 
 		List<Kvp> pickSource = new ArrayList<>();
 		List<Kvp> pickTarget = new ArrayList<>();
@@ -117,8 +116,12 @@ public class ReportController implements Serializable {
 				return new Kvp(dept.getId(), dept.getDepartmentName());
 			}).collect(Collectors.toList());
 		} else if (report.getSelectionType().equals("Employees")) {
-			pickSource = employeeService.findAll().get().stream().map(dept -> {
-				return new Kvp(dept.getEmployeeId(), dept.getEmployeeName());
+			pickSource = employeeService.findAll().get().stream().map(emp -> {
+				return new Kvp(emp.getEmployeeId(), emp.getEmployeeName());
+			}).collect(Collectors.toList());
+		} else if (report.getSelectionType().equals("Caders")) {
+			pickSource = cadreService.findAll().get().stream().map(cad -> {
+				return new Kvp(cad.getCadreId(), cad.getCadre());
 			}).collect(Collectors.toList());
 		}
 
@@ -164,14 +167,22 @@ public class ReportController implements Serializable {
 
 			} else if (report.getSelectionType().equals("Caders")) {
 
+				filteredList = getEmployees.get().stream()
+						.filter(empl -> pickSelectedTypes.getTarget().stream().anyMatch(cad ->
+
+						cad.getKey().equals(empl.getCadre().getCadreId()))).collect(Collectors.toList());
 			}
 		}
+		
 		byte[] buffer = null;
 		switch (report.getReportName()) {
 		case InopsConstant.ATTENDANCE_REGISTER:
 		case InopsConstant.LATEIN_REGISTER:
 		case InopsConstant.EARLYOUT_REGISTER:
 		case InopsConstant.EXTRAHOURS_REGISTER:
+		case InopsConstant.ABSENTEESM_REGISTER:
+		case InopsConstant.OVERTIME_REGISTRY:
+		case InopsConstant.LEAVE_REGISTER:
 			buffer = reportGenerationService.getRegistery().generate(report.getDateRange().get(0),
 					report.getDateRange().get(1), filteredList, report.getReportName());
 			break;
@@ -192,6 +203,14 @@ public class ReportController implements Serializable {
 
 		case "Visitors Register":
 			buffer = reportGenerationService.getDailyVisitors().generate(report.getDateRange().get(0),
+					report.getDateRange().get(1), filteredList, report.getReportName());
+			break;
+		case InopsConstant.PHYSIXAL_DAYS:
+			buffer = reportGenerationService.getPhysicalDays().generate(report.getDateRange().get(0),
+					report.getDateRange().get(1), filteredList, report.getReportName());
+			break;
+		case InopsConstant.LEAVE_TRANSACTION:
+			buffer = reportGenerationService.getLeaveTransactions().generate(report.getDateRange().get(0),
 					report.getDateRange().get(1), filteredList, report.getReportName());
 			break;
 

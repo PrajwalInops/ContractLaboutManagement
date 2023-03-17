@@ -63,8 +63,8 @@ import lombok.extern.log4j.Log4j2;
 @Getter
 @Setter
 @Log4j2
-@Component("visitorController")
-@Scope("session")
+//@Component("visitorController")
+//@Scope("session")
 public class VisitorController implements Serializable {
 
 	private final IVisitorService visitorService;

@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "TbldailyTransactions")
+@Table(name = "Tbldailytransactions")
 public class Transaction {
 	
 	@EmbeddedId
@@ -52,6 +53,7 @@ public class Transaction {
 	@Column(name = "Reasoncode")
 	private String reasonCode;
 	
+	@Transient
 	@Column(name = "Opremarks")
 	private String oPRemarks;
 

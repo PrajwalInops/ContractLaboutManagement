@@ -54,11 +54,20 @@ public class RegisteryService implements DataExtractionService {
 			case InopsConstant.EXTRAHOURS_REGISTER:
 				attribute = String.valueOf(data.getExtraHours());
 				break;
+			case InopsConstant.ABSENTEESM_REGISTER:
+				attribute = String.valueOf(data.getAttendanceId().contains("A") ? data.getAttendanceId() : "");
+				break;
+			case InopsConstant.OVERTIME_REGISTRY:
+				attribute = String.valueOf("S ="+data.getSingleOt()/60+" D="+data.getDoubleOt()/60);
+				break;
+			case InopsConstant.LEAVE_REGISTER:
+				attribute = String.valueOf(data.getLeaveTypeId().equalsIgnoreCase("00")?"":data.getLeaveTypeId());
+				break;
 
 			default:
 				break;
 			}
-			
+
 			if (attendanceRegistry.containsKey(data.getMusterId().getEmployeeId())) {
 				AttendanceRegister attendanceRegister = attendanceRegistry.get(data.getMusterId().getEmployeeId());
 				setRegisteryAttribure(attendanceRegister, day, attribute);

@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 import com.inops.visitorpass.entity.Visitor;
 import com.inops.visitorpass.service.IVisitorService;
 
-@Component
-@FacesConverter(value = "visitorConverter", managed = true)
+//@Component
+//@FacesConverter(value = "visitorConverter", managed = true)
 public class VisitorConverter implements Converter<Visitor> {
 
 	@Autowired

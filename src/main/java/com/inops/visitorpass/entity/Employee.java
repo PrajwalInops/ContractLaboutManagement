@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,6 +40,11 @@ public class Employee {
     @JoinColumn(name = "deptid")
     private Department department;
 	
+	@ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cadreid")
+    private Cadre cadre;
+	
+	@Transient
 	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "divisionId")
     private Division division;

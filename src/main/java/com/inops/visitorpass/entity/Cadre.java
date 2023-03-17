@@ -19,17 +19,17 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tbldepartments")
-public class Department {
+@Table(name = "Tblcadres")
+public class Cadre {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "deptid")
+	@Column(name = "cadreid")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String id;
+	private String cadreId;
 
-	@Column(name = "department")
-	private String departmentName;
+	@Column(name = "cadre")
+	private String cadre;
 
 }

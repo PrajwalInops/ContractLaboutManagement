@@ -24,9 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import com.inops.visitorpass.constant.InopsConstant;
-import com.inops.visitorpass.controller.VisitorController;
 import com.inops.visitorpass.domain.AttendanceRegister;
 import com.inops.visitorpass.domain.ContinousAbsenteesim;
+import com.inops.visitorpass.domain.LeaveTransactionReport;
+import com.inops.visitorpass.domain.PhysicalDays;
 import com.inops.visitorpass.domain.Punch;
 import com.inops.visitorpass.entity.Company;
 import com.inops.visitorpass.entity.Visitor;
@@ -34,6 +35,7 @@ import com.inops.visitorpass.service.DataExtractionService;
 import com.inops.visitorpass.service.ICompany;
 import com.inops.visitorpass.service.IReport;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -45,6 +47,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Log4j2
 @Service("reportGenerationService")
+@RequiredArgsConstructor
 public class ReportGenerationService {
 
 	private final DataExtractionService registery;
@@ -52,20 +55,10 @@ public class ReportGenerationService {
 	private final DataExtractionService allPunch;
 	private final DataExtractionService dailySummary;
 	private final DataExtractionService dailyVisitors;
+	private final DataExtractionService physicalDays;
+	private final DataExtractionService leaveTransactionReportService;
 	private final ICompany company;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
-
-	public ReportGenerationService(DataExtractionService registery, DataExtractionService continousAbsenteesim,
-			DataExtractionService allPunch, DataExtractionService dailySummary, DataExtractionService dailyVisitors,
-			ICompany company) {
-		super();
-		this.registery = registery;
-		this.continousAbsenteesim = continousAbsenteesim;
-		this.allPunch = allPunch;
-		this.dailySummary = dailySummary;
-		this.dailyVisitors = dailyVisitors;
-		this.company = company;
-	}
 
 	public byte[] generateVisitorReport(Visitor visitor, String fileName, String divisionName) {
 		try {
@@ -230,6 +223,18 @@ public class ReportGenerationService {
 					jrxmlFile = "ExtraHoutsRegister.jrxml";
 					reportParameter = "extrahoursRegister";
 					break;
+				case InopsConstant.ABSENTEESM_REGISTER:
+					jrxmlFile = "AbsenteesmRegister.jrxml";
+					reportParameter = "absenteesmRegister";
+					break;
+				case InopsConstant.OVERTIME_REGISTRY:
+					jrxmlFile = "OverTime.jrxml";
+					reportParameter = "overTimeRegister";
+					break;
+				case InopsConstant.LEAVE_REGISTER:
+					jrxmlFile = "LeaveRegister.jrxml";
+					reportParameter = "leaveRegister";
+					break;
 
 				default:
 					break;
@@ -270,7 +275,7 @@ public class ReportGenerationService {
 
 				List<Punch> allPunches = (List<Punch>) allPunch.dataExtraction(from, to, id, type);
 
-				return generateFinalReport(from, to, allPunches, "Allpunches.jrxml", "Allpunches");
+				return generateFinalReport(from, to, allPunches, "Allpunches.jrxml", "allPunches");
 
 			} catch (Exception e) {
 				log.error("GetAllPunches for {} data exception {}", type, e);
@@ -301,6 +306,37 @@ public class ReportGenerationService {
 				List<Visitor> visitorsData = (List<Visitor>) dailyVisitors.dataExtraction(from, to, id, type);
 
 				return generateFinalReport(from, to, visitorsData, "DailyVisitors.jrxml", "dailyVisitor");
+
+			} catch (Exception e) {
+				log.error("GetDailyVisitors for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+
+	public IReport getPhysicalDays() {
+		return (from, to, id, type) -> {
+			try {
+
+				List<PhysicalDays> visitorsData = (List<PhysicalDays>) physicalDays.dataExtraction(from, to, id, type);
+
+				return generateFinalReport(from, to, visitorsData, "PhysicalDays.jrxml", "physicalDays");
+
+			} catch (Exception e) {
+				log.error("GetDailyVisitors for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+
+	public IReport getLeaveTransactions() {
+		return (from, to, id, type) -> {
+			try {
+
+				List<LeaveTransactionReport> visitorsData = (List<LeaveTransactionReport>) leaveTransactionReportService
+						.dataExtraction(from, to, id, type);
+
+				return generateFinalReport(from, to, visitorsData, "LeaveTransaction.jrxml", "leaveTransaction");
 
 			} catch (Exception e) {
 				log.error("GetDailyVisitors for {} data exception {}", type, e);

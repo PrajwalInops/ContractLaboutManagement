@@ -71,7 +71,7 @@ public class AppMenu {
 		//supportMenuItems.add(new MenuItem("PRO Support", "/support"));
 		
 		if(user.getRole().name().equals("ADMIN")){
-		supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));		
+		//supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));		
 		supportMenuItems.add(new MenuItem("Reports","/ui/reporting"));
 		approval = true;
 		}else {

@@ -9,9 +9,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.client.RestTemplate;
 
+import com.inops.visitorpass.entity.Cadre;
 import com.inops.visitorpass.entity.Department;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Visitor;
+import com.inops.visitorpass.service.ICadre;
 import com.inops.visitorpass.service.IDepartment;
 import com.inops.visitorpass.service.IEmployee;
 import com.inops.visitorpass.service.IVisitorService;
@@ -26,6 +28,9 @@ public class VisitorConfig {
 	private IEmployee employeeService;
 
 	@Autowired
+	private ICadre cadreService;
+
+	// @Autowired
 	private IVisitorService visitorService;
 
 	@Bean
@@ -41,7 +46,13 @@ public class VisitorConfig {
 	}
 
 	@Bean
-	@DependsOn(value = "visitorService")
+	@DependsOn(value = "cadreService")
+	public Optional<List<Cadre>> getCadres() {
+		return cadreService.findAll();
+	}
+
+	// @Bean
+	// @DependsOn(value = "visitorService")
 	public Optional<List<Visitor>> getVisitors() {
 		return visitorService.findAll();
 	}
