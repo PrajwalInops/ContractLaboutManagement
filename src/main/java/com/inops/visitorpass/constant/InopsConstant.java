@@ -13,6 +13,7 @@ public class InopsConstant {
 	public static final String LEAVE_TRANSACTION = "Leave Transaction";
 	public static final String LEAVE_ENCASHMENT = "Leave Encashment";
 	public static final String LEAVE_BALANCE = "Leave Balance";
+	public static final String CONSOLIDATED_REPORT = "Consolidated Report";
 	public static final String OUT_PASS = "OUT";
 	public static final String IN_PASS = "IN";
 

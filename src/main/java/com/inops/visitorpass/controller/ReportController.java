@@ -67,6 +67,7 @@ public class ReportController implements Serializable {
 	private StreamedContent file;
 	private List<LocalDate> dateRange;
 	private Optional<List<Employee>> getEmployees;
+	private String selectMode, viewAs;
 
 	@PostConstruct
 	public void init() {
@@ -78,12 +79,12 @@ public class ReportController implements Serializable {
 				new SelectItem("Absenteesm Register", "Absenteesm Register"),
 				new SelectItem("Physical Days", "Physical Days"),
 				new SelectItem("Late In Register", "Late In Register"),
-				new SelectItem("Over Time Summary", "Over Time Summary"), 
+				new SelectItem("Over Time Summary", "Over Time Summary"),
 				new SelectItem("Early Out Register", "Early Out Register"),
 				new SelectItem("Extra Hours Register", "Extra Hours Register"),
 				new SelectItem("Continous Absenteesim", "Continous Absenteesim"),
-				new SelectItem("All Punches", "All Punches"), 
-				new SelectItem("Daily Summary", "Daily Summary") });
+				new SelectItem("All Punches", "All Punches"),
+				new SelectItem("Consolidated Report", "Consolidated Report"), new SelectItem("Daily Summary", "Daily Summary") });
 
 		SelectItemGroup leaveReports = new SelectItemGroup("Leave Reports");
 		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("Leave Transaction", "Leave Transaction"),
@@ -173,7 +174,9 @@ public class ReportController implements Serializable {
 						cad.getKey().equals(empl.getCadre().getCadreId()))).collect(Collectors.toList());
 			}
 		}
-		
+
+		LocalDate to = report.getDateRange().size() == 1 ? report.getDateRange().get(0) : report.getDateRange().get(1);
+
 		byte[] buffer = null;
 		switch (report.getReportName()) {
 		case InopsConstant.ATTENDANCE_REGISTER:
@@ -183,35 +186,43 @@ public class ReportController implements Serializable {
 		case InopsConstant.ABSENTEESM_REGISTER:
 		case InopsConstant.OVERTIME_REGISTRY:
 		case InopsConstant.LEAVE_REGISTER:
-			buffer = reportGenerationService.getRegistery().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList, report.getReportName());
+			buffer = reportGenerationService.getRegistery().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
 			break;
 		case "Continous Absenteesim":
-			buffer = reportGenerationService.getContinousAbsenteesim().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList, report.getReportName());
+			buffer = reportGenerationService.getContinousAbsenteesim().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
 			break;
 
 		case "All Punches":
-			buffer = reportGenerationService.getAllPunches().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList, report.getReportName());
+			buffer = reportGenerationService.getAllPunches().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
 			break;
 
 		case "Daily Summary":
-			buffer = reportGenerationService.getDailySummary().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList, report.getReportName());
+			buffer = reportGenerationService.getDailySummary().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
 			break;
 
 		case "Visitors Register":
-			buffer = reportGenerationService.getDailyVisitors().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList, report.getReportName());
+			buffer = reportGenerationService.getDailyVisitors().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
 			break;
 		case InopsConstant.PHYSIXAL_DAYS:
-			buffer = reportGenerationService.getPhysicalDays().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList, report.getReportName());
+			buffer = reportGenerationService.getPhysicalDays().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
 			break;
 		case InopsConstant.LEAVE_TRANSACTION:
-			buffer = reportGenerationService.getLeaveTransactions().generate(report.getDateRange().get(0),
-					report.getDateRange().get(1), filteredList, report.getReportName());
+			buffer = reportGenerationService.getLeaveTransactions().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+		case InopsConstant.LEAVE_BALANCE:
+			buffer = reportGenerationService.getLeaveBalance().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
+			break;
+		case InopsConstant.CONSOLIDATED_REPORT:
+			buffer = reportGenerationService.getConsolidated().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
 			break;
 
 		default:
@@ -234,6 +245,21 @@ public class ReportController implements Serializable {
 				// FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("C:\\Users\\User\\Prajwal\\source
 				// code\\Visitorpass\\src\\main\\webapp\\resources\\demo\\media\\2515655.pdf"))
 				.build();
+	}
+
+	public void modeSelect() {
+		if (report.getReportType().equalsIgnoreCase("Daily")) {
+			selectMode = "multiple";
+			viewAs = "date";
+		}
+		if (report.getReportType().equalsIgnoreCase("Monthly")) {
+			selectMode = "range";
+			viewAs = "date";
+		}
+		if (report.getReportType().equalsIgnoreCase("Yearly")) {
+			selectMode = "range";
+			viewAs = "month";
+		}
 	}
 
 	public void addMessage(FacesMessage.Severity severity, String summary, String detail) {

@@ -78,13 +78,14 @@
                                     <f:selectItem itemLabel="Daily" itemValue="Daily" />
                                     <f:selectItem itemLabel="Monthly" itemValue="Monthly" />
                                     <f:selectItem itemLabel="Yearly" itemValue="Yearly" />
+                                    <p:ajax listener="#{reportController.modeSelect}" update="dates" />
                                 </p:selectOneRadio>
 
                                 <h:outputText value="Dates: *" />
 
                                 <p:datePicker id="dates" value="#{reportController.report.dateRange}" required="true"
-                                    selectionMode="range" selectOtherMonths="false" monthNavigator="true" yearNavigator="true" inline="true"
-                                    readonlyInput="true" />
+                                    selectionMode="#{reportController.selectMode}" selectOtherMonths="false" view="#{reportController.viewAs}"
+                                    monthNavigator="true" yearNavigator="true" inline="true" readonlyInput="true" />
 
                                 <h:outputText value="Skip to last: " />
                                 <h:selectBooleanCheckbox value="#{reportController.skip}" />
