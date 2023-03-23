@@ -94,8 +94,13 @@ public class ReportController implements Serializable {
 		SelectItemGroup visitorReports = new SelectItemGroup("Visitors Reports");
 		visitorReports.setSelectItems(new SelectItem[] { new SelectItem("Visitors Register", "Visitors Register"), });
 
+		SelectItemGroup logReports = new SelectItemGroup("Log Reports");
+		visitorReports.setSelectItems(new SelectItem[] { new SelectItem("Log Register", "Log Register"), });
+
+		
 		reportTypes.add(attendanceReports);
 		reportTypes.add(leaveReports);
+		reportTypes.add(logReports);
 		// reportTypes.add(visitorReports);
 
 		List<Kvp> pickSource = new ArrayList<>();
@@ -220,8 +225,8 @@ public class ReportController implements Serializable {
 			buffer = reportGenerationService.getLeaveBalance().generate(report.getDateRange().get(0), to, filteredList,
 					report.getReportName());
 			break;
-		case InopsConstant.CONSOLIDATED_REPORT:
-			buffer = reportGenerationService.getConsolidated().generate(report.getDateRange().get(0), to, filteredList,
+		case InopsConstant.LOG_REGISTER:
+			buffer = reportGenerationService.getLogRegister().generate(report.getDateRange().get(0), to, filteredList,
 					report.getReportName());
 			break;
 
