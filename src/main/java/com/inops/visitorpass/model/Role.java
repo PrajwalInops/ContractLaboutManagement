@@ -1,8 +1,9 @@
 package com.inops.visitorpass.model;
 
 public enum Role {
-    USER("User"),
-    ADMIN("Admin");
+    USER("USER"),
+    ADMIN("ADMIN"),
+	SUPER_USER("SUPER_USER");
 
     private final String value;
 

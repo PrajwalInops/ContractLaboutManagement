@@ -1,0 +1,164 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">
+        User <span class="subitem">Details Management</span>
+    </ui:define>
+
+    <ui:define name="description">
+        super users are allowed to create,update and delete the User details in this window.
+    </ui:define>
+
+    <ui:param name="documentationLink" value="/components/schedule" />
+    <ui:param name="widgetLink" value="Schedule-1" />
+
+    <ui:define name="implementation">
+        <div class="card">
+            <h:form>
+                <p:growl id="messages" showDetail="true" />
+
+
+                <div class="card" style="width: 100%">
+
+                    <div class="grid ui-fluid mt-3 floatlabel-demo">
+
+
+                        <div class="col-12 md:col-6">
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+
+                                        <p:selectOneMenu value="#{userController.email}" editable="true" id="userId"
+                                            autoWidth="false" filter="true" 
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{userController.users}" var="player"
+                                                itemLabel="#{player.email}" itemValue="#{player.email}" />
+                                            <p:ajax update="role,employeeId,firstName,lastName,ip"
+                                                listener="#{userController.getUserDetails}" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="UserId" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{userController.firstName}" id="firstName" />
+                                        <p:outputLabel for="@previous" value="FirstName" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{userController.lastName}" id="lastName" />
+                                        <p:outputLabel for="@previous" value="LastName" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:password  value="#{userController.password}" id="password" />
+                                        <p:outputLabel for="@previous" value="Password" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{userController.ip}" id="ip" />
+                                        <p:outputLabel for="@previous" value="IP Address" />
+                                    </span>
+                                </div>
+                            </div>
+                           
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+
+                                        <p:selectOneMenu value="#{userController.employeeId}" editable="true"
+                                            id="employeeId" autoWidth="false" filter="true" 
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{visitorController.employees}" var="player"
+                                                itemLabel="#{player.employeeId}" itemValue="#{player.employeeId}" />
+                                           
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="EmployeeId" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+
+                                        <p:selectOneMenu id="role" value="#{userController.role}">
+                                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                                            <f:selectItem itemLabel="RECEPTION" itemValue="ADMIN"/>
+                                            <f:selectItem itemLabel="SUPER_USER" itemValue="SUPER_USER"/>
+                                            <f:selectItem itemLabel="USER" itemValue="USER"/>                                           
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="Role" />
+                                    </span>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:splitButton value="Save" action="#{userController.saveUser}"
+                                            update="messages,role,employeeId,firstName,lastName,userId,ip,password"
+                                            icon="pi pi-save">
+                                            <p:menuitem value="Update" action="#{userController.updateUser}"
+                                                update="messages,role,employeeId,firstName,lastName,userId,ip,password"
+                                                icon="pi pi-refresh">
+                                            </p:menuitem>
+                                            <p:menuitem value="Clear" action="#{userController.cleanUser}"
+                                                update="messages,role,employeeId,firstName,lastName,userId,ip,password"
+                                                icon="pi pi-times-circle" />
+                                        </p:splitButton>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>

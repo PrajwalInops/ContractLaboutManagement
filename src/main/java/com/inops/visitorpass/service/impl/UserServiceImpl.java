@@ -28,7 +28,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	public void saveUser(User user) {
 		String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
 		user.setPassword(encodedPassword);
-//        user.setRole(Role.USER);
+       // user.setRole(Role.USER);
 		userRepository.save(user);
 	}
 
@@ -76,6 +76,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 		}
 		return false;
 
+	}
+
+	@Override
+	public List<User> findAll() {
+		return userRepository.findAll();
 	}
 
 }

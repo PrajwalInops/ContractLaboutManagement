@@ -12,5 +12,7 @@ public interface IUserService {
 	public List<Object> isUserPresent(User user);
 	
 	public boolean resetPassword(ResetPassword restPassword);
+	
+	List<User> findAll();
 
 }

@@ -31,4 +31,10 @@ public class EmployeeService implements IEmployee {
 		return Optional.of(employeeRepository.findAll());
 	}
 
+	@Override
+	public Employee save(Employee employee) {
+		
+		return employeeRepository.save(employee);
+	}
+
 }

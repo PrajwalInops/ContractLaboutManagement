@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">
+        Employee <span class="subitem">Details Management</span>
+    </ui:define>
+
+    <ui:define name="description">
+        super users are allowed to create,update and delete the employees details in this window.
+    </ui:define>
+
+    <ui:param name="documentationLink" value="/components/schedule" />
+    <ui:param name="widgetLink" value="Schedule-1" />
+
+    <ui:define name="implementation">
+        <div class="card">
+            <h:form>
+                <p:growl id="messages" showDetail="true" />
+
+
+                <div class="card" style="width: 100%">
+
+                    <div class="grid ui-fluid mt-3 floatlabel-demo">
+
+
+                        <div class="col-12 md:col-6">
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+
+                                        <p:selectOneMenu value="#{visitorController.visitingEmployee}" editable="true"
+                                            id="visitingEmployee" autoWidth="false" filter="true" required="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{visitorController.employees}" var="player"
+                                                itemLabel="#{player.employeeId}" itemValue="#{player.employeeId}" />
+                                            <p:ajax update="visitingDepartment,employeeName,Division"
+                                                listener="#{visitorController.getEmployeeDetails}" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="EmployeeId" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:inputText value="#{visitorController.employeeName}" id="employeeName" />
+                                        <p:outputLabel for="@previous" value="EmployeeName" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-users" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+
+                                        <p:selectOneMenu value="#{visitorController.visitingDepartment}"
+                                            id="visitingDepartment" autoWidth="false" filter="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{visitorController.departments}" var="player"
+                                                itemLabel="#{player.departmentName}" itemValue="#{player.id}" />                                           
+                                        </p:selectOneMenu>
+
+                                        <p:outputLabel for="@previous" value="Department" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-map-marker" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu value="#{visitorController.divisionId}" id="Division"
+                                            autoWidth="false" filter="true" filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{visitorController.divisions}" var="player"
+                                                itemLabel="#{player.divisionName}" itemValue="#{player.divisionId}" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel for="@previous" value="Division" />
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:splitButton value="Save" action="#{visitorController.saveEmployee}"
+                                            update="messages,visitingDepartment,employeeName,Division,visitingEmployee"
+                                            icon="pi pi-save">
+                                            <p:menuitem value="Update" action="#{visitorController.updateEmployee}"
+                                                update="messages,visitingDepartment,employeeName,Division,visitingEmployee"
+                                                icon="pi pi-refresh">
+                                            </p:menuitem>                                           
+                                            <p:menuitem value="Clear" action="#{visitorController.clearEmployee}"
+                                                update="messages,visitingDepartment,employeeName,Division,visitingEmployee"
+                                                icon="pi pi-times-circle" />
+                                        </p:splitButton>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>

@@ -12,4 +12,6 @@ public interface IEmployee {
 
 	Optional<List<Employee>> findAll();
 	
+	Employee save(Employee employee);
+	
 }

@@ -43,6 +43,7 @@ import org.springframework.web.client.RestTemplate;
 import com.inops.visitorpass.constant.InopsConstant;
 import com.inops.visitorpass.domain.CardDetails;
 import com.inops.visitorpass.entity.Cards;
+import com.inops.visitorpass.entity.Department;
 import com.inops.visitorpass.entity.Division;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.ReaderIpAddress;
@@ -57,12 +58,14 @@ import com.inops.visitorpass.service.IVisitorService;
 import com.inops.visitorpass.service.impl.ReportGenerationService;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 @Getter
 @Setter
 @Log4j2
+@RequiredArgsConstructor
 @Component("visitorController")
 @Scope("session")
 public class VisitorController implements Serializable {
@@ -81,19 +84,15 @@ public class VisitorController implements Serializable {
 	@Autowired
 	ApplicationContext ctx;
 
-	public VisitorController(IVisitorService visitorService, IEmployee employeeService,
-			ReportGenerationService reportGenerationService, ICompany company, IReaderIpAddress readerIpAddress,
-			ICard card, IDivision division) {
-		super();
-		this.visitorService = visitorService;
-		this.employeeService = employeeService;
-		this.reportGenerationService = reportGenerationService;
-		this.company = company;
-		this.readerIpAddress = readerIpAddress;
-		this.card = card;
-		this.division = division;
-	}
-
+	/*
+	 * public VisitorController(IVisitorService visitorService, IEmployee
+	 * employeeService, ReportGenerationService reportGenerationService, ICompany
+	 * company, IReaderIpAddress readerIpAddress, ICard card, IDivision division) {
+	 * super(); this.visitorService = visitorService; this.employeeService =
+	 * employeeService; this.reportGenerationService = reportGenerationService;
+	 * this.company = company; this.readerIpAddress = readerIpAddress; this.card =
+	 * card; this.division = division; }
+	 */
 	private List<Visitor> visitors;
 	private List<Visitor> preApprovedVisitors;
 	private List<Visitor> droppedVisitors;
@@ -103,6 +102,7 @@ public class VisitorController implements Serializable {
 	private List<ReaderIpAddress> readerIpAddresses;
 	private List<Cards> badgeNumbers;
 	private List<Division> divisions;
+	private List<Department> departments;
 
 	private String photoPath;
 	private StreamedContent visitorPhoto;
@@ -129,6 +129,8 @@ public class VisitorController implements Serializable {
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 	private User user;
 
+	private String employeeName;
+
 	DateFormat fromDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	DateFormat toDateFormat = new SimpleDateFormat("dd/MM/yyyy 18:00");
 
@@ -136,13 +138,16 @@ public class VisitorController implements Serializable {
 	public void init() throws UnsupportedEncodingException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		user = (User) auth.getPrincipal();
-		getAllPreApprovedVisitors();
+
 		droppedVisitors = new ArrayList<>();
 
 		getVisitorIdByDate();
 		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
 		visitors = ((Optional<List<Visitor>>) ctx.getBean("getVisitors")).get();
+		departments = ((Optional<List<Department>>) ctx.getBean("getDepartments")).get();
+
 		divisions = division.findAll().get();
+		getAllPreApprovedVisitors();
 		readerIpAddresses = readerIpAddress.findAll().get();
 		setDate(new Date());
 		fileDownload(null, "VisitorPass");
@@ -315,12 +320,13 @@ public class VisitorController implements Serializable {
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
 					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS,
 					user.getEmployee().getDivision().getDivisionId());
-			byte[] pass = reportGenerationService.generateVisitorReport(visitor, filename, setEmployeeAndDivision(visitor));
+			byte[] pass = reportGenerationService.generateVisitorReport(visitor, filename,
+					setEmployeeAndDivision(visitor));
 			fileDownload(pass, mobileNo);
 			visitorService.update(visitor);
 			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 					"Visitorpass updated successfully for: " + visitorName);
-			//writeCardToDevise();
+			// writeCardToDevise();
 			getCards();
 			cleanUp();
 		} catch (Exception e) {
@@ -367,7 +373,14 @@ public class VisitorController implements Serializable {
 	private void getAllPreApprovedVisitors() {
 		Optional<List<Visitor>> visitors = visitorService.findAllByIsApprovedAndDivision(true,
 				user.getEmployee().getDivision().getDivisionId());
-		setPreApprovedVisitors(visitors.get());
+		List<Visitor> modifiedVisitors = visitors.get().stream().map(visitor -> {
+			Employee employee = employees.stream()
+					.filter(employees -> employees.getEmployeeId().equals(visitor.getVisitingEmployee())).findAny()
+					.orElse(null);
+			visitor.setVisitingEmployee(employee.getEmployeeName());
+			return visitor;
+		}).collect(Collectors.toList());
+		setPreApprovedVisitors(modifiedVisitors);
 	}
 
 	public void getDepartment() {
@@ -468,4 +481,47 @@ public class VisitorController implements Serializable {
 		return user.getEmployee().getDivision().getDivisionName();
 	}
 
+	public void getEmployeeDetails() {
+		Employee employee = employees.stream().filter(employees -> employees.getEmployeeId().equals(visitingEmployee))
+				.findAny().orElse(null);
+		if (employee != null) {
+			setEmployeeName(employee.getEmployeeName());
+			setVisitingDepartment(employee.getDepartment().getId());
+			setDivisionId(employee.getDivision().getDivisionId());
+		}
+	}
+
+	public void saveEmployee() {
+
+		Employee employee = new Employee(visitingEmployee, employeeName,
+				departments.stream().filter(dept -> dept.getId().equals(visitingDepartment)).findAny().orElse(null),
+				divisions.stream().filter(div -> div.getDivisionId() == divisionId).findAny().orElse(null));
+		employeeService.save(employee);
+		employees.add(employee);
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Employee created successfully for: " + employeeName);
+		clearEmployee();
+	}
+
+	public void updateEmployee() {
+
+		Employee employee = employees.stream().filter(employees -> employees.getEmployeeId().equals(visitingEmployee))
+				.findAny().orElse(null);
+
+		employee.setEmployeeName(employeeName);
+		employee.setDepartment(
+				departments.stream().filter(dept -> dept.getId().equals(visitingDepartment)).findAny().orElse(null));
+		employee.setDivision(
+				divisions.stream().filter(div -> div.getDivisionId() == divisionId).findAny().orElse(null));
+
+		employeeService.save(employee);
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Employee updated successfully for: " + employeeName);
+		clearEmployee();
+	}
+
+	public void clearEmployee() {
+		setEmployeeName(null);
+		setVisitingDepartment(null);
+		setVisitingEmployee(null);
+		setDivisionId(0);
+	}
 }

@@ -55,6 +55,12 @@
                     <p:column headerText="Address" sortBy="#{product.address}" filterBy="#{product.address}">
                         <h:outputText value="#{product.address}" />
                     </p:column>
+                    <p:column headerText="Department" sortBy="#{product.visitingDepartment}" filterBy="#{product.address}">
+                        <h:outputText value="#{product.visitingDepartment}" />
+                    </p:column>
+                    <p:column headerText="Requested Employee " sortBy="#{product.visitingEmployee}" filterBy="#{product.address}">
+                        <h:outputText value="#{product.visitingEmployee}" />
+                    </p:column>
 
                     <p:column exportable="false">
                         <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
