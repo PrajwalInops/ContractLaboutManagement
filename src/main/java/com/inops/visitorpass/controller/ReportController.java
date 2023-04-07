@@ -74,17 +74,19 @@ public class ReportController implements Serializable {
 		reportTypes = new ArrayList<>();
 
 		SelectItemGroup attendanceReports = new SelectItemGroup("Attendance Reports");
-		attendanceReports.setSelectItems(new SelectItem[] {
-				new SelectItem("Attendance Register", "Attendance Register"),
-				new SelectItem("Absenteesm Register", "Absenteesm Register"),
-				new SelectItem("Physical Days", "Physical Days"),
-				new SelectItem("Late In Register", "Late In Register"),
-				new SelectItem("Over Time Summary", "Over Time Summary"),
-				new SelectItem("Early Out Register", "Early Out Register"),
-				new SelectItem("Extra Hours Register", "Extra Hours Register"),
-				new SelectItem("Continous Absenteesim", "Continous Absenteesim"),
-				new SelectItem("All Punches", "All Punches"),
-				new SelectItem("Consolidated Report", "Consolidated Report"), new SelectItem("Daily Summary", "Daily Summary") });
+		attendanceReports
+				.setSelectItems(new SelectItem[] { new SelectItem("Attendance Register", "Attendance Register"),
+						new SelectItem("Absenteesm Register", "Absenteesm Register"),
+						new SelectItem("Physical Days", "Physical Days"),
+						new SelectItem("Late In Register", "Late In Register"),
+						new SelectItem("Over Time Summary", "Over Time Summary"),
+						new SelectItem("Early Out Register", "Early Out Register"),
+						new SelectItem("Extra Hours Register", "Extra Hours Register"),
+						new SelectItem("Continous Absenteesim", "Continous Absenteesim"),
+						new SelectItem("All Punches", "All Punches"),
+						new SelectItem("Consolidated Report", "Consolidated Report"),
+						new SelectItem("Daily Summary", "Daily Summary"),
+						new SelectItem("LWP Details", "LWP Details")});
 
 		SelectItemGroup leaveReports = new SelectItemGroup("Leave Reports");
 		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("Leave Transaction", "Leave Transaction"),
@@ -92,12 +94,11 @@ public class ReportController implements Serializable {
 				new SelectItem("Leave Register", "Leave Register"), new SelectItem("Leave Balance", "Leave Balance") });
 
 		SelectItemGroup visitorReports = new SelectItemGroup("Visitors Reports");
-		visitorReports.setSelectItems(new SelectItem[] { new SelectItem("Visitors Register", "Visitors Register"), });
+		visitorReports.setSelectItems(new SelectItem[] { new SelectItem("Visitors Register", "Visitors Register") });
 
 		SelectItemGroup logReports = new SelectItemGroup("Log Reports");
-		visitorReports.setSelectItems(new SelectItem[] { new SelectItem("Log Register", "Log Register"), });
+		logReports.setSelectItems(new SelectItem[] { new SelectItem("Log Register", "Log Register") });
 
-		
 		reportTypes.add(attendanceReports);
 		reportTypes.add(leaveReports);
 		reportTypes.add(logReports);
@@ -227,6 +228,10 @@ public class ReportController implements Serializable {
 			break;
 		case InopsConstant.LOG_REGISTER:
 			buffer = reportGenerationService.getLogRegister().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
+			break;
+		case InopsConstant.LWP_DETAILS:
+			buffer = reportGenerationService.getLWPDetails().generate(report.getDateRange().get(0), to, filteredList,
 					report.getReportName());
 			break;
 

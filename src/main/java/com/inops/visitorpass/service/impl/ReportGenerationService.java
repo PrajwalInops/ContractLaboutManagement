@@ -28,6 +28,7 @@ import com.inops.visitorpass.domain.AttendanceRegister;
 import com.inops.visitorpass.domain.Balance;
 import com.inops.visitorpass.domain.Consolidated;
 import com.inops.visitorpass.domain.ContinousAbsenteesim;
+import com.inops.visitorpass.domain.LWPDetails;
 import com.inops.visitorpass.domain.LeaveTransactionReport;
 import com.inops.visitorpass.domain.LogDeteails;
 import com.inops.visitorpass.domain.PhysicalDays;
@@ -62,7 +63,7 @@ public class ReportGenerationService {
 	private final DataExtractionService leaveTransactionReportService;
 	private final DataExtractionService leaveBalanceReportService;
 	private final DataExtractionService consolidatedService;
-	private final DataExtractionService logRegisterService;
+	private final DataExtractionService logRegisterService,lwpDetailsService;
 	private final ICompany company;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 
@@ -391,6 +392,22 @@ public class ReportGenerationService {
 						.dataExtraction(from, to, id, type);
 
 				return generateFinalReport(from, to, consolidatedData, "LogRegister.jrxml", "logRegister");
+
+			} catch (Exception e) {
+				log.error("getConsolidated for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+	
+	public IReport getLWPDetails() {
+		return (from, to, id, type) -> {
+			try {
+
+				List<LWPDetails> LWPDetails = (List<LWPDetails>) lwpDetailsService
+						.dataExtraction(from, to, id, type);
+
+				return generateFinalReport(from, to, LWPDetails, "LwpDetails.jrxml", "lwpDetails");
 
 			} catch (Exception e) {
 				log.error("getConsolidated for {} data exception {}", type, e);

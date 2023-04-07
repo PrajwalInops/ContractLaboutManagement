@@ -96,7 +96,7 @@
 			<groupExpression><![CDATA[$F{department}]]></groupExpression>
 		</group>
 	</subDataset>
-	<parameter name="lateInRegister" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="absenteesmRegister" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="CompanyName" class="java.lang.String"/>
 	<parameter name="fromDate" class="java.util.Date"/>
 	<parameter name="toDate" class="java.util.Date"/>
@@ -177,7 +177,7 @@
 				</reportElement>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
 					<datasetRun subDataset="tableDataset" uuid="5c378c7e-150f-444c-ad1c-58febba22257">
-						<dataSourceExpression><![CDATA[$P{lateInRegister}]]></dataSourceExpression>
+						<dataSourceExpression><![CDATA[$P{absenteesmRegister}]]></dataSourceExpression>
 					</datasetRun>
 					<jr:columnGroup width="470" uuid="8c3d55aa-bea6-484e-a77f-0301603fccfe">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Columns [16]"/>
