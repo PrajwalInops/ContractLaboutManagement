@@ -326,7 +326,7 @@ public class VisitorController implements Serializable {
 			visitorService.update(visitor);
 			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 					"Visitorpass updated successfully for: " + visitorName);
-			// writeCardToDevise();
+			writeCardToDevise();
 			getCards();
 			cleanUp();
 		} catch (Exception e) {
@@ -474,8 +474,8 @@ public class VisitorController implements Serializable {
 	}
 
 	private String setEmployeeAndDivision(Visitor visitor) {
-		Employee employee = employees.stream().filter(emp -> emp.getEmployeeId().equals(visitor.getVisitingEmployee()))
-				.findAny().orElse(null);
+		Employee employee = employees.stream().filter(emp -> emp.getEmployeeId().equals(visitor.getVisitingEmployee())
+				|| emp.getEmployeeName().equals(visitor.getVisitingEmployee())).findAny().orElse(null);
 		visitor.setVisitingEmployee(employee.getEmployeeName());
 		visitor.setVisitingDepartment(employee.getDepartment().getDepartmentName());
 		return user.getEmployee().getDivision().getDivisionName();

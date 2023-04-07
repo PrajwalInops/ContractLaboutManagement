@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import com.inops.visitorpass.constant.InopsConstant;
-import com.inops.visitorpass.controller.VisitorController;
 import com.inops.visitorpass.domain.AttendanceRegister;
 import com.inops.visitorpass.domain.ContinousAbsenteesim;
 import com.inops.visitorpass.domain.Punch;
