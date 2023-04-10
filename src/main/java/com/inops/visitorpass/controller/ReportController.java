@@ -86,7 +86,8 @@ public class ReportController implements Serializable {
 						new SelectItem("All Punches", "All Punches"),
 						new SelectItem("Consolidated Report", "Consolidated Report"),
 						new SelectItem("Daily Summary", "Daily Summary"),
-						new SelectItem("LWP Details", "LWP Details")});
+						new SelectItem("LWP Details", "LWP Details"),
+						new SelectItem("LWP Summary", "LWP Summary")});
 
 		SelectItemGroup leaveReports = new SelectItemGroup("Leave Reports");
 		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("Leave Transaction", "Leave Transaction"),
@@ -232,6 +233,10 @@ public class ReportController implements Serializable {
 			break;
 		case InopsConstant.LWP_DETAILS:
 			buffer = reportGenerationService.getLWPDetails().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
+			break;
+		case InopsConstant.LWP_SUMMARY:
+			buffer = reportGenerationService.getLWPSummaryDetails().generate(report.getDateRange().get(0), to, filteredList,
 					report.getReportName());
 			break;
 

@@ -21,8 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LwpDetailsService implements DataExtractionService {
 
-	private final IMuster musterService;
-
+	protected final IMuster musterService;
 
 	@Override
 	public Collection<LWPDetails> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds,
@@ -36,13 +35,13 @@ public class LwpDetailsService implements DataExtractionService {
 
 			LWPDetails lWPDetails = new LWPDetails(emp.getEmployeeName(), emp.getDepartment().getDepartmentName(),
 					emp.getEmployeeId(), 0);
-			
+
 			muster.get().stream()
 					.filter(must -> must.getMusterId().getEmployeeId().equalsIgnoreCase(emp.getEmployeeId()))
 					.collect(Collectors.toList()).forEach(mst -> {
 						Double lwp = (mst.getAttendanceId().charAt(0) != 'N' ? 0.5 : 0.0)
 								+ (mst.getAttendanceId().charAt(1) != 'N' ? 0.5 : 0.0);
-						
+
 						lWPDetails.setLwp(lwp);
 
 					});

@@ -14,6 +14,7 @@ public class InopsConstant {
 	public static final String LEAVE_ENCASHMENT = "Leave Encashment";
 	public static final String LEAVE_BALANCE = "Leave Balance";
 	public static final String LWP_DETAILS = "LWP Details";
+	public static final String LWP_SUMMARY = "LWP Summary";
 	public static final String CONSOLIDATED_REPORT = "Consolidated Report";
 	public static final String LOG_REGISTER = "Log Register";
 	public static final String OUT_PASS = "OUT";

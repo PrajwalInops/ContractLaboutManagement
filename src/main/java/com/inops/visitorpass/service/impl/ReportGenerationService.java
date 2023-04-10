@@ -29,6 +29,7 @@ import com.inops.visitorpass.domain.Balance;
 import com.inops.visitorpass.domain.Consolidated;
 import com.inops.visitorpass.domain.ContinousAbsenteesim;
 import com.inops.visitorpass.domain.LWPDetails;
+import com.inops.visitorpass.domain.LWPSummary;
 import com.inops.visitorpass.domain.LeaveTransactionReport;
 import com.inops.visitorpass.domain.LogDeteails;
 import com.inops.visitorpass.domain.PhysicalDays;
@@ -63,7 +64,7 @@ public class ReportGenerationService {
 	private final DataExtractionService leaveTransactionReportService;
 	private final DataExtractionService leaveBalanceReportService;
 	private final DataExtractionService consolidatedService;
-	private final DataExtractionService logRegisterService,lwpDetailsService;
+	private final DataExtractionService logRegisterService, lwpDetailsService, lwpSummaryDetailsService;
 	private final ICompany company;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 
@@ -351,13 +352,13 @@ public class ReportGenerationService {
 			return null;
 		};
 	}
-	
+
 	public IReport getLeaveBalance() {
 		return (from, to, id, type) -> {
 			try {
 
-				List<Balance> visitorsData = (List<Balance>) leaveBalanceReportService
-						.dataExtraction(from, to, id, type);
+				List<Balance> visitorsData = (List<Balance>) leaveBalanceReportService.dataExtraction(from, to, id,
+						type);
 
 				return generateFinalReport(from, to, visitorsData, "LeaveBalance.jrxml", "leaveBalance");
 
@@ -367,13 +368,13 @@ public class ReportGenerationService {
 			return null;
 		};
 	}
-	
+
 	public IReport getConsolidated() {
 		return (from, to, id, type) -> {
 			try {
 
-				List<Consolidated> consolidatedData = (List<Consolidated>) consolidatedService
-						.dataExtraction(from, to, id, type);
+				List<Consolidated> consolidatedData = (List<Consolidated>) consolidatedService.dataExtraction(from, to,
+						id, type);
 
 				return generateFinalReport(from, to, consolidatedData, "ConsolidatedReport.jrxml", "consolidated");
 
@@ -383,34 +384,48 @@ public class ReportGenerationService {
 			return null;
 		};
 	}
-	
+
 	public IReport getLogRegister() {
 		return (from, to, id, type) -> {
 			try {
 
-				List<LogDeteails> consolidatedData = (List<LogDeteails>) logRegisterService
-						.dataExtraction(from, to, id, type);
+				List<LogDeteails> consolidatedData = (List<LogDeteails>) logRegisterService.dataExtraction(from, to, id,
+						type);
 
 				return generateFinalReport(from, to, consolidatedData, "LogRegister.jrxml", "logRegister");
 
 			} catch (Exception e) {
-				log.error("getConsolidated for {} data exception {}", type, e);
+				log.error("getLogRegister for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+
+	public IReport getLWPDetails() {
+		return (from, to, id, type) -> {
+			try {
+
+				List<LWPDetails> LWPDetails = (List<LWPDetails>) lwpDetailsService.dataExtraction(from, to, id, type);
+
+				return generateFinalReport(from, to, LWPDetails, "LwpDetails.jrxml", "lwpDetails");
+
+			} catch (Exception e) {
+				log.error("getLWPDetails for {} data exception {}", type, e);
 			}
 			return null;
 		};
 	}
 	
-	public IReport getLWPDetails() {
+	public IReport getLWPSummaryDetails() {
 		return (from, to, id, type) -> {
 			try {
 
-				List<LWPDetails> LWPDetails = (List<LWPDetails>) lwpDetailsService
-						.dataExtraction(from, to, id, type);
+				List<LWPSummary> LWPDetails = (List<LWPSummary>) lwpSummaryDetailsService.dataExtraction(from, to, id, type);
 
-				return generateFinalReport(from, to, LWPDetails, "LwpDetails.jrxml", "lwpDetails");
+				return generateFinalReport(from, to, LWPDetails, "LwpSummary.jrxml", "lwpSummary");
 
 			} catch (Exception e) {
-				log.error("getConsolidated for {} data exception {}", type, e);
+				log.error("getLWPSummaryDetails for {} data exception {}", type, e);
 			}
 			return null;
 		};

@@ -48,4 +48,12 @@ public class MusterServiceImpl implements IMuster {
 				Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId);
 	}
 
+	@Override
+	public Optional<List<Long>> countAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(LocalDate start,
+			LocalDate end, List<String> employeeId, long from, long to) {
+		return musterRepository.countAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(
+				Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
+				Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId, from, to);
+	}
+
 }
