@@ -21,13 +21,13 @@
                 <p:growl id="messages" showDetail="true" />
 
                
-                <p:dataTable id="dt-products" widgetVar="dtProducts" var="product"
+                <p:dataTable  widgetVar="dtProducts" var="product" id="approvalList"
                     value="#{visitorController.preApprovedVisitors}" reflow="true" styleClass="products-table"
                     selection="#{visitorController.selectedVisitors}" rowKey="#{product.id}" paginator="true" rows="10"
                     rowSelectMode="add" paginatorPosition="bottom">
                     <f:facet name="header">
                         <div class="products-table-header">
-                            <span style="font-weight: bold">PRODUCTS</span>
+                            <span style="font-weight: bold">VISITORS</span>
                             <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
                                 <p:inputText id="globalFilter" onkeyup="PF('dtProducts').filter()"
                                     placeholder="Search" />
@@ -71,7 +71,7 @@
                             <p:resetInput target=":dialogs:manage-product-content" />
                         </p:commandButton>
                         <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash" process="@this"
-                            oncomplete="PF('deleteProductDialog').show()">
+                            oncomplete="PF('deleteProductDialog').show()" update=":form:messages,:form:approvalList">
                             <f:setPropertyActionListener value="#{product}"
                                 target="#{visitorController.selectedVisitor}" />
                         </p:commandButton>

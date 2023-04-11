@@ -31,7 +31,7 @@
                             rendered="#{not empty visitorController.filename}" />
 
                     </p:outputPanel>
-                  
+
                 </h:panelGrid>
 
 
@@ -146,7 +146,6 @@
                                     <span class="ui-float-label" style="width: 100%">
                                         <p:selectOneMenu autoWidth="false" value="#{visitorController.nationality}"
                                             id="nationality">
-                                            <f:selectItem itemLabel="" itemValue="" />
                                             <f:selectItem itemLabel="INDIA" itemValue="INDIA" />
                                             <f:selectItem itemLabel="FOREIGN" itemValue="FOREIGN" />
                                         </p:selectOneMenu>
@@ -168,7 +167,6 @@
                                     <span class="ui-float-label" style="width: 100%">
                                         <p:selectOneMenu autoWidth="false" value="#{visitorController.purpose}"
                                             id="purpose">
-                                            <f:selectItem itemLabel="" itemValue="" />
                                             <f:selectItem itemLabel="OFFICIAL" itemValue="OFFICIAL" />
                                             <f:selectItem itemLabel="PERSONAL" itemValue="PERSONAL" />
                                         </p:selectOneMenu>
@@ -237,6 +235,27 @@
                                     </span>
                                 </div>
                             </div>
+
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-users" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:selectOneMenu value="#{visitorController.visitingDepartment}"
+                                            id="visitingDepartment" autoWidth="false" filter="true" required="true"
+                                            filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="" itemValue="" />
+                                            <f:selectItems value="#{visitorController.departments}" var="player"
+                                                itemLabel="#{player.departmentName}" itemValue="#{player.departmentName}" />
+                                            <p:ajax update="visitingEmployee"
+                                                listener="#{visitorController.getSelectedEmployeesOnDept}" />
+                                        </p:selectOneMenu>                                       
+                                        <p:outputLabel for="@previous" value="VisitingDepartment" />
+                                    </span>
+                                </div>
+                            </div>
+
                             <div class="field">
                                 <div class="ui-inputgroup">
                                     <span class="ui-inputgroup-addon">
@@ -248,27 +267,14 @@
                                             id="visitingEmployee" autoWidth="false" filter="true" required="true"
                                             filterMatchMode="startsWith">
                                             <f:selectItem itemLabel="" itemValue="" />
-                                            <f:selectItems value="#{visitorController.employees}" var="player"
+                                            <f:selectItems value="#{visitorController.selectedEmployees}" var="player"
                                                 itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
-                                            <p:ajax update="visitingDepartment"
-                                                listener="#{visitorController.getDepartment}" />
-                                        </p:selectOneMenu>
+                                            </p:selectOneMenu>   
                                         <p:outputLabel for="@previous" value="VisitingEmployee" />
                                     </span>
                                 </div>
                             </div>
-                            <div class="field">
-                                <div class="ui-inputgroup">
-                                    <span class="ui-inputgroup-addon">
-                                        <i class="pi pi-users" />
-                                    </span>
-                                    <span class="ui-float-label" style="width: 100%">
-                                        <p:inputText value="#{visitorController.visitingDepartment}"
-                                            id="visitingDepartment" />
-                                        <p:outputLabel for="@previous" value="VisitingDepartment" />
-                                    </span>
-                                </div>
-                            </div>
+                           
 
                             <div class="field">
                                 <div class="ui-inputgroup">
@@ -303,7 +309,7 @@
                                             update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo"
                                             icon="pi pi-save">
                                             <p:fileDownload value="#{visitorController.file}" />
-                                            <p:menuitem value="Update" action="#{visitorController.update}"
+                                         <!--   <p:menuitem value="Update" action="#{visitorController.update}"
                                                 update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo"
                                                 icon="pi pi-refresh">
                                                 <p:fileDownload value="#{visitorController.file}" />
@@ -314,7 +320,7 @@
                                             <p:divider />
                                             <p:menuitem value="Clear" action="#{visitorController.cleanUp}"
                                                 update="messages,mobileNo,date,visitorId,badgeNo,visitorName,company,address,noOfPersons,nationality,purpose,idProof,idProofNo,laptopToBePermitted,otherMediaItems,visitingEmployee,visitingDepartment,remarks,photo"
-                                                icon="pi pi-times-circle" />
+                                                icon="pi pi-times-circle" />-->
                                         </p:splitButton>
                                     </span>
                                 </div>

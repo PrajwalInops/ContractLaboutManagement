@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -99,6 +100,7 @@ public class VisitorController implements Serializable {
 	private Visitor selectedVisitor;
 	private List<Visitor> selectedVisitors;
 	private List<Employee> employees;
+	private List<Employee> selectedEmployees;
 	private List<ReaderIpAddress> readerIpAddresses;
 	private List<Cards> badgeNumbers;
 	private List<Division> divisions;
@@ -229,16 +231,19 @@ public class VisitorController implements Serializable {
 						"Please capture the photo for visitor: " + visitorName);
 			} else {
 				visitorService.save(visitor);
-				visitors.add(visitor);
-
+				if (visitors.stream().filter(visit -> visit.getMobileNo().equals(visitor.getMobileNo())).findAny()
+						.orElse(null) == null) {
+					visitors.add(visitor);
+				}
 				byte[] pass = reportGenerationService.generateVisitorReport(visitor, filename,
 						setEmployeeAndDivision(visitor));
+				getCards();
 				fileDownload(pass, mobileNo);
 				addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 						"Visitorpass generated successfully for: " + visitorName);
 				getAllPreApprovedVisitors();
 				writeCardToDevise();
-				getCards();
+
 				cleanUp();
 				log.info("saving the visitor data {}", visitor);
 			}
@@ -257,8 +262,11 @@ public class VisitorController implements Serializable {
 					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS, divisionId);
 
 			visitorService.save(visitor);
-			visitors.add(visitor);
-
+			if (visitors.stream().filter(visit -> visit.getMobileNo().equals(visitor.getMobileNo())).findAny()
+					.orElse(null) == null) {
+				visitors.add(visitor);
+			}
+			getAllPreApprovedVisitors();
 			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 					"Visitor pre-approval pass generated successfully for: " + visitorName);
 			cleanUp();
@@ -304,8 +312,10 @@ public class VisitorController implements Serializable {
 			getAllPreApprovedVisitors();
 			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 					"Visitor pre-approval pass updated successfully for: " + selectedVisitor.getVisitorName());
+			setBadgeNo(selectedVisitor.getBadgeNo());
+			setVisitorName(selectedVisitor.getVisitorName());
 			writeCardToDevise();
-			getCards();
+
 			cleanUp();
 		} catch (Exception e) {
 			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
@@ -337,7 +347,7 @@ public class VisitorController implements Serializable {
 	}
 
 	public void deletePreApproval() {
-		visitorService.delete(selectedVisitor.getMobileNo());
+		visitorService.delete(mobileNo);
 		getAllVisitors();
 		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 				"Visitor pre-approval pass deleted successfully for: " + visitorName);
@@ -390,6 +400,13 @@ public class VisitorController implements Serializable {
 		setVisitingDepartment(employee.getDepartment().getDepartmentName());
 	}
 
+	public void getSelectedEmployeesOnDept() {
+		selectedEmployees = employees.stream()
+				.filter(employees -> employees.getDepartment().getDepartmentName().equals(visitingDepartment))
+				.collect(Collectors.toList());
+
+	}
+
 	public void fileDownload(byte[] buffer, String mobileno) {
 
 		file = DefaultStreamedContent.builder().name(mobileno + ".pdf").contentType("application/pdf")
@@ -418,6 +435,7 @@ public class VisitorController implements Serializable {
 		setVisitingEmployee(null);
 		setRemarks(null);
 		setFilename(null);
+		setSelectedEmployees(null);
 
 	}
 
@@ -451,7 +469,14 @@ public class VisitorController implements Serializable {
 		List<String> badgeNo = visitors.stream().filter(vis -> vis.getDate().after(getdateCount))
 				.map(vis -> vis.getBadgeNo()).collect(Collectors.toList());
 
-		badgeNumbers = cardsList.stream().filter(card -> !badgeNo.contains(card.getCardNo()))
+		Comparator<Cards> customComparator = new Comparator<Cards>() {
+			@Override
+			public int compare(Cards o1, Cards o2) {
+				return o1.getCardNo().compareTo(o2.getCardNo());
+			}
+		};
+
+		badgeNumbers = cardsList.stream().filter(card -> !badgeNo.contains(card.getCardNo())).sorted(customComparator)
 				.collect(Collectors.toList());
 
 	}

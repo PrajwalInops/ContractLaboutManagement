@@ -75,7 +75,7 @@ public class AppMenu {
 			supportMenuItems.add(new MenuItem("Reports", "/ui/reporting"));
 			approval = true;
 		} else {
-			supportMenuItems.add(new MenuItem("Pre Approvals", "/ui/preApproval"));
+			supportMenuItems.add(new MenuItem("Visitor Request", "/ui/preApproval"));
 		}
 		if (user.getRole().name().equals("SUPER_USER")) {
 

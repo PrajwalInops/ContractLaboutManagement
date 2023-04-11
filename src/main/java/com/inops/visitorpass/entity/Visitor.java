@@ -1,5 +1,6 @@
 package com.inops.visitorpass.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -23,7 +24,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Entity
 @Table(name = "Visitor")
-public class Visitor {
+public class Visitor implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 

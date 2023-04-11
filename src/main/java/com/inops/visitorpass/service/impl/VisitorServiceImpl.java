@@ -39,6 +39,9 @@ public class VisitorServiceImpl implements IVisitorService {
 
 	@Override
 	public void save(Visitor visitor) {
+		if (visitorRepository.findByMobileNo(visitor.getMobileNo()).isPresent()) {
+			visitor.setId(visitorRepository.findByMobileNo(visitor.getMobileNo()).get().getId());
+		}
 		visitorRepository.save(visitor);
 	}
 
