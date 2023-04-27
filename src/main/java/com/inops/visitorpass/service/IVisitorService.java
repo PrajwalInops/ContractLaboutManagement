@@ -31,5 +31,5 @@ public interface IVisitorService {
 	
 	Map<String, Visitor> getCountriesAsMap();
 	
-	long countByDate(Date date);
+	long countByDateAndDivision(Date date, long division);
 }

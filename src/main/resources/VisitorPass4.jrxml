@@ -198,7 +198,7 @@
 		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="388" splitType="Stretch">
+		<band height="396" splitType="Stretch">
 			<frame>
 				<reportElement x="2" y="10" width="277" height="249" uuid="fd763160-3443-497a-906d-fefcf740963b"/>
 				<image>
@@ -224,7 +224,7 @@
 					<textElement textAlignment="Center">
 						<font fontName="Times New Roman" size="12" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Visitor Id:]]></text>
+					<text><![CDATA[Sl No]]></text>
 				</staticText>
 				<textField>
 					<reportElement x="84" y="33" width="86" height="16" uuid="3baa9335-0e24-46b1-b98c-7ef07737db7d"/>
@@ -354,48 +354,62 @@
 				</textField>
 			</frame>
 			<frame>
-				<reportElement x="3" y="259" width="287" height="120" uuid="2a744a1e-8b27-4d39-8bf3-2d7ab4a8341d"/>
+				<reportElement x="3" y="259" width="287" height="137" uuid="2a744a1e-8b27-4d39-8bf3-2d7ab4a8341d"/>
 				<staticText>
-					<reportElement x="1" y="48" width="100" height="16" uuid="95bc79f8-55b7-44a4-b5ab-cf20e89f50c4"/>
+					<reportElement x="1" y="63" width="100" height="16" uuid="95bc79f8-55b7-44a4-b5ab-cf20e89f50c4"/>
 					<textElement>
 						<font fontName="Times New Roman" size="10"/>
 					</textElement>
 					<text><![CDATA[NOTE:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="1" y="63" width="277" height="21" uuid="f6445abc-a4f4-49cd-bae7-0fa21bcc20af"/>
+					<reportElement x="1" y="78" width="277" height="21" uuid="f6445abc-a4f4-49cd-bae7-0fa21bcc20af"/>
 					<textElement>
 						<font fontName="Times New Roman" size="10"/>
 					</textElement>
 					<text><![CDATA[** Visitor's Pass is valid upto 4.30 PM to the Div/Sec indicated only]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="1" y="83" width="277" height="16" uuid="22197728-f0be-42b1-af2e-ff1629d6347d"/>
+					<reportElement x="1" y="98" width="277" height="16" uuid="22197728-f0be-42b1-af2e-ff1629d6347d"/>
 					<textElement>
 						<font fontName="Times New Roman" size="10"/>
 					</textElement>
 					<text><![CDATA[** Kindly return Visitor's Pass and badge to Gate Office]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="1" y="100" width="277" height="20" uuid="d07f23b7-b833-46f3-8484-c05eb7e0f46e"/>
+					<reportElement x="1" y="115" width="277" height="20" uuid="d07f23b7-b833-46f3-8484-c05eb7e0f46e"/>
 					<textElement>
 						<font fontName="Times New Roman" size="10"/>
 					</textElement>
 					<text><![CDATA[You are entering a no smoking zone.Smoking inside the campus is an offence]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="2" y="20" width="90" height="25" uuid="a18f3c76-6cd9-4fc6-ad17-35af16272aa1"/>
+					<reportElement x="2" y="13" width="90" height="25" uuid="a18f3c76-6cd9-4fc6-ad17-35af16272aa1"/>
 					<textElement textAlignment="Center">
 						<font fontName="Times New Roman" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Sig.of Receptionist]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="168" y="18" width="100" height="33" uuid="8df847eb-0530-45cd-aea9-46fabc89dcbf"/>
+					<reportElement x="168" y="13" width="100" height="33" uuid="8df847eb-0530-45cd-aea9-46fabc89dcbf"/>
 					<textElement textAlignment="Center">
 						<font fontName="Times New Roman" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Sig.of Person Visited with Time]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="-7" y="39" width="100" height="33" uuid="75291399-6e83-4a46-ae1f-d676fb7760f3"/>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Sig.of Person Visited with Time]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="169" y="51" width="100" height="33" uuid="e14c79d3-2712-45be-9cdb-9bdb1fc5549f"/>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Sig.of Gate Security with Time]]></text>
 				</staticText>
 			</frame>
 			<line>

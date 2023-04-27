@@ -20,5 +20,5 @@ public interface VisitorRepository extends JpaRepository<Visitor, Long> {
 	
 	void deleteByMobileNo(String mobileNo);
 	
-	long countByDateGreaterThan(Date date);
+	long countByDateGreaterThanAndDivision(Date date, long division);
 }

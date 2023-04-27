@@ -77,8 +77,8 @@ public class VisitorServiceImpl implements IVisitorService {
 	}
 
 	@Override
-	public long countByDate(Date date) {
-		return visitorRepository.countByDateGreaterThan(date);
+	public long countByDateAndDivision(Date date, long division) {
+		return visitorRepository.countByDateGreaterThanAndDivision(date, division);
 	}
 
 	@Override

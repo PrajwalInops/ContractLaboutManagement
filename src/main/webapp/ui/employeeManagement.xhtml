@@ -60,6 +60,17 @@
                             <div class="field">
                                 <div class="ui-inputgroup">
                                     <span class="ui-inputgroup-addon">
+                                        <i class="pi pi-user" />
+                                    </span>
+                                    <span class="ui-float-label" style="width: 100%">
+                                        <p:datePicker value="#{visitorController.dateofLeft}" id="dol" />
+                                        <p:outputLabel for="@previous" value="DOL" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui-inputgroup">
+                                    <span class="ui-inputgroup-addon">
                                         <i class="pi pi-users" />
                                     </span>
                                     <span class="ui-float-label" style="width: 100%">
@@ -100,14 +111,14 @@
                                 <div class="ui-inputgroup">
                                     <span class="ui-float-label" style="width: 100%">
                                         <p:splitButton value="Save" action="#{visitorController.saveEmployee}"
-                                            update="messages,visitingDepartment,employeeName,Division,visitingEmployee"
+                                            update="messages,visitingDepartment,employeeName,Division,visitingEmployee,dol"
                                             icon="pi pi-save">
                                             <p:menuitem value="Update" action="#{visitorController.updateEmployee}"
-                                                update="messages,visitingDepartment,employeeName,Division,visitingEmployee"
+                                                update="messages,visitingDepartment,employeeName,Division,visitingEmployee,dol"
                                                 icon="pi pi-refresh">
                                             </p:menuitem>                                           
                                             <p:menuitem value="Clear" action="#{visitorController.clearEmployee}"
-                                                update="messages,visitingDepartment,employeeName,Division,visitingEmployee"
+                                                update="messages,visitingDepartment,employeeName,Division,visitingEmployee,dol"
                                                 icon="pi pi-times-circle" />
                                         </p:splitButton>
                                     </span>

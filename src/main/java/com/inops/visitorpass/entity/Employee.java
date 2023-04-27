@@ -1,5 +1,7 @@
 package com.inops.visitorpass.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,6 +36,9 @@ public class Employee {
 	
 	@Column(name = "empname")
 	private String employeeName;
+	
+	@Column(name = "dol")
+	private Date dateOfLeft;	
 	
 	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "deptid")

@@ -24,6 +24,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.inject.Inject;
 
 import org.primefaces.event.CaptureEvent;
 import org.primefaces.event.DragDropEvent;
@@ -43,6 +44,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.inops.visitorpass.constant.InopsConstant;
 import com.inops.visitorpass.domain.CardDetails;
+import com.inops.visitorpass.domain.Country;
 import com.inops.visitorpass.entity.Cards;
 import com.inops.visitorpass.entity.Department;
 import com.inops.visitorpass.entity.Division;
@@ -56,6 +58,7 @@ import com.inops.visitorpass.service.IDivision;
 import com.inops.visitorpass.service.IEmployee;
 import com.inops.visitorpass.service.IReaderIpAddress;
 import com.inops.visitorpass.service.IVisitorService;
+import com.inops.visitorpass.service.impl.CountryService;
 import com.inops.visitorpass.service.impl.ReportGenerationService;
 
 import lombok.Getter;
@@ -78,6 +81,7 @@ public class VisitorController implements Serializable {
 	private final IReaderIpAddress readerIpAddress;
 	private final ICard card;
 	private final IDivision division;
+	private final CountryService countryService;
 
 	@Autowired
 	RestTemplate restTemplate;
@@ -105,6 +109,7 @@ public class VisitorController implements Serializable {
 	private List<Cards> badgeNumbers;
 	private List<Division> divisions;
 	private List<Department> departments;
+	private List<Country> countries;
 
 	private String photoPath;
 	private StreamedContent visitorPhoto;
@@ -127,6 +132,7 @@ public class VisitorController implements Serializable {
 	private String visitingEmployee;
 	private String remarks;
 	private long divisionId;
+	private Date dateofLeft;
 	private StreamedContent file;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 	private User user;
@@ -140,6 +146,8 @@ public class VisitorController implements Serializable {
 	public void init() throws UnsupportedEncodingException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		user = (User) auth.getPrincipal();
+
+		countries = countryService.getCountries();
 
 		droppedVisitors = new ArrayList<>();
 
@@ -403,7 +411,7 @@ public class VisitorController implements Serializable {
 	public void getSelectedEmployeesOnDept() {
 		selectedEmployees = employees.stream()
 				.filter(employees -> employees.getDepartment().getDepartmentName().equals(visitingDepartment))
-				.collect(Collectors.toList());
+				.filter(emp -> emp.getDateOfLeft() == null).collect(Collectors.toList());
 
 	}
 
@@ -450,7 +458,8 @@ public class VisitorController implements Serializable {
 
 		Date getdateCount = Date.from(LocalDate.now().minusDays(1).atStartOfDay(defaultZoneId).toInstant());
 		new java.sql.Date(getdateCount.getTime());
-		visitorId = String.valueOf(visitorService.countByDate(new java.sql.Date(getdateCount.getTime())) + 1);
+		visitorId = String.valueOf(visitorService.countByDateAndDivision(new java.sql.Date(getdateCount.getTime()),
+				user.getEmployee().getDivision().getDivisionId()) + 1);
 
 	}
 
@@ -518,7 +527,7 @@ public class VisitorController implements Serializable {
 
 	public void saveEmployee() {
 
-		Employee employee = new Employee(visitingEmployee, employeeName,
+		Employee employee = new Employee(visitingEmployee, employeeName, null,
 				departments.stream().filter(dept -> dept.getId().equals(visitingDepartment)).findAny().orElse(null),
 				divisions.stream().filter(div -> div.getDivisionId() == divisionId).findAny().orElse(null));
 		employeeService.save(employee);
@@ -533,6 +542,7 @@ public class VisitorController implements Serializable {
 				.findAny().orElse(null);
 
 		employee.setEmployeeName(employeeName);
+		employee.setDateOfLeft(dateofLeft);
 		employee.setDepartment(
 				departments.stream().filter(dept -> dept.getId().equals(visitingDepartment)).findAny().orElse(null));
 		employee.setDivision(
@@ -548,5 +558,6 @@ public class VisitorController implements Serializable {
 		setVisitingDepartment(null);
 		setVisitingEmployee(null);
 		setDivisionId(0);
+		setDateofLeft(null);
 	}
 }
