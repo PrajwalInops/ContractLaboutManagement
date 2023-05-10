@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -34,6 +35,7 @@ import com.inops.visitorpass.domain.LeaveTransactionReport;
 import com.inops.visitorpass.domain.LogDeteails;
 import com.inops.visitorpass.domain.PhysicalDays;
 import com.inops.visitorpass.domain.Punch;
+import com.inops.visitorpass.domain.ThreeYears;
 import com.inops.visitorpass.entity.Company;
 import com.inops.visitorpass.entity.Visitor;
 import com.inops.visitorpass.service.DataExtractionService;
@@ -64,7 +66,8 @@ public class ReportGenerationService {
 	private final DataExtractionService leaveTransactionReportService;
 	private final DataExtractionService leaveBalanceReportService;
 	private final DataExtractionService consolidatedService;
-	private final DataExtractionService logRegisterService, lwpDetailsService, lwpSummaryDetailsService;
+	private final DataExtractionService logRegisterService, lwpDetailsService, lwpSummaryDetailsService,
+			threeYearsAttendanceReport;
 	private final ICompany company;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 
@@ -415,12 +418,13 @@ public class ReportGenerationService {
 			return null;
 		};
 	}
-	
+
 	public IReport getLWPSummaryDetails() {
 		return (from, to, id, type) -> {
 			try {
 
-				List<LWPSummary> LWPDetails = (List<LWPSummary>) lwpSummaryDetailsService.dataExtraction(from, to, id, type);
+				List<LWPSummary> LWPDetails = (List<LWPSummary>) lwpSummaryDetailsService.dataExtraction(from, to, id,
+						type);
 
 				return generateFinalReport(from, to, LWPDetails, "LwpSummary.jrxml", "lwpSummary");
 
@@ -431,11 +435,64 @@ public class ReportGenerationService {
 		};
 	}
 
+	public IReport getThreeYearsAttendance() {
+		return (from, to, id, type) -> {
+			try {
+
+				List<ThreeYears> threeYearsAttendance = (List<ThreeYears>) threeYearsAttendanceReport
+						.dataExtraction(from, to, id, type);
+
+				Map<String, Object> empParams = new HashMap<String, Object>();
+
+				empParams.put("y1", from.getYear());
+				empParams.put("y2", from.getYear() + 1);
+				empParams.put("y3", from.getYear() + 2);
+
+				return generateFinalReport(from, to, threeYearsAttendance, "ThreeYearsAttendance.jrxml",
+						"threeYearsAttendance", empParams);
+
+			} catch (Exception e) {
+				log.error("getThreeYearsAttendance for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+
 	private byte[] generateFinalReport(LocalDate from, LocalDate to, Collection<?> beanCollection, String jrxmlFileName,
 			String type) throws JRException, FileNotFoundException {
 		// dynamic parameters required for report
 		Company companyDetails = company.findAll().get().get(0);
 		Map<String, Object> empParams = new HashMap<String, Object>();
+		empParams.put("CompanyName", companyDetails.getCompanyName());
+		empParams.put("fromDate", Date.from(from.atStartOfDay(defaultZoneId).toInstant()));
+		empParams.put("toDate", Date.from(to.atStartOfDay(defaultZoneId).toInstant()));
+
+		empParams.put(type, new JRBeanCollectionDataSource(beanCollection));
+
+		JasperPrint extractReport = JasperFillManager.fillReport(JasperCompileManager
+				// .compileReport(ResourceUtils.getFile("classpath:" +
+				// jrxmlFileName).getAbsolutePath()) // path
+				.compileReport(
+						ResourceUtils.getFile(companyDetails.getReportsJRXMLFilePath() + File.separator + jrxmlFileName)
+								.getAbsolutePath()) // path
+		// of
+		// the
+		// jasper
+		// report
+				, empParams // dynamic parameters
+				, new JREmptyDataSource());
+
+		// the report in PDF format
+		// JasperExportManager.exportReportToPdfFile(visitorReport, newPdfFileName);
+
+		return JasperExportManager.exportReportToPdf(extractReport);
+	}
+
+	private byte[] generateFinalReport(LocalDate from, LocalDate to, Collection<?> beanCollection, String jrxmlFileName,
+			String type, Map<String, Object> empParams) throws JRException, FileNotFoundException {
+		// dynamic parameters required for report
+		Company companyDetails = company.findAll().get().get(0);
+		// Map<String, Object> empParams = new HashMap<String, Object>();
 		empParams.put("CompanyName", companyDetails.getCompanyName());
 		empParams.put("fromDate", Date.from(from.atStartOfDay(defaultZoneId).toInstant()));
 		empParams.put("toDate", Date.from(to.atStartOfDay(defaultZoneId).toInstant()));
