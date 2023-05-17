@@ -122,15 +122,15 @@ public class VisitorController implements Serializable {
 	private String visitorCompany;
 	private String address;
 	private String noOfPersons;
-	private String nationality;
+	private String nationality="India";
 	private String purpose;
 	private String idProof;
 	private String idProofNo;
 	private String laptopToBePermitted;
-	private String otherMediaItems;
+	private String otherMediaItems = "NAN";
 	private String visitingDepartment;
 	private String visitingEmployee;
-	private String remarks;
+	private String remarks = "NAN";
 	private long divisionId;
 	private Date dateofLeft;
 	private StreamedContent file;
