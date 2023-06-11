@@ -40,7 +40,7 @@ public class Muster {
 
 	@Column(name = "Latepunch")
 	private int latePunch;
-	
+
 	@Column(name = "SingleOT")
 	private int singleOt;
 
@@ -51,11 +51,14 @@ public class Muster {
 	private int earlyOut;
 
 	@Column(name = "Firstin")
-	//@Column(name = "in1")
+	// @Column(name = "in1")
 	private String firstInPunch;
 
 	@Column(name = "Lastout")
-	//@Column(name = "out1")
+	// @Column(name = "out1")
 	private String lastOutPunch;
+					
+	@Column(name = "Adjshrthrs")
+	private String shortHrs;
 
 }

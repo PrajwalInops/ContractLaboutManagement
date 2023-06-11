@@ -87,7 +87,14 @@ public class ReportController implements Serializable {
 						new SelectItem("Consolidated Report", "Consolidated Report"),
 						new SelectItem("Daily Summary", "Daily Summary"), new SelectItem("LWP Details", "LWP Details"),
 						new SelectItem("LWP Summary", "LWP Summary"),
-						new SelectItem("ThreeYears Attendance", "ThreeYears Attendance") });
+						new SelectItem("ThreeYears Attendance", "ThreeYears Attendance"),
+						new SelectItem("Detailed Physical Days", "Detailed Physical Days"),
+						new SelectItem("Finantial Cutlist", "Finantial Cutlist"),
+						new SelectItem("Extra 4 Hours", "Extra 4 Hours"),
+						new SelectItem("Cutlist OverTime", "Cutlist OverTime"),
+						new SelectItem("Oneline Consolidated", "Oneline Consolidated"),
+						new SelectItem("Payroll Short Hours", "Payroll Short Hours"),
+						new SelectItem("Mandays Detailed", "Mandays Detailed")});
 
 		SelectItemGroup leaveReports = new SelectItemGroup("Leave Reports");
 		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("Leave Transaction", "Leave Transaction"),
@@ -200,6 +207,10 @@ public class ReportController implements Serializable {
 			buffer = reportGenerationService.getContinousAbsenteesim().generate(report.getDateRange().get(0), to,
 					filteredList, report.getReportName());
 			break;
+		case InopsConstant.CONSOLIDATED_REPORT:
+			buffer = reportGenerationService.getConsolidated().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;	
 
 		case "All Punches":
 			buffer = reportGenerationService.getAllPunches().generate(report.getDateRange().get(0), to, filteredList,
@@ -227,6 +238,10 @@ public class ReportController implements Serializable {
 			buffer = reportGenerationService.getLeaveBalance().generate(report.getDateRange().get(0), to, filteredList,
 					report.getReportName());
 			break;
+		case InopsConstant.LEAVE_ENCASHMENT:
+			buffer = reportGenerationService.getLeaveEncashment().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
+			break;
 		case InopsConstant.LOG_REGISTER:
 			buffer = reportGenerationService.getLogRegister().generate(report.getDateRange().get(0), to, filteredList,
 					report.getReportName());
@@ -235,8 +250,46 @@ public class ReportController implements Serializable {
 			buffer = reportGenerationService.getLWPDetails().generate(report.getDateRange().get(0), to, filteredList,
 					report.getReportName());
 			break;
+		case InopsConstant.LWP_SUMMARY:
+			buffer = reportGenerationService.getLWPSummaryDetails().generate(report.getDateRange().get(0), to, filteredList,
+					report.getReportName());
+			break;
 		case InopsConstant.THREE_YEARS_ATTENDANCE:
 			buffer = reportGenerationService.getThreeYearsAttendance().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+
+		case InopsConstant.DETAILED_PHYSICAL_DAYS:
+			buffer = reportGenerationService.getDetailedPhysicalDaysDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+		case InopsConstant.FINANTIAL_CUTLIST:
+			buffer = reportGenerationService.getFinantialCutlistDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+
+		case InopsConstant.EXTRA_4_HOURS:
+			buffer = reportGenerationService.getFourHoursExtraDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+
+		case InopsConstant.CUTLIST_OVERTIME:
+			buffer = reportGenerationService.getCutListOvertimeDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+
+		case InopsConstant.ONELINE_CONSOLIDATED:
+			buffer = reportGenerationService.getOneLineConsolidatedDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+
+		case InopsConstant.PAYROLL_SHORT_HOURS:
+			buffer = reportGenerationService.getPayrollShortHoutsDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+
+		case InopsConstant.MANDAYS_DETAILED:
+			buffer = reportGenerationService.getMandaysDetails().generate(report.getDateRange().get(0), to,
 					filteredList, report.getReportName());
 			break;
 

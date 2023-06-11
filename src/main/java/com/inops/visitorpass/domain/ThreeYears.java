@@ -14,14 +14,14 @@ public class ThreeYears {
 	
 	private String name;
 	private String department;
-	private String designation;
-	private Data doj;
-	private String qualification;
+	//private String designation;
+	//private Data doj;
+	//private String qualification;
 				   
 	
-	private long incentiveY1;	             
-	private long incentiveY2;
-	private long incentiveY3;
+	//private long incentiveY1;	             
+	//private long incentiveY2;
+	///private long incentiveY3;
 	
 	private long attendanceY1;
 	private long attendanceY2;
@@ -47,9 +47,9 @@ public class ThreeYears {
 	private long lwpY2;
 	private long lwpY3;
 	
-	private String medical;
-	private String disciplin;
-	private String punishment;
+	//private String medical;
+	//private String disciplin;
+	//private String punishment;
 	
 
 }

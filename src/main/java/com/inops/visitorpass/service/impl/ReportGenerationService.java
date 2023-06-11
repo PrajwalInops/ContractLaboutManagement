@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -29,6 +28,10 @@ import com.inops.visitorpass.domain.AttendanceRegister;
 import com.inops.visitorpass.domain.Balance;
 import com.inops.visitorpass.domain.Consolidated;
 import com.inops.visitorpass.domain.ContinousAbsenteesim;
+import com.inops.visitorpass.domain.DetailedPhysicalDays;
+import com.inops.visitorpass.domain.Encashment;
+import com.inops.visitorpass.domain.FinantialCutlist;
+import com.inops.visitorpass.domain.FourhoursExtra;
 import com.inops.visitorpass.domain.LWPDetails;
 import com.inops.visitorpass.domain.LWPSummary;
 import com.inops.visitorpass.domain.LeaveTransactionReport;
@@ -61,13 +64,13 @@ public class ReportGenerationService {
 	private final DataExtractionService continousAbsenteesim;
 	private final DataExtractionService allPunch;
 	private final DataExtractionService dailySummary;
-	private final DataExtractionService dailyVisitors;
-	private final DataExtractionService physicalDays;
-	private final DataExtractionService leaveTransactionReportService;
-	private final DataExtractionService leaveBalanceReportService;
-	private final DataExtractionService consolidatedService;
+	private final DataExtractionService dailyVisitors,mandaysDetailedService;
+	private final DataExtractionService physicalDays,payrollShortHoursService;
+	private final DataExtractionService leaveTransactionReportService,oneLineConsolidatedService;
+	private final DataExtractionService leaveBalanceReportService,leaveEncashReportService;
+	private final DataExtractionService consolidatedService,finantialCutlistService,fourHoursExtraService,cutlistOverTimeService;
 	private final DataExtractionService logRegisterService, lwpDetailsService, lwpSummaryDetailsService,
-			threeYearsAttendanceReport;
+			threeYearsAttendanceReport,detailedPhysicalDaysReport;
 	private final ICompany company;
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 
@@ -299,9 +302,9 @@ public class ReportGenerationService {
 		return (from, to, id, type) -> {
 			try {
 
-				List<Punch> allPunches = (List<Punch>) dailySummary.dataExtraction(from, to, id, type);
+				List<Punch> dailySummaryList = (List<Punch>) dailySummary.dataExtraction(from, to, id, type);
 
-				return generateFinalReport(from, to, allPunches, "DailySummary.jrxml", "dailySummary");
+				return generateFinalReport(from, to, dailySummaryList, "DailySummary.jrxml", "dailySummary");
 
 			} catch (Exception e) {
 				log.error("GetDailySummary for {} data exception {}", type, e);
@@ -329,9 +332,9 @@ public class ReportGenerationService {
 		return (from, to, id, type) -> {
 			try {
 
-				List<PhysicalDays> visitorsData = (List<PhysicalDays>) physicalDays.dataExtraction(from, to, id, type);
+				List<PhysicalDays> physicalDaysList = (List<PhysicalDays>) physicalDays.dataExtraction(from, to, id, type);
 
-				return generateFinalReport(from, to, visitorsData, "PhysicalDays.jrxml", "physicalDays");
+				return generateFinalReport(from, to, physicalDaysList, "PhysicalDays.jrxml", "physicalDays");
 
 			} catch (Exception e) {
 				log.error("getPhysicalDays for {} data exception {}", type, e);
@@ -344,10 +347,10 @@ public class ReportGenerationService {
 		return (from, to, id, type) -> {
 			try {
 
-				List<LeaveTransactionReport> visitorsData = (List<LeaveTransactionReport>) leaveTransactionReportService
+				List<LeaveTransactionReport> leaveTransaction = (List<LeaveTransactionReport>) leaveTransactionReportService
 						.dataExtraction(from, to, id, type);
 
-				return generateFinalReport(from, to, visitorsData, "LeaveTransaction.jrxml", "leaveTransaction");
+				return generateFinalReport(from, to, leaveTransaction, "LeaveTransaction.jrxml", "leaveTransaction");
 
 			} catch (Exception e) {
 				log.error("getLeaveTransactions for {} data exception {}", type, e);
@@ -360,13 +363,29 @@ public class ReportGenerationService {
 		return (from, to, id, type) -> {
 			try {
 
-				List<Balance> visitorsData = (List<Balance>) leaveBalanceReportService.dataExtraction(from, to, id,
+				List<Balance> leaveBalance = (List<Balance>) leaveBalanceReportService.dataExtraction(from, to, id,
 						type);
 
-				return generateFinalReport(from, to, visitorsData, "LeaveBalance.jrxml", "leaveBalance");
+				return generateFinalReport(from, to, leaveBalance, "LeaveBalance.jrxml", "leaveBalance");
 
 			} catch (Exception e) {
 				log.error("getLeaveBalance for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+	
+	public IReport getLeaveEncashment() {
+		return (from, to, id, type) -> {
+			try {
+
+				List<Encashment> leaveEncashment = (List<Encashment>) leaveEncashReportService.dataExtraction(from, to, id,
+						type);
+
+				return generateFinalReport(from, to, leaveEncashment, "LeaveEncashment.jrxml", "leaveEncashment");
+
+			} catch (Exception e) {
+				log.error("getLeaveEncashment for {} data exception {}", type, e);
 			}
 			return null;
 		};
@@ -458,6 +477,112 @@ public class ReportGenerationService {
 		};
 	}
 
+	public IReport getDetailedPhysicalDaysDetails() {
+		return (from, to, id, type) -> {
+			try {
+
+				List<DetailedPhysicalDays> LWPDetails = (List<DetailedPhysicalDays>) detailedPhysicalDaysReport.dataExtraction(from, to, id,
+						type);
+
+				return generateFinalReport(from, to, LWPDetails, "DetailedPhysicalDays.jrxml", "detailedPhysicalDays");
+
+			} catch (Exception e) {
+				log.error("getDetailedPhysicalDaysDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+	
+	public IReport getFinantialCutlistDetails() {
+		return (from, to, id, type) -> {
+			try {
+				List<FinantialCutlist> finantialCutlist = (List<FinantialCutlist>) finantialCutlistService.dataExtraction(from, to, id,
+						type);
+
+				return generateFinalReport(from, to, finantialCutlist, "FinantialCutlist.jrxml", "finantialCutlist");
+
+			} catch (Exception e) {
+				log.error("getFinantialCutlistDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+	
+	public IReport getFourHoursExtraDetails() {
+		return (from, to, id, type) -> {
+			try {
+				List<FourhoursExtra> fourhoursExtra = (List<FourhoursExtra>) fourHoursExtraService.dataExtraction(from, to, id,
+						type);
+
+				return generateFinalReport(from, to, fourhoursExtra, "Extra4Hours.jrxml", "extra4Hours");
+
+			} catch (Exception e) {
+				log.error("getFourHoursExtraDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+
+	public IReport getCutListOvertimeDetails() {
+		return (from, to, id, type) -> {
+			try {
+				List<FinantialCutlist> cutlistOverTime = (List<FinantialCutlist>) cutlistOverTimeService.dataExtraction(from, to, id,
+						type);
+
+				return generateFinalReport(from, to, cutlistOverTime, "CutlistOvertime.jrxml", "cutlistOvertime");
+
+			} catch (Exception e) {
+				log.error("getCutListOvertimeDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+	
+	public IReport getOneLineConsolidatedDetails() {
+		return (from, to, id, type) -> {
+			try {
+				List<FourhoursExtra> oneLineConsolidated = (List<FourhoursExtra>) oneLineConsolidatedService.dataExtraction(from, to, id,
+						type);
+
+				return generateFinalReport(from, to, oneLineConsolidated, "OneLineConsolidated.jrxml", "onelineConsolidated");
+
+			} catch (Exception e) {
+				log.error("getOneLineConsolidatedDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+	
+	public IReport getMandaysDetails() {
+		return (from, to, id, type) -> {
+			try {
+				List<FinantialCutlist> mandaysDetailed = (List<FinantialCutlist>) mandaysDetailedService.dataExtraction(from, to, id,
+						type);
+
+				return generateFinalReport(from, to, mandaysDetailed, "MandaysDetailed.jrxml", "mandaysDetailed");
+
+			} catch (Exception e) {
+				log.error("getMandaysDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+	
+	public IReport getPayrollShortHoutsDetails() {
+		return (from, to, id, type) -> {
+			try {
+				List<FourhoursExtra> payrollShortHours = (List<FourhoursExtra>) payrollShortHoursService.dataExtraction(from, to, id,
+						type);
+
+				return generateFinalReport(from, to, payrollShortHours, "PayrollShorthours.jrxml", "payrollShorthrs");
+
+			} catch (Exception e) {
+				log.error("getPayrollShortHoutsDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+	
 	private byte[] generateFinalReport(LocalDate from, LocalDate to, Collection<?> beanCollection, String jrxmlFileName,
 			String type) throws JRException, FileNotFoundException {
 		// dynamic parameters required for report

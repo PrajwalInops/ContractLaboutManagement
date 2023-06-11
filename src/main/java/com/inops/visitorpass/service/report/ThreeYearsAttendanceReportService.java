@@ -37,112 +37,138 @@ public class ThreeYearsAttendanceReportService implements DataExtractionService 
 			ThreeYears threeYear = new ThreeYears();
 			threeYear.setName(emp.getEmployeeName());
 			threeYear.setDepartment(emp.getDepartment().getDepartmentName());
-			threeYear.setDesignation(null);
-			threeYear.setDoj(null);
+			//threeYear.setDesignation("");
+			//threeYear.setDoj(null);
 
 			SimpleDateFormat df = new SimpleDateFormat("yyyy");
-			 
 
 			//////// Attendance
-			List<Muster> yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear()))
+			List<Muster> yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear())
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
-			threeYear.setAttendanceY1(
-					yearlyMusters.stream().filter(must -> !must.getAttendanceId().equals("AA")).count());
+			threeYear
+					.setAttendanceY1(yearlyMusters
+							.stream().filter(must -> !must.getAttendanceId().equals("AA")
+									&& !must.getAttendanceId().equals("HH") && !must.getAttendanceId().equals("WW"))
+							.count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
-			threeYear.setAttendanceY2(
-					yearlyMusters.stream().filter(must -> !must.getAttendanceId().equals("AA")).count());
+			threeYear
+					.setAttendanceY2(yearlyMusters
+							.stream().filter(must -> !must.getAttendanceId().equals("AA")
+									&& !must.getAttendanceId().equals("HH") && !must.getAttendanceId().equals("WW"))
+							.count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
-			threeYear.setAttendanceY3(
-					yearlyMusters.stream().filter(must -> !must.getAttendanceId().equals("AA")).count());
+			threeYear
+					.setAttendanceY3(yearlyMusters
+							.stream().filter(must -> !must.getAttendanceId().equals("AA")
+									&& !must.getAttendanceId().equals("HH") && !must.getAttendanceId().equals("WW"))
+							.count());
 
 			/////////// Late
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear()))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear())
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setLateY1(yearlyMusters.stream().filter(must -> must.getLatePunch() != 0).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setLateY2(yearlyMusters.stream().filter(must -> must.getLatePunch() != 0).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setLateY3(yearlyMusters.stream().filter(must -> must.getLatePunch() != 0).count());
 
 			///////// Early
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear()))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear())
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setEarlyY1(yearlyMusters.stream().filter(must -> must.getEarlyOut() != 0).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setEarlyY2(yearlyMusters.stream().filter(must -> must.getEarlyOut() != 0).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setEarlyY3(yearlyMusters.stream().filter(must -> must.getEarlyOut() != 0).count());
 
 			///////// CL
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear()))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear())
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setClY1(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("CC")).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setClY2(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("CC")).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setClY3(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("CC")).count());
 
 			///////// VL
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear()))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear())
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setVlY1(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("VV")).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setVlY2(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("VV")).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setVlY3(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("VV")).count());
 
 			///////// LWP
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear()))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear())
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setLwpY1(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("NN")).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 1)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setLwpY2(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("NN")).count());
 
-			yearlyMusters = muster.get().stream()
-					.filter(must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2))
+			yearlyMusters = muster.get().stream().filter(
+					must -> Integer.parseInt(df.format(must.getMusterId().getAttendanceDate())) == (from.getYear() + 2)
+							&& must.getMusterId().getEmployeeId().equals(emp.getEmployeeId()))
 					.collect(Collectors.toList());
 			threeYear.setLwpY3(yearlyMusters.stream().filter(must -> must.getLeaveTypeId().equals("NN")).count());
 
