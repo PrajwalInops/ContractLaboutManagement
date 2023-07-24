@@ -78,4 +78,10 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	}
 
+	@Override
+	public Optional<List<User>> findAll() {
+		// TODO Auto-generated method stub
+		return Optional.of(userRepository.findAll());
+	}
+
 }

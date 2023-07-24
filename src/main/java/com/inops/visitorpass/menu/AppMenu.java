@@ -71,15 +71,31 @@ public class AppMenu {
 		// supportMenuItems.add(new MenuItem("PRO Support", "/support"));
 
 		if (user.getRole().name().equals("ADMIN")) {
-			// supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));
-			supportMenuItems.add(new MenuItem("Reports", "/ui/reporting"));
+			supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));
+					
 			approval = true;
 		} else {
 			supportMenuItems.add(new MenuItem("Pre Approvals", "/ui/preApproval"));
 		}
 		supportMenuItems.add(new MenuItem("User Management", "/ui/usersManagement"));
-		menuCategories.add(new MenuCategory("Reporting", supportMenuItems));
+		menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
 
+		// DATA CATEGORY START
+		List<MenuItem> dataMenuItems = new ArrayList<>();
+		dataMenuItems.add(new MenuItem("Leave Settings", "/ui/leaveType"));
+				
+		menuCategories.add(new MenuCategory("Leave Management", dataMenuItems));
+		
+		List<MenuItem> masterMenuItems = new ArrayList<>();
+		masterMenuItems.add(new MenuItem("Master Settings", "/ui/master"));
+				
+		menuCategories.add(new MenuCategory("Masters Management", masterMenuItems));
+		
+		
+		List<MenuItem> reportMenuItems = new ArrayList<>();
+		reportMenuItems.add(new MenuItem("Reports", "/ui/reporting"));	
+				
+		menuCategories.add(new MenuCategory("Reports Management", reportMenuItems));
 		// SUPPORT CATEGORY END
 
 		/*

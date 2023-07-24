@@ -1,6 +1,7 @@
 package com.inops.visitorpass.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.inops.visitorpass.domain.ResetPassword;
 import com.inops.visitorpass.entity.User;
@@ -12,5 +13,7 @@ public interface IUserService {
 	public List<Object> isUserPresent(User user);
 	
 	public boolean resetPassword(ResetPassword restPassword);
+	
+	Optional<List<User>> findAll();
 
 }
