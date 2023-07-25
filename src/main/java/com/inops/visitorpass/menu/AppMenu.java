@@ -91,6 +91,11 @@ public class AppMenu {
 				
 		menuCategories.add(new MenuCategory("Masters Management", masterMenuItems));
 		
+		List<MenuItem> transactionMenuItems = new ArrayList<>();
+		transactionMenuItems.add(new MenuItem("Transactions", "/ui/transaction"));
+				
+		menuCategories.add(new MenuCategory("Transaction Management", transactionMenuItems));
+		
 		
 		List<MenuItem> reportMenuItems = new ArrayList<>();
 		reportMenuItems.add(new MenuItem("Reports", "/ui/reporting"));	

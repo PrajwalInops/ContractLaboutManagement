@@ -1,27 +1,156 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
-    template="/WEB-INF/template.xhtml">
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:p="http://primefaces.org/ui"
+  template="/WEB-INF/template.xhtml"
+>
+  <ui:define name="title">
+    Masters <span class="subitem">Management</span>
+  </ui:define>
 
-    <ui:define name="title">
-        Masters <span class="subitem">Management</span>
-    </ui:define>
+  <ui:define name="description">
+    Tool provides an Outlook for endusers who is pertinant to operate the
+    company masters genereation and policy request process.
+  </ui:define>
 
-    <ui:define name="description">
-        Tool provides an Outlook for endusers who is pertinant to operate the company masters genereation and policy
-        request process.
-    </ui:define>
+  <ui:param name="documentationLink" value="/components/schedule" />
+  <ui:param name="widgetLink" value="Schedule-1" />
 
-    <ui:param name="documentationLink" value="/components/schedule" />
-    <ui:param name="widgetLink" value="Schedule-1" />
-
-    <ui:define name="implementation">
+  <ui:define name="implementation">
+    <div class="card">
+      <h:form id="form">
+        <p:growl id="messages" showDetail="true" />
         <div class="card">
-            <h:form id="form">
-                <p:growl id="messages" showDetail="true" />
-                
-               
-            </h:form>
-        </div>
-    </ui:define>
+          <h5>Company Details</h5>
+          <p:panelGrid
+            columns="4"
+            layout="flex"
+            columnClasses="col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4, col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4"
+            contentStyleClass="align-items-baseline ui-fluid"
+          >
+            <p:outputLabel for="subscription" value="Subscription Id" />
+            <p:inputText id="subscription" />
 
+            <p:outputLabel for="companyName" value="Company Name" />
+            <p:inputText id="companyName" />
+
+            <p:outputLabel for="companyAddress" value="Company Address" />
+            <p:inputText id="companyAddress" />
+
+            <p:outputLabel for="companyLocation" value="Company Location" />
+            <p:inputText id="companyLocation" />
+
+            <p:outputLabel for="graceInTime" value="Grace In Time" />
+            <p:inputText id="graceInTime" />
+
+            <p:outputLabel for="graceOurTime" value="Grace Out Time" />
+            <p:inputText id="graceOurTime" />
+
+            <p:outputLabel for="graceLunchInTime" value="Grace Lunch-In Time" />
+            <p:inputText id="graceLunchInTime" />
+
+            <p:outputLabel
+              for="graceLunchOurTime"
+              value="Grace Lunch-Out Time"
+            />
+            <p:inputText id="graceLunchOurTime" />
+
+            <p:outputLabel for="graceOt" value="Grace Over-Time" />
+            <p:inputText id="graceOt" />
+
+            <p:outputLabel for="employeeIdLength" value="EmployeeId Length" />
+            <p:inputText id="employeeIdLength" />
+
+            <p:outputLabel
+              for="duplicatePunchPeriod"
+              value="Duplicate Punch Min period"
+            />
+            <p:inputText id="duplicatePunchPeriod" />
+
+            <p:outputLabel for="readerVersion" value="Badge Reader version" />
+            <p:inputText id="readerVersion" />
+
+            <p:outputLabel for="date" value="Date of Subscription" />
+            <p:datePicker id="date" showIcon="true" style="width: auto" />
+
+            <p:outputLabel for="flexy" value="Flexy Time Calculation" />
+            <p:selectBooleanCheckbox
+              id="flexy"
+              itemLabel="Enable flex time calculation"
+            />
+
+            <p:outputLabel for="minimumLate" value="Minimum Late times" />
+            <p:inputText id="minimumLate" />
+
+            <p:outputLabel for="minimumEarly" value="Minimum Early times" />
+            <p:inputText id="minimumEarly" />
+
+          </p:panelGrid>
+          
+          <p:splitButton
+          value="Save"
+          action="#{leaveTypeController.save}"
+          
+          icon="pi pi-save"
+        >
+          <p:menuitem
+            value="Update"
+            action="#{visitorController.updatePreApproval}"
+           
+            icon="pi pi-refresh"
+          >
+          </p:menuitem>
+          <p:menuitem
+            value="Delete"
+            action="#{visitorController.deletePreApproval}"
+            
+            icon="pi pi-times"
+          />
+          <p:divider />
+          <p:menuitem
+            value="Clear"
+            action="#{visitorController.cleanUp}"
+           
+            icon="pi pi-times-circle"
+          />
+        </p:splitButton>
+        </div>
+
+        <div class="card">
+          <h5>Responsive (PrimeFlex, align-items-baseline)</h5>
+          <p:panelGrid
+            columns="4"
+            layout="flex"
+            columnClasses="col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4, col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4"
+            contentStyleClass="align-items-baseline ui-fluid"
+          >
+            <p:outputLabel for="text10" value="Text 10" />
+            <p:inputText id="text10" />
+
+            <p:outputLabel for="text20" value="Text 20" />
+            <p:inputText id="text20" />
+
+            <p:outputLabel for="date1" value="Date1" />
+            <p:datePicker id="date1" showIcon="true" style="width: auto" />
+
+            <p:outputLabel for="checkbox1" value="Checkbox1" />
+            <p:selectBooleanCheckbox id="checkbox1" itemLabel="Checkbox1" />
+
+            <p:outputLabel for="text30" value="Text 30" />
+            <p:inputText id="text30" />
+
+            <p:outputLabel for="selectOne1" value="SelectOne (misaligned)" />
+            <p:selectOneMenu id="selectOne1">
+              <f:selectItem itemLabel="Select One" itemValue="" />
+              <f:selectItem itemLabel="Xbox One" itemValue="Xbox One" />
+              <f:selectItem itemLabel="PS4" itemValue="PS4" />
+              <f:selectItem itemLabel="Wii U" itemValue="Wii U" />
+            </p:selectOneMenu>
+          </p:panelGrid>
+        </div>
+      </h:form>
+    </div>
+  </ui:define>
 </ui:composition>
