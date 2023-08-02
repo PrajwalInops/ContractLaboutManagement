@@ -33,10 +33,10 @@ public class OneLineConsolidatedReportService implements DataExtractionService {
 				employeeIds.stream().map(Employee::getEmployeeId).collect(Collectors.toList()));
 
 		employeeIds.stream().forEach(employee -> {
-			FourhoursExtra extra = new FourhoursExtra();
+			
 			muster.get().stream().filter(must -> must.getMusterId().getEmployeeId().equals(employee.getEmployeeId()))
 					.collect(Collectors.toList()).forEach(musterData -> {
-						
+						FourhoursExtra extra = new FourhoursExtra();
 							extra.setLate(musterData.getEarlyOut());
 							extra.setExtra(musterData.getExtraHours());
 							extra.setEarly(musterData.getEarlyOut());
