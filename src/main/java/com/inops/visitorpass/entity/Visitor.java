@@ -3,11 +3,13 @@ package com.inops.visitorpass.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -54,6 +56,11 @@ public class Visitor implements Serializable{
 	private boolean isApproved;
 	private String outOrInPass;
 	private long division;
+	
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "channelApproval")
+    private ChannelApproval channelApproval;
+	
+	
 
 	public void setId(long id) {
 		this.id = id;
@@ -141,6 +148,10 @@ public class Visitor implements Serializable{
 
 	public void setDivision(long division) {
 		this.division = division;
+	}
+
+	public void setChannelApproval(ChannelApproval channelApproval) {
+		this.channelApproval = channelApproval;
 	}
 
 }

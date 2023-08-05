@@ -46,6 +46,7 @@ import com.inops.visitorpass.constant.InopsConstant;
 import com.inops.visitorpass.domain.CardDetails;
 import com.inops.visitorpass.domain.Country;
 import com.inops.visitorpass.entity.Cards;
+import com.inops.visitorpass.entity.ChannelApproval;
 import com.inops.visitorpass.entity.Department;
 import com.inops.visitorpass.entity.Division;
 import com.inops.visitorpass.entity.Employee;
@@ -53,6 +54,7 @@ import com.inops.visitorpass.entity.ReaderIpAddress;
 import com.inops.visitorpass.entity.User;
 import com.inops.visitorpass.entity.Visitor;
 import com.inops.visitorpass.service.ICard;
+import com.inops.visitorpass.service.IChannelApprovalService;
 import com.inops.visitorpass.service.ICompany;
 import com.inops.visitorpass.service.IDivision;
 import com.inops.visitorpass.service.IEmployee;
@@ -60,6 +62,7 @@ import com.inops.visitorpass.service.IReaderIpAddress;
 import com.inops.visitorpass.service.IVisitorService;
 import com.inops.visitorpass.service.impl.CountryService;
 import com.inops.visitorpass.service.impl.ReportGenerationService;
+import com.inops.visitorpass.whatsapp.TwilioService;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +85,8 @@ public class VisitorController implements Serializable {
 	private final ICard card;
 	private final IDivision division;
 	private final CountryService countryService;
+	private final TwilioService twilioService;
+	private final IChannelApprovalService channelApprovalService;
 
 	@Autowired
 	RestTemplate restTemplate;
@@ -122,7 +127,7 @@ public class VisitorController implements Serializable {
 	private String visitorCompany;
 	private String address;
 	private String noOfPersons;
-	private String nationality="India";
+	private String nationality = "India";
 	private String purpose;
 	private String idProof;
 	private String idProofNo;
@@ -230,10 +235,14 @@ public class VisitorController implements Serializable {
 
 	public void save() {
 		try {
+			ChannelApproval channelApproval = new ChannelApproval(null, "918951870661", "prajja1990@gmail.com", false);
+			twilioService.sendWhatsAppMessage("+918951870661",
+					"Hi " + visitingEmployee + ",/n Here is a visitor " + visitorName + " from " + visitorCompany
+							+ " please send 'yes' for approval and 'no' for dis-approval");
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
 					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS,
-					user.getEmployee().getDivision().getDivisionId());
+					user.getEmployee().getDivision().getDivisionId(), channelApproval);
 			if (filename == null) {
 				addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
 						"Please capture the photo for visitor: " + visitorName);
@@ -267,7 +276,8 @@ public class VisitorController implements Serializable {
 		try {
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS, divisionId);
+					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS, divisionId,
+					null);
 
 			visitorService.save(visitor);
 			if (visitors.stream().filter(visit -> visit.getMobileNo().equals(visitor.getMobileNo())).findAny()
@@ -289,7 +299,8 @@ public class VisitorController implements Serializable {
 		try {
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
-					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS, divisionId);
+					visitingDepartment, visitingEmployee, remarks, filename, true, InopsConstant.IN_PASS, divisionId,
+					null);
 			visitorService.update(visitor);
 			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
 					"Visitor pre-approval pass updated successfully for: " + visitorName);
@@ -312,7 +323,8 @@ public class VisitorController implements Serializable {
 					selectedVisitor.getIdProofNo(), selectedVisitor.getLaptopToBePermitted(),
 					selectedVisitor.getOtherMediaItems(), selectedVisitor.getVisitingDepartment(),
 					selectedVisitor.getVisitingEmployee(), selectedVisitor.getRemarks(),
-					selectedVisitor.getVisitorPhoto(), false, InopsConstant.IN_PASS, selectedVisitor.getDivision());
+					selectedVisitor.getVisitorPhoto(), false, InopsConstant.IN_PASS, selectedVisitor.getDivision(),
+					null);
 			byte[] pass = reportGenerationService.generateVisitorReport(visitor, selectedVisitor.getVisitorPhoto(),
 					setEmployeeAndDivision(visitor));
 			fileDownload(pass, selectedVisitor.getMobileNo());
@@ -337,7 +349,7 @@ public class VisitorController implements Serializable {
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
 					noOfPersons, nationality, purpose, idProof, idProofNo, laptopToBePermitted, otherMediaItems,
 					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS,
-					user.getEmployee().getDivision().getDivisionId());
+					user.getEmployee().getDivision().getDivisionId(), null);
 			byte[] pass = reportGenerationService.generateVisitorReport(visitor, filename,
 					setEmployeeAndDivision(visitor));
 			fileDownload(pass, mobileNo);
