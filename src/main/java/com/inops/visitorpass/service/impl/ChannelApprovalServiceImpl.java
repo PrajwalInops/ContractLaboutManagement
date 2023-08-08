@@ -11,11 +11,10 @@ import com.inops.visitorpass.service.IChannelApprovalService;
 
 import lombok.RequiredArgsConstructor;
 
-
 @Service("channelApprovalService")
 @RequiredArgsConstructor
 public class ChannelApprovalServiceImpl implements IChannelApprovalService {
-	
+
 	private final ChannelApprovalRepository approvalRepository;
 
 	@Override
@@ -38,6 +37,9 @@ public class ChannelApprovalServiceImpl implements IChannelApprovalService {
 		return approvalRepository.save(channelApproval);
 	}
 
-	
+	@Override
+	public Optional<ChannelApproval> findByPhoneNoAndIsApproved(String phoneNo, boolean isApproved) {
+		return approvalRepository.findByPhoneNoAndIsApproved(phoneNo, false);
+	}
 
 }

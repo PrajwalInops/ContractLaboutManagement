@@ -8,10 +8,12 @@ import com.inops.visitorpass.entity.ChannelApproval;
 public interface IChannelApprovalService {
 
 	Optional<List<ChannelApproval>> findAll();
-	
+
 	Optional<ChannelApproval> findByPhoneNo(String phoneNo);
-	
+
+	Optional<ChannelApproval> findByPhoneNoAndIsApproved(String phoneNo, boolean isApproved);
+
 	Optional<ChannelApproval> findByMailId(String mailId);
-	
+
 	ChannelApproval create(ChannelApproval channelApproval);
 }

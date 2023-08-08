@@ -22,7 +22,7 @@
 
                
                 <p:dataTable  widgetVar="dtProducts" var="product" id="approvalList"
-                    value="#{visitorController.preApprovedVisitors}" reflow="true" styleClass="products-table"
+                    value="#{visitorController.allPreApprovedVisitors}" reflow="true" styleClass="products-table"
                     selection="#{visitorController.selectedVisitors}" rowKey="#{product.id}" paginator="true" rows="10"
                     rowSelectMode="add" paginatorPosition="bottom">
                     <f:facet name="header">

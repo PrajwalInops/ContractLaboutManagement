@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -26,7 +27,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Entity
 @Table(name = "Visitor")
-public class Visitor implements Serializable{
+public class Visitor implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -56,11 +57,7 @@ public class Visitor implements Serializable{
 	private boolean isApproved;
 	private String outOrInPass;
 	private long division;
-	
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "channelApproval")
-    private ChannelApproval channelApproval;
-	
-	
+	private long channelId;
 
 	public void setId(long id) {
 		this.id = id;
@@ -148,10 +145,6 @@ public class Visitor implements Serializable{
 
 	public void setDivision(long division) {
 		this.division = division;
-	}
-
-	public void setChannelApproval(ChannelApproval channelApproval) {
-		this.channelApproval = channelApproval;
 	}
 
 }

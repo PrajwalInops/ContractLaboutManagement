@@ -28,4 +28,6 @@ public class Company {
 	private String visitorsPhotoPath;
 	private String reportsJRXMLFilePath;
 	private String companyName;
+	//private String passFolder;
+		
 }

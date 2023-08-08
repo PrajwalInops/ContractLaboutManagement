@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -20,14 +22,14 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name = "ChannelApproval")
 public class ChannelApproval {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long channelId;
 
 	private String phoneNo;
 	private String mailId;
 	private boolean isApproved;
-
+	private String visitorMobileNo;
 
 }

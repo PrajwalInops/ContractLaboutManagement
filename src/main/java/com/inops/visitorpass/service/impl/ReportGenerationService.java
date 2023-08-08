@@ -116,7 +116,7 @@ public class ReportGenerationService {
 					, new JREmptyDataSource());
 
 			// the report in PDF format
-			// JasperExportManager.exportReportToPdfFile(visitorReport, newPdfFileName);
+		 JasperExportManager.exportReportToPdfFile(visitorReport, "C:\\Users\\SPURGE\\Prajwal N\\source code\\passes\\"+fileName+".pdf");
 
 			return JasperExportManager.exportReportToPdf(visitorReport);
 			// return new ResponseEntity<byte[]>

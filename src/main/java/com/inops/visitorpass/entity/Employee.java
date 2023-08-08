@@ -47,5 +47,10 @@ public class Employee {
 	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "divisionId")
     private Division division;
+	
+	@Column(name = "phoneno")
+	private String phoneNo;
+	@Column(name = "Email")
+	private String mailId;
 
 }
