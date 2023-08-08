@@ -28,8 +28,8 @@ public class ChannelApprovalServiceImpl implements IChannelApprovalService {
 	}
 
 	@Override
-	public Optional<ChannelApproval> findByMailId(String mailId) {
-		return approvalRepository.findByPhoneNo(mailId);
+	public Optional<ChannelApproval> findByMailIdAndIsApproved(String mailId, boolean isApproved) {
+		return approvalRepository.findByMailIdAndIsApproved(mailId, isApproved);
 	}
 
 	@Override

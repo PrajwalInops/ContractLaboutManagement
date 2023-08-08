@@ -8,7 +8,7 @@ import com.inops.visitorpass.entity.ChannelApproval;
 
 public interface ChannelApprovalRepository extends JpaRepository<ChannelApproval, Long> {
 
-	Optional<ChannelApproval> findByMailId(String mailId);
+	Optional<ChannelApproval> findByMailIdAndIsApproved(String mailId, boolean isApproved);
 
 	Optional<ChannelApproval> findByPhoneNo(String phoneNo);
 

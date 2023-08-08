@@ -247,12 +247,6 @@ public class VisitorController implements Serializable {
 					visitingDepartment, visitingEmployee, remarks, filename, false, InopsConstant.IN_PASS,
 					user.getEmployee().getDivision().getDivisionId(), channelApproval.getChannelId());
 
-			/*
-			 * emailService.sendEmail(employee.getMailId(), "Visitor approval for " +
-			 * visitorName, "Your appointment is coming up with " + visitorName + " from " +
-			 * visitorCompany + " send yes to approve no to dis-approve");
-			 */
-
 			twilioService.sendWhatsAppMessage(employee.getPhoneNo(), "Your appointment is coming up with " + visitorName
 					+ " from " + visitorCompany + " send yes to approve no to dis-approve");
 
@@ -265,8 +259,19 @@ public class VisitorController implements Serializable {
 						.orElse(null) == null) {
 					visitors.add(visitor);
 				}
-				//byte[] pass = reportGenerationService.generateVisitorReport(visitor, filename,
-				//		setEmployeeAndDivision(visitor));
+				byte[] attachment = reportGenerationService.generateVisitorReport(visitor, filename,
+						setEmployeeAndDivision(visitor));
+
+				String subject = "Visitor approval for " + visitorName;
+				String body = "Please find the attached file and approve the visitor by clicking on link below:";
+				String attachmentFilename = filename + ".pdf";
+				String linkUrl = "http://localhost:8080/mail/approvevisitor?from=" + employee.getMailId()
+						+ "&isApproved=true";
+				String linkText = "click to Approve";
+
+				emailService.sendEmailWithAttachmentAndLink(employee.getMailId(), subject, body, attachment,
+						attachmentFilename, linkUrl, linkText);
+
 				getCards();
 				// fileDownload(pass, mobileNo);
 				addMessage(FacesMessage.SEVERITY_INFO, "Info Message",

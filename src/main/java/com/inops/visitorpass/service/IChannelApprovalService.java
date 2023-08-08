@@ -13,7 +13,7 @@ public interface IChannelApprovalService {
 
 	Optional<ChannelApproval> findByPhoneNoAndIsApproved(String phoneNo, boolean isApproved);
 
-	Optional<ChannelApproval> findByMailId(String mailId);
+	Optional<ChannelApproval> findByMailIdAndIsApproved(String mailId, boolean isApproved);
 
 	ChannelApproval create(ChannelApproval channelApproval);
 }

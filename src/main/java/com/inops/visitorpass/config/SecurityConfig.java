@@ -59,7 +59,7 @@ public class SecurityConfig {
 		http.formLogin().loginPage("/login.xhtml").permitAll().failureUrl("/login.xhtml?error=true")
 				.successHandler(sucessHandler);// .usernameParameter("email") .passwordParameter("password");
 
-		http.authorizeRequests().antMatchers("/ui/mailApproval.xhtml","/send-whatsapp", "/webhook", "/javax.faces.resource/**").permitAll()
+		http.authorizeRequests().antMatchers("/ui/mailApproval.xhtml","/mail/approvevisitor","/send-whatsapp", "/webhook", "/javax.faces.resource/**").permitAll()
 				.anyRequest().authenticated();
 		// logout
 		http.logout().logoutSuccessUrl("/login.xhtml");
