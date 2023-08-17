@@ -83,6 +83,8 @@ public class AppMenu {
 		// DATA CATEGORY START
 		List<MenuItem> dataMenuItems = new ArrayList<>();
 		dataMenuItems.add(new MenuItem("Leave Settings", "/ui/leaveType"));
+		dataMenuItems.add(new MenuItem("Holiday Settings", "/ui/holiday"));
+		dataMenuItems.add(new MenuItem("Compensatory Off", "/ui/compensatoryOff"));
 				
 		menuCategories.add(new MenuCategory("Leave Management", dataMenuItems));
 		

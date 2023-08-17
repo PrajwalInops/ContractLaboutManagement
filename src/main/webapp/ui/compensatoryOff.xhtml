@@ -1,0 +1,209 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:p="http://primefaces.org/ui"
+  template="/WEB-INF/template.xhtml"
+>
+  <ui:define name="title">
+    compensatoryOff <span class="subitem"> policy configuration</span>
+  </ui:define>
+
+  <ui:define name="description">
+    Tool provides an Outlook for endusers who is pertinant to operate the
+    Visitor pass genereation and pre-approval request process.
+  </ui:define>
+
+  <ui:param name="documentationLink" value="/components/schedule" />
+  <ui:param name="widgetLink" value="Schedule-1" />
+
+  <ui:define name="implementation">
+    <h:form id="comp">
+      <p:growl id="messages" showDetail="true" />
+
+      <div class="card">
+        <h5>Compensatory Off Details</h5>
+        <p:commandButton
+          value="Add New CompensatoryOff"
+          icon="pi pi-plus"
+          onclick="PF('compOffDialog').show();"
+        />
+        <p:dataTable
+          id="itemTable"
+          var="item"
+          value="#{leaveTypeController.compensatoryOffs}"
+          selection="#{leaveTypeController.compensatoryOff}"
+          rowKey="#{item}"
+        >
+          <p:column headerText="Mode">
+            <p:cellEditor>
+              <f:facet name="output">
+                <h:outputText value="#{item.mode}" />
+              </f:facet>
+              <f:facet name="input">
+                <p:inputText value="#{item.mode}" />
+              </f:facet>
+            </p:cellEditor>
+          </p:column>
+
+          <p:column headerText="Enable">
+            <p:cellEditor>
+              <f:facet name="output">
+                <h:outputText value="#{item.enable}" />
+              </f:facet>
+              <f:facet name="input">
+                <p:selectBooleanCheckbox value="#{item.enable}" />
+              </f:facet>
+            </p:cellEditor>
+          </p:column>
+
+          <p:column headerText="Credit Weekend">
+            <p:cellEditor>
+              <f:facet name="output">
+                <h:outputText value="#{item.creditWeekend}" />
+              </f:facet>
+              <f:facet name="input">
+                <p:inputText value="#{item.creditWeekend}" />
+              </f:facet>
+            </p:cellEditor>
+          </p:column>
+
+          <p:column headerText="Credit Holiday">
+            <p:cellEditor>
+              <f:facet name="output">
+                <h:outputText value="#{item.creditHoliday}" />
+              </f:facet>
+              <f:facet name="input">
+                <p:inputText value="#{item.creditHoliday}" />
+              </f:facet>
+            </p:cellEditor>
+          </p:column>
+
+          <p:column headerText="Expires In">
+            <p:cellEditor>
+              <f:facet name="output">
+                <h:outputText value="#{item.expiresIn}" />
+              </f:facet>
+              <f:facet name="input">
+                <p:inputText value="#{item.expiresIn}" />
+              </f:facet>
+            </p:cellEditor>
+          </p:column>
+
+          <p:column headerText="Units Allowed">
+            <p:cellEditor>
+              <f:facet name="output">
+                <h:outputText value="#{item.unitsAllowed}" />
+              </f:facet>
+              <f:facet name="input">
+                <p:inputText value="#{item.unitsAllowed}" />
+              </f:facet>
+            </p:cellEditor>
+          </p:column>
+
+          <p:column headerText="Duration Allowed">
+            <p:cellEditor>
+              <f:facet name="output">
+                <h:outputText value="#{item.durationAllowed}" />
+              </f:facet>
+              <f:facet name="input">
+                <p:inputText value="#{item.durationAllowed}" />
+              </f:facet>
+            </p:cellEditor>
+          </p:column>
+
+          <p:column headerText="Action">
+            <p:commandButton
+              icon="pi pi-pencil"  styleClass="edit-button rounded-button ui-button-success"
+              oncomplete="PF('compOffDialog').show();"
+              update=":comp:itemTable"
+            />
+            <p:spacer width="10" />
+            <p:commandButton
+              icon="pi pi-trash"  class="ui-button-warning rounded-button"
+              action="#{leaveTypeController.deleteCompOff(item)}"
+            />
+          </p:column>
+        </p:dataTable>
+
+        <p:dialog
+          header="Compensatory Off Edit"
+          widgetVar="compOffDialog"
+          modal="true"
+        >
+          <h:panelGrid columns="2" cellpadding="5">
+            <h:outputLabel
+              for="mode"
+              value="Mode to add Compensatory Request entry:"
+            />
+            <p:inputText
+              id="mode"
+              value="#{leaveTypeController.compensatoryOff.mode}"
+            />
+
+            <h:outputLabel
+              for="enable"
+              value="Add Compensatory Request for future date:"
+            />
+            <p:selectBooleanCheckbox
+              id="enable"
+              value="#{leaveTypeController.compensatoryOff.enable}"
+            />
+
+            <h:outputLabel
+              for="creditWeekend"
+              value="Leave to be credited when work is done on a Weekend:"
+            />
+            <p:inputText
+              id="creditWeekend"
+              value="#{leaveTypeController.compensatoryOff.creditWeekend}"
+            />
+
+            <h:outputLabel
+              for="creditHoliday"
+              value="Leave to be credited when work is done on a Holiday:"
+            />
+            <p:inputText
+              id="creditHoliday"
+              value="#{leaveTypeController.compensatoryOff.creditHoliday}"
+            />
+
+            <h:outputLabel
+              for="expiresIn"
+              value="Credited leave expires after:"
+            />
+            <p:inputText
+              id="expiresIn"
+              value="#{leaveTypeController.compensatoryOff.expiresIn}"
+            />
+
+            <h:outputLabel for="unitsAllowed" value="Units Allowed:" />
+            <p:inputText
+              id="unitsAllowed"
+              value="#{leaveTypeController.compensatoryOff.unitsAllowed}"
+            />
+
+            <h:outputLabel for="durationAllowed" value="Duration Allowed:" />
+            <p:inputText
+              id="durationAllowed"
+              value="#{leaveTypeController.compensatoryOff.durationAllowed}"
+            />
+          </h:panelGrid>
+          <p:commandButton
+            value="Save"
+            action="#{leaveTypeController.saveCompOff}"
+            update=":comp:itemTable"
+            oncomplete="PF('compOffDialog').hide()"
+          />
+          <p:commandButton
+            value="Delete"
+            action="#{leaveTypeController.deleteCompOff}"
+            update=":comp:itemTable"
+            oncomplete="PF('compOffDialog').hide()"
+          />
+        </p:dialog>
+      </div>
+    </h:form>
+  </ui:define>
+</ui:composition>

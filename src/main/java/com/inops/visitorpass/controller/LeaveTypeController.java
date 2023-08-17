@@ -12,10 +12,15 @@ import org.primefaces.event.TabCloseEvent;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.inops.visitorpass.entity.CompensatoryOff;
+import com.inops.visitorpass.entity.Holiday;
 import com.inops.visitorpass.entity.LeaveTypeEntity;
+import com.inops.visitorpass.service.ICompensatoryOff;
+import com.inops.visitorpass.service.IHoliday;
 import com.inops.visitorpass.service.ILeaveType;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
@@ -24,9 +29,16 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Component("leaveTypeController")
 @Scope("session")
+@RequiredArgsConstructor
 public class LeaveTypeController {
 
-	private ILeaveType leaveTypeService;
+	private final ILeaveType leaveTypeService;
+	private final IHoliday holidayService;
+	private final ICompensatoryOff compensatoryOffService;
+
+	private LeaveTypeEntity leaveTypeEntity;
+	private Holiday holiday;
+	private CompensatoryOff compensatoryOff;
 
 	private String leaveName;
 	private String leaveCode;
@@ -80,28 +92,39 @@ public class LeaveTypeController {
 	private String encashmentScale;
 	private int encashmentMaxLimit;
 	private String prorateAccrual;
-	
+
 	private List<LeaveTypeEntity> leaveTypes;
 	private LeaveTypeEntity leaveTypeObject;
 
-	public LeaveTypeController(ILeaveType leaveTypeService) {
-		super();
-		this.leaveTypeService = leaveTypeService;
-	}
+	private List<Holiday> holidays;
+	private List<CompensatoryOff> compensatoryOffs;
 
 	
+
 	@PostConstruct
-	public void init()  {
+	public void init() {
 		leaveTypes = leaveTypeService.findAll().get();
+		holidays = holidayService.findAll().get();
+		compensatoryOffs = compensatoryOffService.findAll().get();
 	}
-	
-	public void leaveDetails()
-	{
+
+	public void leaveDetails() {
 		leaveCode = leaveTypeObject.getLeaveCode();
 	}
 
 	public void save() {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Welcome " + leaveName + " " + leaveCode));
+		LeaveTypeEntity leaveTypeObj = new LeaveTypeEntity(0L, leaveName, leaveCode, leaveType, leaveUnits,
+				leaveBalanceBasedOn, validFrom, validTo, leaveDescription, applicableFor, applicableRole,
+				applicableLocation, applicableGender, applicableMaritalStatus, quarterDay, halfDay,
+				beyondPermittedLeave, roundOffPermittedLeave, excludeHolidays, excludeWeekEndsDays,
+				includeAllHolidaysAndWeeklyOffs, maxConsecutiveDays, holidayWeekendConsicutive, applicationSubmitBefore,
+				effectiveAfter, entitlementInterval, effectiveFrom, accrual, accrualType, accrualOn, accrualMonth,
+				noOfDays, reset, resetType, resetOn, resetMonth, carryForwardType, unit, carryForwardScale,
+				carryForwardMaxLimit, expiresIn, carryForwardInterval, encashment, encashmentScale, encashmentMaxLimit,
+				prorateAccrual);
+		leaveTypeService.create(leaveTypeObj);
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage("Leave " + leaveName + " " + leaveCode + " created successfully"));
 	}
 
 	public void onTabChange(TabChangeEvent event) {
@@ -114,5 +137,14 @@ public class LeaveTypeController {
 		FacesContext.getCurrentInstance().addMessage(null, msg);
 	}
 
+	public void saveHoliday() {
+
+	}
+
+	public void deleteHoliday(Holiday holiday) {
+	}
 	
+	public void saveCompOff() {}
+	public void deleteCompOff(CompensatoryOff compOff) {}
+
 }
