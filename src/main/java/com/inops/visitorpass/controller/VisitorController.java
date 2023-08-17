@@ -238,8 +238,8 @@ public class VisitorController implements Serializable {
 		try {
 			Employee employee = employees.stream().filter(emp -> emp.getEmployeeId().equals(visitingEmployee)).findAny()
 					.orElse(null);
-			ChannelApproval channelApproval = new ChannelApproval(0l, employee.getPhoneNo(), employee.getMailId(),
-					false, mobileNo);
+			ChannelApproval channelApproval = new ChannelApproval(0l, employee.getPhoneNo(),
+					employee.getMailId().trim(), false, mobileNo);
 			channelApproval = channelApprovalService.create(channelApproval);
 
 			Visitor visitor = new Visitor(0, mobileNo, date, visitorId, badgeNo, visitorName, visitorCompany, address,
@@ -269,7 +269,7 @@ public class VisitorController implements Serializable {
 						+ "&isApproved=true";
 				String linkText = "click to Approve";
 
-				emailService.sendEmailWithAttachmentAndLink(employee.getMailId(), subject, body, attachment,
+				emailService.sendEmailWithAttachmentAndLink(employee.getMailId().trim(), subject, body, attachment,
 						attachmentFilename, linkUrl, linkText);
 
 				getCards();

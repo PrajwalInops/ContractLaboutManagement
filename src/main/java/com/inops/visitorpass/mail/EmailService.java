@@ -25,10 +25,11 @@ public class EmailService {
 			String attachmentFilename, String linkUrl, String linkText) throws MessagingException, IOException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
+		helper.setFrom("vamshi@inops.tech");
 		helper.setTo(to);
 		helper.setSubject(subject);
 		helper.setText(body + "\n\n" + linkText + ": " + linkUrl, true);
-
+				
 		helper.addAttachment(attachmentFilename, new ByteArrayResource(attachment));
 
 		javaMailSender.send(message);
