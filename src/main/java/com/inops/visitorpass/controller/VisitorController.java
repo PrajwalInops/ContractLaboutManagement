@@ -30,6 +30,7 @@ import org.primefaces.event.DragDropEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
@@ -147,6 +148,9 @@ public class VisitorController implements Serializable {
 
 	DateFormat fromDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	DateFormat toDateFormat = new SimpleDateFormat("dd/MM/yyyy 18:00");
+	
+	@Value("${application.host}")
+    private String applicationHost;
 
 	@PostConstruct
 	public void init() throws UnsupportedEncodingException {
@@ -265,7 +269,7 @@ public class VisitorController implements Serializable {
 				String subject = "Visitor approval for " + visitorName;
 				String body = "Please find the attached file and approve the visitor by clicking on link below:";
 				String attachmentFilename = filename + ".pdf";
-				String linkUrl = "http://localhost:8080/mail/approvevisitor?from=" + employee.getMailId()
+				String linkUrl = "http://"+applicationHost+"/mail/approvevisitor?from=" + employee.getMailId()
 						+ "&isApproved=true";
 				String linkText = "click to Approve";
 

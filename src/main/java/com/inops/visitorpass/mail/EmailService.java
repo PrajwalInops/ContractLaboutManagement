@@ -6,6 +6,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Service;
 
 @Service("emailService")
 public class EmailService {
+	
+	@Value("${spring.mail.username}")
+    private String fromMailId;
 
 	private final JavaMailSender javaMailSender;
 
@@ -25,7 +29,7 @@ public class EmailService {
 			String attachmentFilename, String linkUrl, String linkText) throws MessagingException, IOException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
-		helper.setFrom("vamshi@inops.tech");
+		helper.setFrom(fromMailId);
 		helper.setTo(to);
 		helper.setSubject(subject);
 		helper.setText(body + "\n\n" + linkText + ": " + linkUrl, true);
