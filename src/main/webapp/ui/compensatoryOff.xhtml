@@ -19,191 +19,342 @@
   <ui:param name="widgetLink" value="Schedule-1" />
 
   <ui:define name="implementation">
-    <h:form id="comp">
+    <h:form id="form">
       <p:growl id="messages" showDetail="true" />
 
       <div class="card">
         <h5>Compensatory Off Details</h5>
-        <p:commandButton
-          value="Add New CompensatoryOff"
-          icon="pi pi-plus"
-          onclick="PF('compOffDialog').show();"
-        />
+        <p:toolbar>
+          <p:toolbarGroup>
+            <p:commandButton
+              value="New"
+              icon="pi pi-plus"
+              actionListener="#{leaveTypeController.openNew}"
+              update=":dialogs:manage-product-content"
+              oncomplete="PF('manageProductDialog').show()"
+              styleClass="ui-button-success"
+              style="margin-right: 0.5rem"
+            >
+              <p:resetInput target=":dialogs:manage-product-content" />
+            </p:commandButton>
+            <p:commandButton
+              id="delete-products-button"
+              value="#{leaveTypeController.deleteButtonMessage}"
+              icon="pi pi-trash"
+              actionListener="#{leaveTypeController.deleteSelectedProducts}"
+              styleClass="ui-button-danger"
+              disabled="#{!leaveTypeController.hasSelectedProducts()}"
+              update="@this"
+            >
+              <p:confirm
+                header="Confirmation"
+                message="Delete the selected products?"
+                icon="pi pi-exclamation-triangle"
+              />
+            </p:commandButton>
+          </p:toolbarGroup>
+          <p:toolbarGroup align="right">
+            <p:fileUpload
+              mode="simple"
+              skinSimple="true"
+              label="Import"
+              chooseIcon="pi pi-download"
+            />
+            <p:commandButton
+              value="Export"
+              icon="pi pi-upload"
+              styleClass="ui-button-help"
+              ajax="false"
+            >
+              <p:dataExporter
+                type="pdf"
+                target="dt-products"
+                fileName="products"
+              />
+            </p:commandButton>
+          </p:toolbarGroup>
+        </p:toolbar>
+
         <p:dataTable
-          id="itemTable"
-          var="item"
+          id="dt-products"
+          widgetVar="dtProducts"
+          var="product"
           value="#{leaveTypeController.compensatoryOffs}"
-          selection="#{leaveTypeController.compensatoryOff}"
-          rowKey="#{item}"
+          reflow="true"
+          styleClass="products-table"
+          selection="#{leaveTypeController.selectedCompensatoryOffs}"
+          rowKey="#{product.id}"
+          paginator="true"
+          rows="10"
+          rowSelectMode="add"
+          paginatorPosition="bottom"
         >
-          <p:column headerText="Mode">
-            <p:cellEditor>
-              <f:facet name="output">
-                <h:outputText value="#{item.mode}" />
-              </f:facet>
-              <f:facet name="input">
-                <p:inputText value="#{item.mode}" />
-              </f:facet>
-            </p:cellEditor>
+          <f:facet name="header">
+            <div class="products-table-header">
+              <span style="font-weight: bold">Compensatory Off</span>
+              <span class="filter-container ui-input-icon-left">
+                <i class="pi pi-search"></i>
+                <p:inputText
+                  id="globalFilter"
+                  onkeyup="PF('dtProducts').filter()"
+                  placeholder="Search"
+                />
+              </span>
+            </div>
+          </f:facet>
+
+          <p:ajax event="rowSelect" update=":form:delete-products-button" />
+          <p:ajax event="rowUnselect" update=":form:delete-products-button" />
+          <p:ajax
+            event="rowSelectCheckbox"
+            update=":form:delete-products-button"
+          />
+          <p:ajax
+            event="rowUnselectCheckbox"
+            update=":form:delete-products-button"
+          />
+          <p:ajax event="toggleSelect" update=":form:delete-products-button" />
+
+          <p:column selectionMode="multiple" exportable="false"></p:column>
+
+          <p:column
+            headerText="Code"
+            sortBy="#{product.id}"
+            filterBy="#{product.id}"
+          >
+            <h:outputText value="#{product.id}" />
+          </p:column>
+          <p:column
+            headerText="Mode"
+            sortBy="#{product.mode}"
+            filterBy="#{product.mode}"
+          >
+            <h:outputText value="#{product.mode}" />
           </p:column>
 
-          <p:column headerText="Enable">
-            <p:cellEditor>
-              <f:facet name="output">
-                <h:outputText value="#{item.enable}" />
-              </f:facet>
-              <f:facet name="input">
-                <p:selectBooleanCheckbox value="#{item.enable}" />
-              </f:facet>
-            </p:cellEditor>
+          <p:column headerText="Enable" sortBy="#{product.enable}">
+            <h:outputText value="#{product.enable}"> </h:outputText>
           </p:column>
 
-          <p:column headerText="Credit Weekend">
-            <p:cellEditor>
-              <f:facet name="output">
-                <h:outputText value="#{item.creditWeekend}" />
-              </f:facet>
-              <f:facet name="input">
-                <p:inputText value="#{item.creditWeekend}" />
-              </f:facet>
-            </p:cellEditor>
+          <p:column
+            headerText="Credit Weekend"
+            sortBy="#{product.creditWeekend}"
+            filterBy="#{product.creditWeekend}"
+          >
+            <h:outputText value="#{product.creditWeekend}" />
           </p:column>
 
-          <p:column headerText="Credit Holiday">
-            <p:cellEditor>
-              <f:facet name="output">
-                <h:outputText value="#{item.creditHoliday}" />
-              </f:facet>
-              <f:facet name="input">
-                <p:inputText value="#{item.creditHoliday}" />
-              </f:facet>
-            </p:cellEditor>
+          <p:column
+            headerText="Credit Holiday"
+            sortBy="#{product.creditHoliday}"
+          >
+            <h:outputText value="#{product.creditHoliday}" />
           </p:column>
 
-          <p:column headerText="Expires In">
-            <p:cellEditor>
-              <f:facet name="output">
-                <h:outputText value="#{item.expiresIn}" />
-              </f:facet>
-              <f:facet name="input">
-                <p:inputText value="#{item.expiresIn}" />
-              </f:facet>
-            </p:cellEditor>
+          <p:column headerText="Expires In" sortBy="#{product.expiresIn}">
+            <h:outputText value="#{holiday.expiresIn}" />
           </p:column>
 
-          <p:column headerText="Units Allowed">
-            <p:cellEditor>
-              <f:facet name="output">
-                <h:outputText value="#{item.unitsAllowed}" />
-              </f:facet>
-              <f:facet name="input">
-                <p:inputText value="#{item.unitsAllowed}" />
-              </f:facet>
-            </p:cellEditor>
+          <p:column headerText="Units Allowed" sortBy="#{product.unitsAllowed}">
+            <h:outputText value="#{holiday.unitsAllowed}" />
           </p:column>
 
-          <p:column headerText="Duration Allowed">
-            <p:cellEditor>
-              <f:facet name="output">
-                <h:outputText value="#{item.durationAllowed}" />
-              </f:facet>
-              <f:facet name="input">
-                <p:inputText value="#{item.durationAllowed}" />
-              </f:facet>
-            </p:cellEditor>
+          <p:column
+            headerText="Duration Allowed"
+            sortBy="#{product.durationAllowed}"
+          >
+            <h:outputText value="#{holiday.durationAllowed}" />
           </p:column>
 
-          <p:column headerText="Action">
+          <p:column exportable="false">
             <p:commandButton
-              icon="pi pi-pencil"  styleClass="edit-button rounded-button ui-button-success"
-              oncomplete="PF('compOffDialog').show();"
-              update=":comp:itemTable"
-            />
-            <p:spacer width="10" />
+              icon="pi pi-pencil"
+              update=":dialogs:manage-product-content"
+              oncomplete="PF('manageProductDialog').show()"
+              styleClass="edit-button rounded-button ui-button-success"
+              process="@this"
+            >
+              <f:setPropertyActionListener
+                value="#{product}"
+                target="#{leaveTypeController.selectedCompensatoryOff}"
+              />
+              <p:resetInput target=":dialogs:manage-product-content" />
+            </p:commandButton>
             <p:commandButton
-              icon="pi pi-trash"  class="ui-button-warning rounded-button"
-              action="#{leaveTypeController.deleteCompOff(item)}"
-            />
+              class="ui-button-warning rounded-button"
+              icon="pi pi-trash"
+              process="@this"
+              oncomplete="PF('deleteProductDialog').show()"
+            >
+              <f:setPropertyActionListener
+                value="#{product}"
+                target="#{leaveTypeController.selectedCompensatoryOff}"
+              />
+            </p:commandButton>
           </p:column>
         </p:dataTable>
+      </div>
+    </h:form>
 
-        <p:dialog
-          header="Compensatory Off Edit"
-          widgetVar="compOffDialog"
-          modal="true"
-        >
-          <h:panelGrid columns="2" cellpadding="5">
-            <h:outputLabel
-              for="mode"
-              value="Mode to add Compensatory Request entry:"
-            />
-            <p:inputText
-              id="mode"
-              value="#{leaveTypeController.compensatoryOff.mode}"
-            />
+    <h:form id="dialogs">
+      <p:dialog
+        header="Compensatory Off"
+        showEffect="fade"
+        modal="true"
+        widgetVar="manageProductDialog"
+        responsive="true"
+      >
+        <p:outputPanel id="manage-product-content" class="ui-fluid">
+          <p:outputPanel
+            rendered="#{not empty leaveTypeController.selectedCompensatoryOff}"
+          >
+            <div class="field">
+              <p:outputLabel for="mode"
+                >Mode to add Compensatory Request entry:</p:outputLabel
+              >
+              <p:selectOneRadio
+                id="mode"
+                value="#{leaveTypeController.selectedCompensatoryOff.mode}"
+                layout="responsive"
+                columns="2"
+              >
+                <f:selectItem itemLabel="Requests" itemValue="Requests" />
+                <f:selectItem itemLabel="Both" itemValue="Both" />
+                <f:selectItem itemLabel="None" itemValue="None" />
+              </p:selectOneRadio>
+            </div>
+            <div class="field">
+              <p:outputLabel for="enable"
+                >Add Compensatory Request for future date:</p:outputLabel
+              >
+              <p:selectOneRadio
+                id="enable"
+                value="#{leaveTypeController.selectedCompensatoryOff.enable}"
+                layout="responsive"
+                columns="2"
+              >
+                <f:selectItem itemLabel="enable" itemValue="enable" />
+                <f:selectItem itemLabel="disable" itemValue="disable" />
+              </p:selectOneRadio>
+            </div>
+            <div class="field">
+              <p:outputLabel for="creditWeekend"
+                >Leave to be credited when work is done on a Weekend: 1 *
+              </p:outputLabel>
+              <p:inputText
+                id="creditWeekend"
+                value="#{leaveTypeController.selectedCompensatoryOff.creditWeekend}"
+              />
+            </div>
+            <div class="formgrid grid">
+              <div class="field col">
+                <p:outputLabel for="creditHoliday"
+                  >Leave to be credited when work is done on a Holiday: 1 *
+                </p:outputLabel>
+                <p:inputText
+                  id="creditHoliday"
+                  value="#{leaveTypeController.selectedCompensatoryOff.creditHoliday}"
+                />
+              </div>
+              <div class="field col">
+                <p:outputLabel for="expiresIn"
+                  >Credited leave expires after:</p:outputLabel
+                >
+                <p:inputText
+                  id="expiresIn"
+                  value="#{leaveTypeController.selectedCompensatoryOff.expiresIn}"
+                />
+              </div>
+              </div>
+              <div class="formgrid grid">
+              <div class="field col">
+                <p:outputLabel for="unitsAllowed">Units Allowed:</p:outputLabel>
+                <p:selectOneRadio
+                  id="unitsAllowed"
+                  value="#{leaveTypeController.selectedCompensatoryOff.unitsAllowed}"
+                  layout="responsive"
+                  columns="2"
+                >
+                  <f:selectItem itemLabel="Hours" itemValue="Hours" />
+                  <f:selectItem itemLabel="Days" itemValue="Days" />
+                  <f:selectItem itemLabel="Both" itemValue="Both" />
+                </p:selectOneRadio>
+              </div>
+              <div class="field col">
+                <p:outputLabel for="durationAllowed">Duration Allowed:</p:outputLabel>
+                
+                <p:selectManyCheckbox
+                  id="durationAllowed"
+                  value="#{leaveTypeController.selectedCompensatoryOff.durationAllowed}"
+                  widgetVar="blub"
+                >                  
+                  <f:selectItem itemLabel="Full Day" itemValue="Full Day" />
+                  <f:selectItem itemLabel="Half Day" itemValue="Half Day" />
+                  <f:selectItem itemLabel="Quarter Day" itemValue="Quarter Day" />
+                </p:selectManyCheckbox>
+              </div>
+              
+            </div>
+          </p:outputPanel>
+        </p:outputPanel>
 
-            <h:outputLabel
-              for="enable"
-              value="Add Compensatory Request for future date:"
-            />
-            <p:selectBooleanCheckbox
-              id="enable"
-              value="#{leaveTypeController.compensatoryOff.enable}"
-            />
-
-            <h:outputLabel
-              for="creditWeekend"
-              value="Leave to be credited when work is done on a Weekend:"
-            />
-            <p:inputText
-              id="creditWeekend"
-              value="#{leaveTypeController.compensatoryOff.creditWeekend}"
-            />
-
-            <h:outputLabel
-              for="creditHoliday"
-              value="Leave to be credited when work is done on a Holiday:"
-            />
-            <p:inputText
-              id="creditHoliday"
-              value="#{leaveTypeController.compensatoryOff.creditHoliday}"
-            />
-
-            <h:outputLabel
-              for="expiresIn"
-              value="Credited leave expires after:"
-            />
-            <p:inputText
-              id="expiresIn"
-              value="#{leaveTypeController.compensatoryOff.expiresIn}"
-            />
-
-            <h:outputLabel for="unitsAllowed" value="Units Allowed:" />
-            <p:inputText
-              id="unitsAllowed"
-              value="#{leaveTypeController.compensatoryOff.unitsAllowed}"
-            />
-
-            <h:outputLabel for="durationAllowed" value="Duration Allowed:" />
-            <p:inputText
-              id="durationAllowed"
-              value="#{leaveTypeController.compensatoryOff.durationAllowed}"
-            />
-          </h:panelGrid>
+        <f:facet name="footer">
           <p:commandButton
             value="Save"
-            action="#{leaveTypeController.saveCompOff}"
-            update=":comp:itemTable"
-            oncomplete="PF('compOffDialog').hide()"
+            icon="pi pi-check"
+            actionListener="#{leaveTypeController.saveProduct}"
+            update="manage-product-content"
+            process="manage-product-content @this"
           />
           <p:commandButton
-            value="Delete"
-            action="#{leaveTypeController.deleteCompOff}"
-            update=":comp:itemTable"
-            oncomplete="PF('compOffDialog').hide()"
+            value="Cancel"
+            icon="pi pi-times"
+            onclick="PF('manageProductDialog').hide()"
+            class="ui-button-secondary"
+            type="button"
           />
-        </p:dialog>
-      </div>
+        </f:facet>
+      </p:dialog>
+
+      <p:confirmDialog
+        widgetVar="deleteProductDialog"
+        showEffect="fade"
+        width="300"
+        message="Delete the product?"
+        header="Confirm"
+        severity="warn"
+      >
+        <p:commandButton
+          value="Yes"
+          icon="pi pi-check"
+          actionListener="#{leaveTypeController.deleteProduct}"
+          process="@this"
+          update=":form:delete-products-button"
+          oncomplete="PF('deleteProductDialog').hide()"
+        />
+        <p:commandButton
+          value="No"
+          type="button"
+          styleClass="ui-button-secondary"
+          icon="pi pi-times"
+          onclick="PF('deleteProductDialog').hide()"
+        />
+      </p:confirmDialog>
+
+      <p:confirmDialog global="true" showEffect="fade" width="300">
+        <p:commandButton
+          value="Yes"
+          type="button"
+          styleClass="ui-confirmdialog-yes"
+          icon="pi pi-check"
+        />
+        <p:commandButton
+          value="No"
+          type="button"
+          styleClass="ui-confirmdialog-no ui-button-secondary"
+          icon="pi pi-times"
+        />
+      </p:confirmDialog>
     </h:form>
   </ui:define>
 </ui:composition>

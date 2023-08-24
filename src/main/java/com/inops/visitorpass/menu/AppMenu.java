@@ -85,6 +85,9 @@ public class AppMenu {
 		dataMenuItems.add(new MenuItem("Leave Settings", "/ui/leaveType"));
 		dataMenuItems.add(new MenuItem("Holiday Settings", "/ui/holiday"));
 		dataMenuItems.add(new MenuItem("Compensatory Off", "/ui/compensatoryOff"));
+		dataMenuItems.add(new MenuItem("Compensatory Off Scheduler", "/ui/compensatoryOffScheduler"));
+		dataMenuItems.add(new MenuItem("Leave Balance", "/ui/leaveBalance"));
+		dataMenuItems.add(new MenuItem("Leave Application", "/ui/leaveApplication"));
 				
 		menuCategories.add(new MenuCategory("Leave Management", dataMenuItems));
 		

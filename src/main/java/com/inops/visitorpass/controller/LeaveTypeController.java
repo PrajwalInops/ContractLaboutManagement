@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.TabCloseEvent;
 import org.springframework.context.annotation.Scope;
@@ -37,8 +38,11 @@ public class LeaveTypeController {
 	private final ICompensatoryOff compensatoryOffService;
 
 	private LeaveTypeEntity leaveTypeEntity;
-	private Holiday holiday;
-	private CompensatoryOff compensatoryOff;
+	private CompensatoryOff selectedCompensatoryOff;
+	 private List<CompensatoryOff> selectedCompensatoryOffs;
+	
+    private Holiday selectedHoliday;
+    private List<Holiday> selectedHolidays;
 
 	private String leaveName;
 	private String leaveCode;
@@ -146,5 +150,53 @@ public class LeaveTypeController {
 	
 	public void saveCompOff() {}
 	public void deleteCompOff(CompensatoryOff compOff) {}
+	
+
+	  public void openNew() {
+	        this.selectedHoliday = new Holiday();
+	    }
+
+	    public void saveProduct() {
+	        if (this.selectedHoliday.getId() == null) {
+	           // this.selectedHoliday.setCode(UUID.randomUUID().toString().replaceAll("-", "").substring(0, 9));
+	            //this.products.add(this.selectedProduct);
+	            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Added"));
+	        }
+	        else {
+	            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Updated"));
+	        }
+
+	        PrimeFaces.current().executeScript("PF('manageProductDialog').hide()");
+	        PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+	    }
+
+	    public void deleteProduct() {
+	        this.holidays.remove(this.selectedHoliday);
+	        this.selectedHolidays.remove(this.selectedHoliday);
+	        this.selectedHoliday = null;
+	        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Removed"));
+	        PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+	    }
+
+	    public String getDeleteButtonMessage() {
+	        if (hasSelectedProducts()) {
+	            int size = this.selectedHolidays.size();
+	            return size > 1 ? size + " products selected" : "1 product selected";
+	        }
+
+	        return "Delete";
+	    }
+
+	    public boolean hasSelectedProducts() {
+	        return this.selectedHolidays != null && !this.selectedHolidays.isEmpty();
+	    }
+
+	    public void deleteSelectedProducts() {
+	        //this.holidays.removeAll(this.selectedHoliday);
+	        this.selectedHolidays = null;
+	        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Products Removed"));
+	        PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+	        PrimeFaces.current().executeScript("PF('dtProducts').clearFilters()");
+	    }
 
 }

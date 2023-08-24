@@ -1,0 +1,144 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:p="http://primefaces.org/ui"
+  template="/WEB-INF/template.xhtml"
+>
+  <ui:define name="title">
+    Compensatory Off  <span class="subitem"> Scheduler configuration</span>
+  </ui:define>
+
+  <ui:define name="description">
+    When an employee works on a weekend or a holiday, using Inops People, you can
+    have a scheduler run to create a record of work done during weekends or
+    holidays. Follow the steps given below to know how to create a scheduler.
+  </ui:define>
+
+  <ui:param name="documentationLink" value="/components/schedule" />
+  <ui:param name="widgetLink" value="Schedule-1" />
+
+  <ui:define name="implementation">
+    <h:form id="holidayForm">
+      <p:growl id="messages" showDetail="true" />
+
+      <div class="card">
+        <h5>Compensatory Off Scheduler</h5>
+        <p:commandButton
+          value="Leave Scheduler"
+          icon="pi pi-plus"
+          onclick="PF('holidayDialog').show();"
+        />
+        <p:dataTable
+          id="leaveSchedular"
+          var="schedule"
+          value="#{leaveTypeController.holidays}" selection="#{leaveTypeController.holiday}"
+          rowKey="#{schedule.id}"  rowSelectMode="add"  reflow="true" styleClass="products-table" 
+        >
+          <p:column headerText="Holiday Name">
+            <h:outputText value="#{schedule.holidayName}" />
+          </p:column>
+          <p:column headerText="Holiday Date">
+            <h:outputText value="#{schedule.holidayDate}" />
+          </p:column>
+          <p:column headerText="Description">
+            <h:outputText value="#{schedule.holidayDescription}" />
+          </p:column>
+          <p:column headerText="Year">
+            <h:outputText value="#{schedule.holidayYear}" />
+          </p:column>
+          <p:column headerText="Type">
+            <h:outputText value="#{schedule.holidayType}" />
+          </p:column>
+          <p:column headerText="Applicable For">
+            <p:dataTable
+              var="shift"
+              value="#{schedule.applicableFor}"
+              styleClass="nested-table"
+            >
+              <p:column headerText="Shift Name">
+                <h:outputText value="#{shift.shiftName}" />
+              </p:column>
+            </p:dataTable>
+          </p:column>
+          <p:column headerText="Reminder Before">
+            <h:outputText value="#{schedule.reminderBefore}" />
+          </p:column>
+          <!-- Edit and Delete buttons -->
+          <p:column headerText="Actions">
+            <p:commandButton
+              icon="pi pi-pencil"
+              styleClass="edit-button rounded-button ui-button-success"
+              oncomplete="PF('holidayDialog').show();"
+              update=":holidayForm:holidayDialogForm"
+            />
+            <p:spacer width="10" />
+            <p:commandButton
+              icon="pi pi-trash"
+              class="ui-button-warning rounded-button"
+              action="#{leaveTypeController.deleteHoliday(schedule)}"
+            />
+          </p:column>
+        </p:dataTable>
+
+        <!-- Edit Holiday Dialog -->
+        <p:dialog id="holidayDialog" widgetVar="holidayDialog" modal="true">
+          <h:form id="holidayDialogForm">
+            <h:panelGrid columns="2" cellpadding="5">
+              <h:outputLabel for="holidayName" value="Holiday Name:" />
+              <p:inputText
+                id="holidayName"
+                value="#{leaveTypeController.holiday.holidayName}"
+              />
+
+              <h:outputLabel for="holidayDate" value="Holiday Date:" />
+              <p:calendar
+                id="holidayDate"
+                value="#{leaveTypeController.holiday.holidayDate}"
+                showOn="button"
+              />
+
+              <h:outputLabel for="holidayDescription" value="Description:" />
+              <p:inputText
+                id="holidayDescription"
+                value="#{leaveTypeController.holiday.holidayDescription}"
+              />
+
+              <h:outputLabel for="holidayYear" value="Year:" />
+              <p:spinner
+                id="holidayYear"
+                value="#{leaveTypeController.holiday.holidayYear}"
+              />
+
+              <h:outputLabel for="holidayType" value="Type:" />
+              <p:inputText
+                id="holidayType"
+                value="#{leaveTypeController.holiday.holidayType}"
+              />
+
+              <h:outputLabel for="reminderBefore" value="Reminder Before:" />
+              <p:spinner
+                id="reminderBefore"
+                value="#{leaveTypeController.holiday.reminderBefore}"
+              />
+
+              <h:outputLabel for="applicableFor" value="Applicable For:" />
+              <p:inputText id="applicableFor" value="" />
+
+              <p:commandButton
+                value="Save"
+                action="#{leaveTypeController.saveHoliday}"
+                update=":holidayForm:leaveSchedular"
+              />
+              <p:commandButton
+                value="Cancel"
+                onclick="PF('holidayDialog').hide();"
+              />
+            </h:panelGrid>
+          </h:form>
+        </p:dialog>
+      </div>
+    </h:form>
+  </ui:define>
+</ui:composition>

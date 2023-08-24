@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +35,9 @@ public class CompensatoryOff {
     private int creditHoliday;
     private int expiresIn;
     private String unitsAllowed;
-    private String durationAllowed;
+    
+    @Transient
+    private String[] durationAllowed;
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "divisionId", nullable = false)
