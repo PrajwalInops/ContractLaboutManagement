@@ -23,6 +23,6 @@ public class LeaveBalanceId implements Serializable{
 	private String employeeId;
 	
 	@Column(name = "leavetypeid")
-	private String LeaveTypeId;
+	private String leaveTypeId;
 
 }

@@ -7,7 +7,7 @@
   template="/WEB-INF/template.xhtml"
 >
   <ui:define name="title">
-    Holidays <span class="subitem"> policy configuration</span>
+    Leave <span class="subitem"> Balance Details</span>
   </ui:define>
 
   <ui:define name="description">
@@ -19,121 +19,154 @@
   <ui:param name="widgetLink" value="Schedule-1" />
 
   <ui:define name="implementation">
-    <h:form id="holidayForm">
+    <h:form id="form">
       <p:growl id="messages" showDetail="true" />
 
-      <div class="card">
-        <h5>Holiday Details</h5>
-        <p:commandButton value="Add New Holiday" icon="pi pi-plus" onclick="PF('holidayDialog').show();" />
-        <p:dataTable
-          id="holidaysTable"
-          var="holiday"
-          value="#{leaveTypeController.holidays}"
-        >
-          <p:column headerText="Holiday Name">
-            <h:outputText value="#{holiday.holidayName}" />
-          </p:column>
-          <p:column headerText="Holiday Date">
-            <h:outputText value="#{holiday.holidayDate}" />
-          </p:column>
-          <p:column headerText="Description">
-            <h:outputText value="#{holiday.holidayDescription}" />
-          </p:column>
-          <p:column headerText="Year">
-            <h:outputText value="#{holiday.holidayYear}" />
-          </p:column>
-          <p:column headerText="Type">
-            <h:outputText value="#{holiday.holidayType}" />
-          </p:column>
-          <p:column headerText="Applicable For">
-            <p:dataTable
-              var="shift"
-              value="#{holiday.applicableFor}"
-              styleClass="nested-table"
-            >
-              <p:column headerText="Shift Name">
-                <h:outputText value="#{shift.shiftName}" />
-              </p:column>
-            </p:dataTable>
-          </p:column>
-          <p:column headerText="Reminder Before">
-            <h:outputText value="#{holiday.reminderBefore}" />
-          </p:column>
-          <!-- Edit and Delete buttons -->
-          <p:column headerText="Actions">
-            <p:commandButton
-              icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-success"
-              oncomplete="PF('holidayDialog').show();"
-              update=":holidayForm:holidayDialogForm"
-            />
-            <p:spacer width="10" />
-            <p:commandButton
-              icon="pi pi-trash"  class="ui-button-warning rounded-button"
-              action="#{leaveTypeController.deleteHoliday(holiday)}"
-            />
-          </p:column>
-        </p:dataTable>
+      <div class="card crud-demo">
+        <h5>Leave Balance Details</h5>
+        <p:toolbar>
+          <p:toolbarGroup>
+              <p:commandButton value="New" icon="pi pi-plus" actionListener="#{leaveTypeController.openNew}"
+                  update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                  styleClass="ui-button-success" style="margin-right: .5rem">
+                  <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>
+              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteButtonMessage}"
+                  icon="pi pi-trash" actionListener="#{leaveTypeController.deleteSelectedProducts}"
+                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedProducts()}" update="@this">
+                  <p:confirm header="Confirmation" message="Delete the selected products?"
+                      icon="pi pi-exclamation-triangle" />
+              </p:commandButton>
+          </p:toolbarGroup>
+          <p:toolbarGroup align="right">
+              <p:fileUpload mode="simple" skinSimple="true" label="Import" chooseIcon="pi pi-download" />
+              <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                  <p:dataExporter type="pdf" target="dt-products" fileName="products" />
+              </p:commandButton>
+          </p:toolbarGroup>
+      </p:toolbar>
 
-        <!-- Edit Holiday Dialog -->
-        <p:dialog id="holidayDialog" widgetVar="holidayDialog" modal="true">
-          <h:form id="holidayDialogForm">
-            <h:panelGrid columns="2" cellpadding="5">
-              <h:outputLabel for="holidayName" value="Holiday Name:" />
-              <p:inputText
-                id="holidayName"
-                value="#{leaveTypeController.holiday.holidayName}"
-              />
+      <p:dataTable id="dt-products" widgetVar="dtProducts" var="product" value="#{leaveTypeController.leaveBalances}"
+          reflow="true" styleClass="products-table" selection="#{leaveTypeController.selectedLeaveBalances}"
+          rowKey="#{product.leaveBalanceId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+          <f:facet name="header">
+              <div class="products-table-header">
+                  <span style="font-weight: bold">Leave Balance</span>
+                  <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                      <p:inputText id="globalFilter" onkeyup="PF('dtProducts').filter()" placeholder="Search" />
+                  </span>
+              </div>
+          </f:facet>
 
-              <h:outputLabel for="holidayDate" value="Holiday Date:" />
-              <p:calendar
-                id="holidayDate"
-                value="#{leaveTypeController.holiday.holidayDate}"
-                showOn="button"
-              />
+          <p:ajax event="rowSelect" update=":form:delete-products-button" />
+          <p:ajax event="rowUnselect" update=":form:delete-products-button" />
+          <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button" />
+          <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button" />
+          <p:ajax event="toggleSelect" update=":form:delete-products-button" />
 
-              <h:outputLabel for="holidayDescription" value="Description:" />
-              <p:inputText
-                id="holidayDescription"
-                value="#{leaveTypeController.holiday.holidayDescription}"
-              />
+          <p:column selectionMode="multiple" exportable="false"></p:column>
 
-              <h:outputLabel for="holidayYear" value="Year:" />
-              <p:spinner
-                id="holidayYear"
-                value="#{leaveTypeController.holiday.holidayYear}"
-              />
+          <p:headerRow field="leaveBalanceId.employeeId"  expandable="true" >
 
-              <h:outputLabel for="holidayType" value="Type:" />
-              <p:inputText
-                id="holidayType"
-                value="#{leaveTypeController.holiday.holidayType}"
-              />
+            <p:column colspan="6">
+                <div class="inline-flex align-items-center" style="vertical-align: middle">
+                    
+                    <h:outputText styleClass="ml-2" value="#{product.leaveBalanceId.employeeId}"/>
+                </div>
+            </p:column>
+          </p:headerRow>
 
-              <h:outputLabel for="reminderBefore" value="Reminder Before:" />
-              <p:spinner
-                id="reminderBefore"
-                value="#{leaveTypeController.holiday.reminderBefore}"
-              />
+          <p:column headerText="Employee Name" sortBy="#{product.leaveBalanceId.employeeId}" groupRow="true" filterBy="#{product.leaveBalanceId.employeeId}">
+              <h:outputText value="#{product.leaveBalanceId.employeeId}" />
+          </p:column>
+          <p:column headerText="Leave Type Name" sortBy="#{product.leaveBalanceId.leaveTypeId}" filterBy="#{product.leaveBalanceId.leaveTypeId}">
+              <h:outputText value="#{product.leaveBalanceId.leaveTypeId}" />
+          </p:column>
+         
+          <p:column headerText="Leave Balance" sortBy="#{product.balance}">
+            <h:outputText value="#{product.balance}" >              
+            </h:outputText>     
+          </p:column>
 
-              <h:outputLabel for="applicableFor" value="Applicable For:" />
-              <p:inputText
-                id="applicableFor"
-                value=""
-              />
+          <p:column headerText="Date" sortBy="#{product.lastCreditDate}" filterBy="#{product.lastCreditDate}">
+            <h:outputText value="#{product.lastCreditDate}">
+              <f:convertDateTime pattern="MM/dd/yyyy" />
+          </h:outputText>
+          </p:column>
+                 
+          <p:column exportable="false">
 
-              <p:commandButton
-                value="Save"
-                action="#{leaveTypeController.saveHoliday}"
-                update=":holidayForm:holidaysTable"
-              />
-              <p:commandButton
-                value="Cancel"
-                onclick="PF('holidayDialog').hide();"
-              />
-            </h:panelGrid>
-          </h:form>
-        </p:dialog>
-      </div>
+              <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
+                  oncomplete="PF('manageProductDialog').show()"
+                  styleClass="edit-button rounded-button ui-button-success" process="@this">
+                  <f:setPropertyActionListener value="#{product}" target="#{leaveTypeController.selectedLeaveBalance}" />
+                  <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>
+              <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                               process="@this"
+                               oncomplete="PF('deleteProductDialog').show()">
+                  <f:setPropertyActionListener value="#{product}" target="#{leaveTypeController.selectedLeaveBalance}" />
+              </p:commandButton>
+          </p:column>
+
+      </p:dataTable>
+    </div>
+  </h:form>
+
+  <h:form id="dialogs">
+      <p:dialog header="Compensatory Off Scheduler  Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+          responsive="true">
+          <p:outputPanel id="manage-product-content" class="ui-fluid">
+              <p:outputPanel rendered="#{not empty leaveTypeController.selectedCompensatoryOffScheduler}">
+                  
+                  <div class="field">
+                      <p:outputLabel for="name">Schedule Name</p:outputLabel>
+                      <p:inputText id="name" value="#{leaveTypeController.selectedCompensatoryOffScheduler.name}" required="true" />
+                  </div>
+                  <div class="field">
+                      <p:outputLabel for="dateBefore">Days before schedule date</p:outputLabel>
+                      <p:spinner id="dateBefore" value="#{leaveTypeController.selectedCompensatoryOffScheduler.dateBefore}" buttons="vertical"
+                      upButtonStyleClass="ui-button-secondary" downButtonStyleClass="ui-button-secondary"/>                      
+                  </div>
+                 
+                  <div class="formgrid grid">
+                    <div class="field">
+                      <p:outputLabel for="timeToSchedule">Time to Schedule</p:outputLabel>     
+                      <p:datePicker id="timeToSchedule" value="#{leaveTypeController.selectedCompensatoryOffScheduler.timeToSchedule}"	timeOnly="true" pattern="HH:mm" />
+                    </div>
+                      <div class="field col">
+                        <p:outputLabel for="reminder">Include OverTime done on working day</p:outputLabel>
+                        <p:inputText id="reminder" value="#{leaveTypeController.selectedCompensatoryOffScheduler.includeOverTime}" 
+                            />
+                    </div>
+                     
+                  </div>
+              </p:outputPanel>
+          </p:outputPanel>
+
+          <f:facet name="footer">
+              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveProduct}"
+                  update="manage-product-content" process="manage-product-content @this" />
+              <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                  class="ui-button-secondary" type="button" />
+          </f:facet>
+      </p:dialog>
+
+      <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+          message="Delete the product?" header="Confirm" severity="warn">
+          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteProduct}"
+              process="@this" update=":form:delete-products-button"
+              oncomplete="PF('deleteProductDialog').hide()" />
+          <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+              onclick="PF('deleteProductDialog').hide()" />
+      </p:confirmDialog>
+
+      <p:confirmDialog global="true" showEffect="fade" width="300">
+          <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+          <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+              icon="pi pi-times" />
+      </p:confirmDialog>      
+     
     </h:form>
   </ui:define>
 </ui:composition>
