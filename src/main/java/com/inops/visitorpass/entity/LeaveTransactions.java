@@ -35,10 +35,10 @@ public class LeaveTransactions {
 	private String toHalfDayFlag;
 	
 	@Column(name = "Noofdays")
-	private double noOfDays;
+	private Double noOfDays;
 	
 	@Column(name = "Nodaysupdt")
-	private double noOfDaysUpdated;
+	private Double noOfDaysUpdated;
 	
 	@Column(name = "Applieddate")
 	private Date appliedDate;

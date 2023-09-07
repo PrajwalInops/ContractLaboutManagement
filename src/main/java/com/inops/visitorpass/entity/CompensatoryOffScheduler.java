@@ -18,7 +18,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
-@Setter
+//@Setter
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,7 +36,33 @@ public class CompensatoryOffScheduler {
 	private boolean includeOverTime;
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "divisionId", nullable = false)
+	@JoinColumn(name = "divisionId", nullable = true)
 	private Division division;
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setTimeToSchedule(Date timeToSchedule) {
+		this.timeToSchedule = timeToSchedule;
+	}
+
+	public void setDateBefore(int dateBefore) {
+		this.dateBefore = dateBefore;
+	}
+
+	public void setIncludeOverTime(boolean includeOverTime) {
+		this.includeOverTime = includeOverTime;
+	}
+
+	public void setDivision(Division division) {
+		this.division = division;
+	}
+	
+	
 
 }

@@ -11,4 +11,10 @@ public interface ICompensatoryOffScheduler {
 	Optional<List<CompensatoryOffScheduler>> findAll();
 
 	Optional<List<CompensatoryOffScheduler>> findAllByDivisionId(Division divisionId);
+
+	CompensatoryOffScheduler save(CompensatoryOffScheduler scheduler);
+
+	void delete(CompensatoryOffScheduler scheduler);
+
+	void deleteAll(List<CompensatoryOffScheduler> schedulers);
 }

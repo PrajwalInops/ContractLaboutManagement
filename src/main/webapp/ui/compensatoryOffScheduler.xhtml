@@ -32,10 +32,10 @@
                   styleClass="ui-button-success" style="margin-right: .5rem">
                   <p:resetInput target=":dialogs:manage-product-content" />
               </p:commandButton>
-              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteButtonMessage}"
-                  icon="pi pi-trash" actionListener="#{leaveTypeController.deleteSelectedProducts}"
-                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedProducts()}" update="@this">
-                  <p:confirm header="Confirmation" message="Delete the selected products?"
+              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteSchedulerButtonMessage}"
+                  icon="pi pi-trash" actionListener="#{leaveTypeController.deleteCompOffSchedulers}"
+                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedSchedulers()}" update="@this">
+                  <p:confirm header="Confirmation" message="Delete the selected schedulers?"
                       icon="pi pi-exclamation-triangle" />
               </p:commandButton>
           </p:toolbarGroup>
@@ -123,6 +123,23 @@
                       <p:spinner id="dateBefore" value="#{leaveTypeController.selectedCompensatoryOffScheduler.dateBefore}" buttons="vertical"
                       upButtonStyleClass="ui-button-secondary" downButtonStyleClass="ui-button-secondary"/>                      
                   </div>
+
+                  <div class="field">
+                    <p:outputLabel for="divisionName">Days before schedule date</p:outputLabel>
+                    <p:selectOneMenu value="#{leaveTypeController.selectedCompensatoryOffScheduler.division}" id="divisionName" var="c"
+                            converter="#{divisionConverter}" autoWidth="false" editable="true" maxlength="10"
+                            filter="true" filterMatchMode="startsWith">
+                            
+                            <f:selectItems value="#{leaveTypeController.divisions}" var="player"
+                                itemLabel="#{player.divisionId}" itemValue="#{player}" />
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Name" />
+                                </f:facet>
+                                <h:outputText value="#{c.divisionName}" />
+                            </p:column>
+                        </p:selectOneMenu>
+                  </div>
                  
                   <div class="formgrid grid">
                     <div class="field">
@@ -130,9 +147,12 @@
                       <p:datePicker id="timeToSchedule" value="#{leaveTypeController.selectedCompensatoryOffScheduler.timeToSchedule}"	timeOnly="true" pattern="HH:mm" />
                     </div>
                       <div class="field col">
-                        <p:outputLabel for="reminder">Include OverTime done on working day</p:outputLabel>
-                        <p:inputText id="reminder" value="#{leaveTypeController.selectedCompensatoryOffScheduler.includeOverTime}" 
-                            />
+                        <p:outputLabel for="overTime">Include OverTime done on working day</p:outputLabel>
+                       
+                        <p:selectOneRadio id="overTime" value="#{leaveTypeController.selectedCompensatoryOffScheduler.includeOverTime}">
+                           <f:selectItem itemLabel="Include" itemValue="true" />
+                           <f:selectItem itemLabel="Exclude" itemValue="false" />
+                        </p:selectOneRadio>
                     </div>
                      
                   </div>
@@ -140,16 +160,16 @@
           </p:outputPanel>
 
           <f:facet name="footer">
-              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveProduct}"
-                  update="manage-product-content" process="manage-product-content @this" />
+              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveCompOffScheduler}"
+               update="manage-product-content,:form:messages,:form:dt-products" process="manage-product-content @this" />
               <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
                   class="ui-button-secondary" type="button" />
           </f:facet>
       </p:dialog>
 
       <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
-          message="Delete the product?" header="Confirm" severity="warn">
-          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteProduct}"
+          message="Delete the scheduler?" header="Confirm" severity="warn">
+          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteCompOffScheduler}"
               process="@this" update=":form:delete-products-button"
               oncomplete="PF('deleteProductDialog').hide()" />
           <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"

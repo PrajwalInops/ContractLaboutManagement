@@ -29,4 +29,22 @@ public class CompensatoryOffSchedulerService implements ICompensatoryOffSchedule
 		return compensatoryRepository.findAllByDivision(division);
 	}
 
+	@Override
+	public CompensatoryOffScheduler save(CompensatoryOffScheduler scheduler) {
+		
+		return compensatoryRepository.save(scheduler);
+	}
+
+	@Override
+	public void delete(CompensatoryOffScheduler scheduler) {
+		compensatoryRepository.delete(scheduler);
+		
+	}
+
+	@Override
+	public void deleteAll(List<CompensatoryOffScheduler> schedulers) {
+		compensatoryRepository.deleteAll(schedulers);
+		
+	}
+
 }
