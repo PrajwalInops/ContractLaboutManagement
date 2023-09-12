@@ -13,6 +13,8 @@ public interface IUserService {
 	
 	public boolean resetPassword(ResetPassword restPassword);
 	
+	public boolean changePassword(ResetPassword restPassword);
+	
 	List<User> findAll();
 
 }

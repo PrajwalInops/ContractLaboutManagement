@@ -24,7 +24,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.imageio.stream.FileImageOutputStream;
-import javax.inject.Inject;
 
 import org.primefaces.event.CaptureEvent;
 import org.primefaces.event.DragDropEvent;
@@ -130,6 +129,7 @@ public class VisitorController implements Serializable {
 	private String otherMediaItems = "NAN";
 	private String visitingDepartment;
 	private String visitingEmployee;
+	private List<Employee> approvingEmployee;
 	private String remarks = "NAN";
 	private long divisionId;
 	private Date dateofLeft;
@@ -150,12 +150,14 @@ public class VisitorController implements Serializable {
 		countries = countryService.getCountries();
 
 		droppedVisitors = new ArrayList<>();
-
+		approvingEmployee = new ArrayList<>();
 		getVisitorIdByDate();
 		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
 		visitors = ((Optional<List<Visitor>>) ctx.getBean("getVisitors")).get();
 		departments = ((Optional<List<Department>>) ctx.getBean("getDepartments")).get();
 
+		approvingEmployee.add(user.getEmployee());
+		
 		divisions = division.findAll().get();
 		getAllPreApprovedVisitors();
 		readerIpAddresses = readerIpAddress.findAll().get();

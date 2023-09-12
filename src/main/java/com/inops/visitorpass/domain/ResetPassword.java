@@ -1,5 +1,7 @@
 package com.inops.visitorpass.domain;
 
+import com.inops.visitorpass.entity.User;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +15,5 @@ public class ResetPassword {
 
 	private String emailId;
 	private String oldPassword;
-	private String newPassword;
+	private String newPassword;	
 }

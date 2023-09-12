@@ -66,7 +66,10 @@ public class User implements UserDetails {
 
 	@Column(name = "ip")
 	private String systemIpAddress;
-
+	
+	@Column(name="reset")
+	private boolean isRestPassword;
+	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.name());
@@ -170,6 +173,14 @@ public class User implements UserDetails {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
 
+	public boolean isRestPassword() {
+		return isRestPassword;
+	}
+
+	public void setRestPassword(boolean isRestPassword) {
+		this.isRestPassword = isRestPassword;
+	}
+	
+	
 }

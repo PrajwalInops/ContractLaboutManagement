@@ -28,7 +28,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	public void saveUser(User user) {
 		String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
 		user.setPassword(encodedPassword);
-       // user.setRole(Role.USER);
+		// user.setRole(Role.USER);
 		userRepository.save(user);
 	}
 
@@ -65,14 +65,12 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 		Optional<User> userOp = userRepository.findByEmail(restPassword.getEmailId());
 		if (userOp.isPresent()) {
-
-			if (bCryptPasswordEncoder.matches(restPassword.getOldPassword(), userOp.get().getPassword())) {
-				String encodedPassword = bCryptPasswordEncoder.encode(restPassword.getNewPassword());
-				User user = userOp.get();
-				user.setPassword(encodedPassword);
-				userRepository.save(user);
-				return true;
-			}
+			String encodedPassword = bCryptPasswordEncoder.encode(restPassword.getNewPassword());
+			User user = userOp.get();
+			user.setPassword(encodedPassword);
+			user.setRestPassword(true);
+			userRepository.save(user);
+			return true;
 		}
 		return false;
 
@@ -81,6 +79,22 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	@Override
 	public List<User> findAll() {
 		return userRepository.findAll();
+	}
+
+	@Override
+	public boolean changePassword(ResetPassword restPassword) {
+		Optional<User> userOp = userRepository.findByEmail(restPassword.getEmailId());
+		if (userOp.isPresent()) {
+			if (bCryptPasswordEncoder.matches(restPassword.getOldPassword(), userOp.get().getPassword())) {
+				String encodedPassword = bCryptPasswordEncoder.encode(restPassword.getNewPassword());
+				User user = userOp.get();
+				user.setPassword(encodedPassword);
+				user.setRestPassword(false);
+				userRepository.save(user);
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

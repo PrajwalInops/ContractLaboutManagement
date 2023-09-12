@@ -1,5 +1,6 @@
 package com.inops.visitorpass.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,8 @@ import javax.faces.context.FacesContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.inops.visitorpass.domain.ResetPassword;
@@ -48,10 +51,21 @@ public class UserController {
 	private String email;
 	private String password;
 	private String ip;
+	private boolean rest;
+	private User user;
 
 	@PostConstruct
 	public void init() {
-		users = userService.findAll();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		user = (User) auth.getPrincipal();
+		if (user.getRole().equals(Role.SUPER_USER)) {
+			users = userService.findAll();
+			rest = true;
+		} else {			
+			users = new ArrayList<>();
+			users.add(user);
+		}
+
 		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
 	}
 
@@ -63,11 +77,25 @@ public class UserController {
 		try {
 			boolean isReset = userService.resetPassword(new ResetPassword(emailId, oldPassword, newPassword));
 			if (isReset)
-				addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Password changed successfully for: " + emailId);
+				addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Password reset successfully for: " + emailId);
+			else
+				addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", "Failed to reset password for : " + emailId);
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", "Failed to reset password for : " + emailId);
+			log.error("exception at the time of resetPassword {}", e);
+		}
+		cleanUp();
+	}
+	
+	public void changePassword() {
+		try {
+			boolean isReset = userService.changePassword(new ResetPassword(emailId, oldPassword, newPassword));
+			if (isReset)
+				addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Password changed successfully for: " + emailId+" Please re-login");
 			else
 				addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", "Old Password not matching for : " + emailId);
 		} catch (Exception e) {
-			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", "Failed to reset password for : " + emailId);
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", "Failed to change password for : " + emailId);
 			log.error("exception at the time of resetPassword {}", e);
 		}
 		cleanUp();
@@ -136,6 +164,14 @@ public class UserController {
 
 	public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
+	}
+
+	public boolean rest() {
+		return rest;
+	}
+
+	public void setRest(boolean isRest) {
+		this.rest = isRest;
 	}
 
 }

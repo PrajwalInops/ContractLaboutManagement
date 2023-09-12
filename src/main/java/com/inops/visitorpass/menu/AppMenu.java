@@ -55,36 +55,41 @@ public class AppMenu {
 		menuCategories = new ArrayList<>();
 		menuItems = new ArrayList<>();
 
-		// GENERAL CATEGORY START
-		List<MenuItem> generalMenuItems = new ArrayList<>();
-		generalMenuItems.add(new MenuItem("Get Started", "/ui/home"));
-		generalMenuItems.add(new MenuItem("Documentation", ""));
-		generalMenuItems.add(new MenuItem("Content Security", ""));
-		menuCategories.add(new MenuCategory("General", generalMenuItems));
-		// GENERAL CATEGORY END
-
-		// SUPPORT CATEGORY START
-		List<MenuItem> supportMenuItems = new ArrayList<>();
-		// supportMenuItems.add(new MenuItem("Forum", "https://forum.primefaces.org"));
-		// supportMenuItems.add(new MenuItem("Discord Chat",
-		// "https://discord.gg/gzKFYnpmCY"));
-		// supportMenuItems.add(new MenuItem("PRO Support", "/support"));
-
-		if (user.getRole().name().equals("ADMIN")) {
-			supportMenuItems.add(new MenuItem("Visitor Pass", "/ui/visitorPass"));
-			supportMenuItems.add(new MenuItem("Reports", "/ui/reporting"));
-			approval = true;
+		if (user.isRestPassword()) {
+			List<MenuItem> supportMenuItems = new ArrayList<>();
+			supportMenuItems.add(new MenuItem("Password Management", "/ui/passwordManagement"));
+			menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
 		} else {
-			supportMenuItems.add(new MenuItem("Visitor Request", "/ui/preApproval"));
-		}
-		if (user.getRole().name().equals("SUPER_USER")) {
+			// GENERAL CATEGORY START
+			List<MenuItem> generalMenuItems = new ArrayList<>();
+			generalMenuItems.add(new MenuItem("Get Started", "/ui/home"));
+			generalMenuItems.add(new MenuItem("Documentation", ""));
+			generalMenuItems.add(new MenuItem("Content Security", ""));
+			menuCategories.add(new MenuCategory("General", generalMenuItems));
+			// GENERAL CATEGORY END
 
-			supportMenuItems.add(new MenuItem("User Management", "/ui/userManagement"));
-			supportMenuItems.add(new MenuItem("Employee Management", "/ui/employeeManagement"));
-		}
-		supportMenuItems.add(new MenuItem("Password Management", "/ui/passwordManagement"));
-		menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
+			// SUPPORT CATEGORY START
+			List<MenuItem> supportMenuItems = new ArrayList<>();
+			// supportMenuItems.add(new MenuItem("Forum", "https://forum.primefaces.org"));
+			// supportMenuItems.add(new MenuItem("Discord Chat",
+			// "https://discord.gg/gzKFYnpmCY"));
+			// supportMenuItems.add(new MenuItem("PRO Support", "/support"));
 
+			if (user.getRole().name().equals("ADMIN")) {
+				supportMenuItems.add(new MenuItem("Visitor Pass", "/ui/visitorPass"));
+				supportMenuItems.add(new MenuItem("Reports", "/ui/reporting"));
+				approval = true;
+			} else {
+				supportMenuItems.add(new MenuItem("Visitor Request", "/ui/preApproval"));
+			}
+			if (user.getRole().name().equals("SUPER_USER")) {
+
+				supportMenuItems.add(new MenuItem("User Management", "/ui/userManagement"));
+				supportMenuItems.add(new MenuItem("Employee Management", "/ui/employeeManagement"));
+			}
+			supportMenuItems.add(new MenuItem("Password Management", "/ui/passwordManagement"));
+			menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
+		}
 		// SUPPORT CATEGORY END
 
 		/*
