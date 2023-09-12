@@ -125,7 +125,7 @@
                                             id="visitingEmployee" autoWidth="false" filter="true"
                                             filterMatchMode="startsWith">
                                             <f:selectItem itemLabel="" itemValue="" />
-                                            <f:selectItems value="#{visitorController.employees}" var="player"
+                                            <f:selectItems value="#{visitorController.approvingEmployee}" var="player"
                                                 itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
                                             <p:ajax update="visitingDepartment"
                                                 listener="#{visitorController.getDepartment}" />
