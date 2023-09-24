@@ -92,7 +92,10 @@ public class AppMenu {
 		menuCategories.add(new MenuCategory("Leave Management", dataMenuItems));
 		
 		List<MenuItem> masterMenuItems = new ArrayList<>();
-		masterMenuItems.add(new MenuItem("Master Settings", "/ui/master"));
+		masterMenuItems.add(new MenuItem("Company Settings", "/ui/master"));
+		masterMenuItems.add(new MenuItem("Division Settings", "/ui/division"));
+		masterMenuItems.add(new MenuItem("Department Settings", "/ui/department"));
+		masterMenuItems.add(new MenuItem("Designation Settings", "/ui/designation"));
 				
 		menuCategories.add(new MenuCategory("Masters Management", masterMenuItems));
 		

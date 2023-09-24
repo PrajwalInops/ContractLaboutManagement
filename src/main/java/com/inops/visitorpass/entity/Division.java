@@ -14,11 +14,10 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
-@Setter
+//@Setter
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,4 +34,17 @@ public class Division {
 	@OneToMany(mappedBy = "division", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Cards> cards;
 
+	public void setDivisionId(long divisionId) {
+		this.divisionId = divisionId;
+	}
+
+	public void setDivisionName(String divisionName) {
+		this.divisionName = divisionName;
+	}
+
+	public void setCards(Set<Cards> cards) {
+		this.cards = cards;
+	}
+
+	
 }

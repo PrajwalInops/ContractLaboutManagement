@@ -16,7 +16,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
-@Setter
+//@Setter
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,7 +31,20 @@ public class Cards {
 	private String cardNo;
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "divisionId", nullable = false)
+	@JoinColumn(name = "divisionId", nullable = false, updatable = true)
 	private Division division;
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setCardNo(String cardNo) {
+		this.cardNo = cardNo;
+	}
+
+	public void setDivision(Division division) {
+		this.division = division;
+	}
+
+	
 }

@@ -24,4 +24,20 @@ public class DivisionService implements IDivision {
 		return Optional.of(divisionRepository.findAll());
 	}
 
+	@Override
+	public Division save(Division division) {
+		
+		return divisionRepository.save(division);
+	}
+
+	@Override
+	public void delete(Division division) {
+		divisionRepository.delete(division);
+	}
+
+	@Override
+	public void deleteAll(List<Division> divisions) {
+		divisionRepository.deleteAll(divisions);
+	}
+
 }

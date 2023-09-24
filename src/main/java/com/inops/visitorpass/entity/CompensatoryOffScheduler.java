@@ -34,6 +34,7 @@ public class CompensatoryOffScheduler {
 	private Date timeToSchedule;
 	private int dateBefore;
 	private boolean includeOverTime;
+	private String status;
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "divisionId", nullable = true)

@@ -8,4 +8,10 @@ import com.inops.visitorpass.entity.Division;
 public interface IDivision {
 
 	Optional<List<Division>> findAll();
+
+	Division save(Division division);
+
+	void delete(Division division);
+
+	void deleteAll(List<Division> divisions);
 }

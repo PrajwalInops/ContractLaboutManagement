@@ -14,7 +14,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
-@Setter
+//@Setter
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,4 +32,16 @@ public class Department {
 	@Column(name = "department")
 	private String departmentName;
 
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
+	
 }

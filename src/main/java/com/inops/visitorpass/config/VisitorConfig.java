@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 
 import com.inops.visitorpass.entity.Cadre;
@@ -18,6 +20,7 @@ import com.inops.visitorpass.service.IDepartment;
 import com.inops.visitorpass.service.IEmployee;
 import com.inops.visitorpass.service.IVisitorService;
 
+@EnableScheduling
 @Configuration
 public class VisitorConfig {
 
@@ -61,4 +64,12 @@ public class VisitorConfig {
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
 	}
+	
+	 @Bean
+	    public ThreadPoolTaskScheduler taskScheduler() {
+	        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+	        scheduler.setPoolSize(5); // Set the thread pool size
+	        scheduler.setThreadNamePrefix("TaskScheduler-");
+	        return scheduler;
+	    }
 }
