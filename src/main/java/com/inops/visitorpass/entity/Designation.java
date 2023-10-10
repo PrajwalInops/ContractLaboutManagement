@@ -1,54 +1,45 @@
 package com.inops.visitorpass.entity;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
-@Setter
+//@Setter
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tblshifts")
-public class Shift {
+@Table(name = "tbldesignations")
+public class Designation {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "shiftid")
+	@Column(name = "desigid")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String shiftId;
-	
-	@Column(name = "shiftname")
-	private String shiftName;
-	
-	@Transient
-	@Column(name = "shiftStart")
-	private Date shiftStart;
-	
-	@Transient
-	@Column(name = "shiftEnd")
-	private Date shiftEnd;	
-	
-	@Transient
-	@Column(name = "lunchStart")
-	private Date lunchStart;
-	
-	@Transient
-	@Column(name = "lunchEnd")
-	private Date lunchEnd;
-		
+	private String id;
+
+	@Column(name = "designation")
+	private String designationName;
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setDesignationName(String designationName) {
+		this.designationName = designationName;
+	}
 }

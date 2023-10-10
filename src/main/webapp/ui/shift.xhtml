@@ -7,12 +7,12 @@
   template="/WEB-INF/template.xhtml"
 >
   <ui:define name="title">
-    Designation <span class="subitem"> configuration</span>
+    Shift <span class="subitem"> configuration</span>
   </ui:define>
 
   <ui:define name="description">
     Tool provides an Outlook for endusers who is pertinant to operate the
-    designations genereation request process.
+    Shift genereation request process.
   </ui:define>
 
   <ui:param name="documentationLink" value="/components/schedule" />
@@ -23,7 +23,7 @@
       <p:growl id="messages" showDetail="true" />
 
       <div class="card crud-demo">
-        <h5>Designation Details</h5>
+        <h5>Shift Details</h5>
         <p:toolbar>
           <p:toolbarGroup>
               <p:commandButton value="New" icon="pi pi-plus" actionListener="#{mastersController.openNew}"
@@ -31,10 +31,10 @@
                   styleClass="ui-button-success" style="margin-right: .5rem">
                   <p:resetInput target=":dialogs:manage-product-content" />
               </p:commandButton>
-              <p:commandButton id="delete-products-button" value="#{mastersController.deleteDesignationsButtonMessage}"
-                  icon="pi pi-trash" actionListener="#{mastersController.deleteDesignations}"
-                  styleClass="ui-button-danger" disabled="#{!mastersController.hasSelectedDesignations()}" update="@this">
-                  <p:confirm header="Confirmation" message="Delete the selected designations?"
+              <p:commandButton id="delete-products-button" value="#{mastersController.deleteShiftsButtonMessage}"
+                  icon="pi pi-trash" actionListener="#{mastersController.deleteShifts}"
+                  styleClass="ui-button-danger" disabled="#{!mastersController.hasSelectedShifts()}" update="@this">
+                  <p:confirm header="Confirmation" message="Delete the selected Shifts?"
                       icon="pi pi-exclamation-triangle" />
               </p:commandButton>
           </p:toolbarGroup>
@@ -46,12 +46,12 @@
           </p:toolbarGroup>
       </p:toolbar>
 
-      <p:dataTable id="dt-products" widgetVar="dtProducts" var="product" value="#{mastersController.designations}"
-          reflow="true" styleClass="products-table" selection="#{mastersController.selectedDesignations}"
-          rowKey="#{product.id}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+      <p:dataTable id="dt-products" widgetVar="dtProducts" var="product" value="#{mastersController.shifts}"
+          reflow="true" styleClass="products-table" selection="#{mastersController.selectedShifts}"
+          rowKey="#{product.shiftId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
           <f:facet name="header">
               <div class="products-table-header">
-                  <span style="font-weight: bold">Designations</span>
+                  <span style="font-weight: bold">Shifts</span>
                   <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
                       <p:inputText id="globalFilter" onkeyup="PF('dtProducts').filter()" placeholder="Search" />
                   </span>
@@ -66,25 +66,41 @@
 
           <p:column selectionMode="multiple" exportable="false"></p:column>
 
-          <p:column headerText="Code" sortBy="#{product.id}" filterBy="#{product.id}">
-              <h:outputText value="#{product.id}" />
+          <p:column headerText="Code" sortBy="#{product.shiftId}" filterBy="#{product.shiftId}">
+              <h:outputText value="#{product.shiftId}" />
           </p:column>
           
-          <p:column headerText="Name" sortBy="#{product.designationName}" filterBy="#{product.designationName}">
-              <h:outputText value="#{product.designationName}" />
+          <p:column headerText="Name" sortBy="#{product.shiftName}" filterBy="#{product.shiftName}">
+              <h:outputText value="#{product.shiftName}" />
+          </p:column>
+
+          <p:column headerText="Shift Start" sortBy="#{product.shiftStart}" filterBy="#{product.shiftStart}">
+              <h:outputText value="#{product.shiftStart}" />
+          </p:column>
+
+          <p:column headerText="Shift End" sortBy="#{product.shiftEnd}" filterBy="#{product.shiftEnd}">
+              <h:outputText value="#{product.shiftEnd}" />
+          </p:column>
+
+          <p:column headerText="Lunch Start" sortBy="#{product.lunchStart}" filterBy="#{product.lunchStart}">
+              <h:outputText value="#{product.lunchStart}" />
+          </p:column>
+
+          <p:column headerText="Lunch End" sortBy="#{product.lunchEnd}" filterBy="#{product.lunchEnd}">
+              <h:outputText value="#{product.lunchEnd}" />
           </p:column>
                            
           <p:column exportable="false">
               <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
                   oncomplete="PF('manageProductDialog').show()"
                   styleClass="edit-button rounded-button ui-button-success" process="@this">
-                  <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedDesignation}" />
+                  <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedShift}" />
                   <p:resetInput target=":dialogs:manage-product-content" />
               </p:commandButton>
               <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
                                process="@this"
                                oncomplete="PF('deleteProductDialog').show()">
-                  <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedDesignation}" />
+                  <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedShift}" />
               </p:commandButton>
           </p:column>
 
@@ -93,25 +109,48 @@
   </h:form>
 
   <h:form id="dialogs">
-      <p:dialog header="Designation Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+      <p:dialog header="Shift Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
           responsive="true">
           <p:outputPanel id="manage-product-content" class="ui-fluid">
-              <p:outputPanel rendered="#{not empty mastersController.selectedDesignation}">
+              <p:outputPanel rendered="#{not empty mastersController.selectedShift}">
             
               <div class="field">
-                <p:outputLabel for="id">Designation Id</p:outputLabel>
-                <p:inputText id="id" value="#{mastersController.selectedDesignation.id}" required="true" />
+                <p:outputLabel for="id">Shift Id</p:outputLabel>
+                <p:inputText id="id" value="#{mastersController.selectedShift.shiftId}" required="true" />
              </div>      
                   <div class="field">
-                      <p:outputLabel for="name">Designation Name</p:outputLabel>
-                      <p:inputText id="name" value="#{mastersController.selectedDesignation.designationName}" required="true" />
-                  </div>              
-                  
+                      <p:outputLabel for="name">Shift Name</p:outputLabel>
+                      <p:inputText id="name" value="#{mastersController.selectedShift.shiftName}" required="true" />
+                  </div> 
+             <div class="formgrid grid">   
+                  <div class="field col">
+                    <p:outputLabel for="shiftStart">Shift Start</p:outputLabel>
+                    <p:datePicker id="shiftStart" value="#{mastersController.selectedShift.shiftStart}" timeOnly="true" pattern="HH:mm"
+                    required="true"/>                    
+                </div> 
+                <div class="field col">
+                    <p:outputLabel for="shiftEnd">Shift End</p:outputLabel>
+                    <p:datePicker id="shiftEnd" value="#{mastersController.selectedShift.shiftEnd}" timeOnly="true" pattern="HH:mm"
+                    required="true"/> 
+                </div> 
+                </div>
+                <div class="formgrid grid">  
+                <div class="field col">
+                    <p:outputLabel for="lunchStart">Lunch Start</p:outputLabel>
+                    <p:datePicker id="lunchStart" value="#{mastersController.selectedShift.lunchStart}" timeOnly="true" pattern="HH:mm"
+                    required="true"/> 
+                </div> 
+                <div class="field col">
+                    <p:outputLabel for="lunchEnd">Lunch End</p:outputLabel>
+                    <p:datePicker id="lunchEnd" value="#{mastersController.selectedShift.lunchEnd}" timeOnly="true" pattern="HH:mm" 
+                    required="true"/>                     
+                </div>              
+            </div>
               </p:outputPanel>
           </p:outputPanel>
 
           <f:facet name="footer">
-              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{mastersController.saveDesignation}"
+              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{mastersController.saveShift}"
                   update="manage-product-content,:form:messages,:form:dt-products" process="manage-product-content @this" />
               <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
                   class="ui-button-secondary" type="button" />
@@ -120,7 +159,7 @@
 
       <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
           message="Delete the description" header="Confirm" severity="warn">
-          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{mastersController.deleteDesignation}"
+          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{mastersController.deleteShift}"
               process="@this" update=":form:delete-products-button"
               oncomplete="PF('deleteProductDialog').hide()" />
           <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"

@@ -96,6 +96,9 @@ public class AppMenu {
 		masterMenuItems.add(new MenuItem("Division Settings", "/ui/division"));
 		masterMenuItems.add(new MenuItem("Department Settings", "/ui/department"));
 		masterMenuItems.add(new MenuItem("Designation Settings", "/ui/designation"));
+		masterMenuItems.add(new MenuItem("Cadre Settings", "/ui/cadre"));
+		masterMenuItems.add(new MenuItem("Shift Settings", "/ui/shift"));
+		masterMenuItems.add(new MenuItem("Employee Settings", "/ui/employee"));
 				
 		menuCategories.add(new MenuCategory("Masters Management", masterMenuItems));
 		

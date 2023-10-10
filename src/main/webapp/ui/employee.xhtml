@@ -1,0 +1,288 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:p="http://primefaces.org/ui"
+  template="/WEB-INF/template.xhtml"
+>
+  <ui:define name="title">
+    Employee <span class="subitem"> configuration</span>
+  </ui:define>
+
+  <ui:define name="description">
+    Tool provides an Outlook for endusers who is pertinant to operate the
+    employees genereation request process.
+  </ui:define>
+
+  <ui:param name="documentationLink" value="/components/schedule" />
+  <ui:param name="widgetLink" value="Schedule-1" />
+
+  <ui:define name="implementation">
+    <h:form id="form">
+      <p:growl id="messages" showDetail="true" />
+
+      <div class="card crud-demo">
+        <h5>Employee Details</h5>
+        <p:toolbar>
+          <p:toolbarGroup>
+              <p:commandButton value="New" icon="pi pi-plus" actionListener="#{mastersController.openNew}"
+                  update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                  styleClass="ui-button-success" style="margin-right: .5rem">
+                  <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>
+              <p:commandButton id="delete-products-button" value="#{mastersController.deleteEmployeesButtonMessage}"
+                  icon="pi pi-trash" actionListener="#{mastersController.deleteEmployees}"
+                  styleClass="ui-button-danger" disabled="#{!mastersController.hasSelectedEmployees()}" update="@this">
+                  <p:confirm header="Confirmation" message="Delete the selected employees?"
+                      icon="pi pi-exclamation-triangle" />
+              </p:commandButton>
+          </p:toolbarGroup>
+          <p:toolbarGroup align="right">
+              <p:fileUpload mode="simple" skinSimple="true" label="Import" chooseIcon="pi pi-download" />
+              <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                  <p:dataExporter type="pdf" target="dt-products" fileName="products" />
+              </p:commandButton>
+          </p:toolbarGroup>
+      </p:toolbar>
+
+      <p:dataTable id="dt-products" widgetVar="dtProducts" var="product" value="#{mastersController.employees}"
+          reflow="true" styleClass="products-table" selection="#{mastersController.selectedEmployees}"
+          rowKey="#{product.employeeId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+          <f:facet name="header">
+              <div class="products-table-header">
+                  <span style="font-weight: bold">Employees</span>
+                  <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                      <p:inputText id="globalFilter" onkeyup="PF('dtProducts').filter()" placeholder="Search" />
+                  </span>
+              </div>
+          </f:facet>
+
+          <p:ajax event="rowSelect" update=":form:delete-products-button" />
+          <p:ajax event="rowUnselect" update=":form:delete-products-button" />
+          <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button" />
+          <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button" />
+          <p:ajax event="toggleSelect" update=":form:delete-products-button" />
+
+          <p:column selectionMode="multiple" exportable="false"></p:column>
+
+          <p:column headerText="Code" sortBy="#{product.employeeId}" filterBy="#{product.employeeId}">
+              <h:outputText value="#{product.employeeId}" />
+          </p:column>
+          
+          <p:column headerText="Name" sortBy="#{product.employeeName}" filterBy="#{product.employeeName}">
+              <h:outputText value="#{product.employeeName}" />
+          </p:column>
+
+          <p:column headerText="Adress" sortBy="#{product.address}" filterBy="#{product.address}">
+              <h:outputText value="#{product.address}" />
+          </p:column>
+          <p:column headerText="G" sortBy="#{product.gender}" filterBy="#{product.gender}">
+              <h:outputText value="#{product.gender}" />
+          </p:column>
+          <p:column headerText="M/S" sortBy="#{product.maritalStatus}" filterBy="#{product.maritalStatus}">
+              <h:outputText value="#{product.maritalStatus}" />
+          </p:column>
+          <p:column headerText="Date Of Birth" sortBy="#{product.dateOfBirth}" filterBy="#{product.dateOfBirth}">
+              <h:outputText value="#{product.dateOfBirth}" />
+          </p:column>
+          <p:column headerText="Date Of Joining" sortBy="#{product.dateOfJoining}" filterBy="#{product.dateOfJoining}">
+            <h:outputText value="#{product.dateOfJoining}" />
+        </p:column>
+        <p:column headerText="Date Of Left" sortBy="#{product.dateOfLeft}" filterBy="#{product.dateOfLeft}">
+            <h:outputText value="#{product.dateOfLeft}" />
+        </p:column>
+        <p:column headerText="ShiftType - Shift" sortBy="#{product.shift}" filterBy="#{product.shift}">
+            <h:outputText value="#{product.shiftType} - #{product.shift}" />
+        </p:column>
+        <p:column headerText="Department" sortBy="#{product.department}" filterBy="#{product.department}">
+            <h:outputText value="#{product.department.departmentName}" />
+        </p:column>
+        <p:column headerText="Designation" sortBy="#{product.designation}" filterBy="#{product.designation}">
+            <h:outputText value="#{product.designation.designationName}" />
+        </p:column>
+        <p:column headerText="Cadre" sortBy="#{product.cadre}" filterBy="#{product.cadre}">
+            <h:outputText value="#{product.cadre.cadre}" />
+        </p:column>
+                           
+          <p:column exportable="false">
+              <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
+                  oncomplete="PF('manageProductDialog').show()"
+                  styleClass="edit-button rounded-button ui-button-success" process="@this">
+                  <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedEmployee}" />
+                  <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>
+              <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                               process="@this"
+                               oncomplete="PF('deleteProductDialog').show()">
+                  <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedEmployee}" />
+              </p:commandButton>
+          </p:column>
+
+      </p:dataTable>
+    </div>
+  </h:form>
+
+  <h:form id="dialogs">
+      <p:dialog header="Employee Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+          responsive="true">
+          <p:outputPanel id="manage-product-content" class="ui-fluid">
+              <p:outputPanel rendered="#{not empty mastersController.selectedEmployee}">
+            
+              <div class="field">
+                <p:outputLabel for="id">Employee Id</p:outputLabel>
+                <p:inputText id="id" value="#{mastersController.selectedEmployee.employeeId}" required="true" />
+             </div>      
+                  <div class="field">
+                      <p:outputLabel for="name">Employee Name</p:outputLabel>
+                      <p:inputText id="name" value="#{mastersController.selectedEmployee.employeeName}" required="true" />
+                  </div>  
+                  <div class="field">
+                    <p:outputLabel for="address">Employee Address</p:outputLabel>
+                    <p:inputText id="address" value="#{mastersController.selectedEmployee.address}" required="true" />
+                </div> 
+                <div class="formgrid grid"> 
+                <div class="field col">
+                    <p:outputLabel for="dob">Date Of Birth</p:outputLabel>
+                    <p:datePicker  id="dob" value="#{mastersController.selectedEmployee.dateOfBirth}" required="true"  monthNavigator="true"
+                    yearNavigator="true"/>
+                </div>  
+                <div class="field col">
+                    <p:outputLabel for="doj">Date Of Birth</p:outputLabel>
+                    <p:datePicker  id="doj" value="#{mastersController.selectedEmployee.dateOfJoining}" required="true"  monthNavigator="true"
+                    yearNavigator="true"/>
+                </div>  
+                <div class="field col">
+                    <p:outputLabel for="dol">Date Of Birth</p:outputLabel>
+                    <p:datePicker  id="dol" value="#{mastersController.selectedEmployee.dateOfLeft}" required="true"  monthNavigator="true"
+                    yearNavigator="true"/>
+                </div> 
+            </div>   
+            <div class="formgrid grid"> 
+                <div class="field col">
+                    <p:outputLabel for="gender">Gender</p:outputLabel>                    
+                    <p:selectOneButton id="gender" value="#{mastersController.selectedEmployee.gender}" required="true">
+                        <f:selectItem itemLabel="Male" itemValue="male"/>
+                        <f:selectItem itemLabel="Female" itemValue="female"/>                       
+                    </p:selectOneButton>
+                </div>    
+                <div class="field col">
+                    <p:outputLabel for="maritalStatus">Marital Status</p:outputLabel>
+                    <p:selectOneButton id="maritalStatus" value="#{mastersController.selectedEmployee.maritalStatus}" required="true">
+                        <f:selectItem itemLabel="Married" itemValue="married"/>
+                        <f:selectItem itemLabel="Un-Married" itemValue="un-married"/>                       
+                    </p:selectOneButton>
+                </div>            
+                <div class="field col">
+                    <p:outputLabel for="shiftType">Shift Type</p:outputLabel>
+                    <p:selectOneButton id="shiftType" value="#{mastersController.selectedEmployee.shiftType}" required="true">
+                        <p:ajax update="shift" listener="#{mastersController.shiftType}" />
+                        <f:selectItem itemLabel="Fixed" itemValue="F"/>
+                        <f:selectItem itemLabel="Automatic" itemValue="A"/>                       
+                    </p:selectOneButton>
+                </div>   
+                <div class="field col">
+                    <p:outputLabel for="shift">Shift</p:outputLabel>                    
+                    <p:selectOneMenu id="shift" value="#{mastersController.selectedEmployee.shift}" dynamic="true">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{mastersController.objShifts}"/>
+                </p:selectOneMenu>
+                </div>     
+                </div>    
+                <div class="formgrid grid"> 
+                    <div class="field col">
+                    <p:outputLabel for="division">Division</p:outputLabel>
+                    <p:selectOneMenu value="#{mastersController.selectedEmployee.division}" id="division" var="c"
+                    converter="#{divisionConverter}" autoWidth="false" editable="false" maxlength="10"
+                    filter="true" filterMatchMode="startsWith">
+
+                    <f:selectItems value="#{mastersController.divisions}" var="player"
+                        itemLabel="#{player.divisionName}" itemValue="#{player}" />
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{c.divisionName}" />
+                    </p:column>
+                </p:selectOneMenu>
+                </div>         
+                <div class="field col">
+                    <p:outputLabel for="department">Department</p:outputLabel>
+                    <p:selectOneMenu value="#{mastersController.selectedEmployee.department}" id="department" var="c"
+                    converter="#{departmentConverter}" autoWidth="false" editable="false" maxlength="10"
+                    filter="true" filterMatchMode="startsWith">
+
+                    <f:selectItems value="#{mastersController.departments}" var="player"
+                        itemLabel="#{player.departmentName}" itemValue="#{player}" />
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{c.departmentName}" />
+                    </p:column>
+                </p:selectOneMenu>
+                </div>         
+                <div class="field col">
+                    <p:outputLabel for="designation">Designation</p:outputLabel>
+                    <p:selectOneMenu value="#{mastersController.selectedEmployee.designation}" id="designation" var="c"
+                    converter="#{designationConverter}" autoWidth="false" editable="false" maxlength="10"
+                    filter="true" filterMatchMode="startsWith">
+
+                    <f:selectItems value="#{mastersController.designations}" var="player"
+                        itemLabel="#{player.designationName}" itemValue="#{player}" />
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{c.designationName}" />
+                    </p:column>
+                </p:selectOneMenu>
+                </div>         
+                <div class="field col">
+                    <p:outputLabel for="cadre">Cadre</p:outputLabel>
+                    <p:selectOneMenu value="#{mastersController.selectedEmployee.cadre}" id="cadre" var="c"
+                    converter="#{cadreConverter}" autoWidth="false" editable="false" maxlength="10"
+                    filter="true" filterMatchMode="startsWith">
+
+                    <f:selectItems value="#{mastersController.cadres}" var="player"
+                        itemLabel="#{player.cadre}" itemValue="#{player}" />
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{c.cadre}" />
+                    </p:column>
+                </p:selectOneMenu>
+                </div>   
+                </div>      
+                  
+              </p:outputPanel>
+          </p:outputPanel>
+
+          <f:facet name="footer">
+              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{mastersController.saveEmployee}"
+                  update="manage-product-content,:form:messages,:form:dt-products" process="manage-product-content @this" />
+              <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                  class="ui-button-secondary" type="button" />
+          </f:facet>
+      </p:dialog>
+
+      <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+          message="Delete the employee" header="Confirm" severity="warn">
+          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{mastersController.deleteEmployee}"
+              process="@this" update=":form:delete-products-button"
+              oncomplete="PF('deleteProductDialog').hide()" />
+          <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+              onclick="PF('deleteProductDialog').hide()" />
+      </p:confirmDialog>
+
+      <p:confirmDialog global="true" showEffect="fade" width="300">
+          <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+          <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+              icon="pi pi-times" />
+      </p:confirmDialog>      
+  
+    </h:form>
+ 
+  </ui:define>
+</ui:composition>
