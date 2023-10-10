@@ -66,6 +66,10 @@
 
           <p:column selectionMode="multiple" exportable="false"></p:column>
 
+          <p:column style="width:2rem">
+            <p:rowToggler/>
+          </p:column>
+
           <p:column headerText="Code" sortBy="#{product.employeeId}" filterBy="#{product.employeeId}">
               <h:outputText value="#{product.employeeId}" />
           </p:column>
@@ -73,19 +77,7 @@
           <p:column headerText="Name" sortBy="#{product.employeeName}" filterBy="#{product.employeeName}">
               <h:outputText value="#{product.employeeName}" />
           </p:column>
-
-          <p:column headerText="Adress" sortBy="#{product.address}" filterBy="#{product.address}">
-              <h:outputText value="#{product.address}" />
-          </p:column>
-          <p:column headerText="G" sortBy="#{product.gender}" filterBy="#{product.gender}">
-              <h:outputText value="#{product.gender}" />
-          </p:column>
-          <p:column headerText="M/S" sortBy="#{product.maritalStatus}" filterBy="#{product.maritalStatus}">
-              <h:outputText value="#{product.maritalStatus}" />
-          </p:column>
-          <p:column headerText="Date Of Birth" sortBy="#{product.dateOfBirth}" filterBy="#{product.dateOfBirth}">
-              <h:outputText value="#{product.dateOfBirth}" />
-          </p:column>
+         
           <p:column headerText="Date Of Joining" sortBy="#{product.dateOfJoining}" filterBy="#{product.dateOfJoining}">
             <h:outputText value="#{product.dateOfJoining}" />
         </p:column>
@@ -118,6 +110,32 @@
                   <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedEmployee}" />
               </p:commandButton>
           </p:column>
+
+          <p:rowExpansion>
+            <div class="product">
+                <div class="product-list-item">
+                    <p:graphicImage name="demo/images/photocam/5390519.jpeg"/>
+                    <div class="product-list-detail">
+                        <div class="product-name">#{product.employeeName}</div>
+                        <div class="product-description">#{product.address}</div>  
+                        <p:rating readonly="true" value="3"/>
+                        <i class="pi pi-tag product-category-icon"/><span
+                            class="product-category">#{product.gender}</span>                       
+                        , <i class="pi pi-tag product-category-icon"/><span
+                                class="product-category">#{product.maritalStatus}</span>                                                 
+                    </div> 
+                    <div class="product-list-action">
+                        <h:outputText value="#{product.dateOfBirth}" styleClass="product-price" />                       
+                        <p:commandButton value="Mark as Left" icon="pi pi-shopping-cart" type="button"
+                        disabled="#{product.dateOfLeft != null}">
+                        </p:commandButton>
+                        <span class="product-badge status-instock">Active</span>
+                        <h:outputText value="" />   
+                            <h:outputText value=""  />   
+                    </div>                  
+                </div>
+            </div>
+        </p:rowExpansion>
 
       </p:dataTable>
     </div>

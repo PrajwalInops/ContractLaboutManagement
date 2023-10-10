@@ -24,7 +24,7 @@ public class Muster {
 	private MusterId musterId;
 
 	@Column(name = "Shiftid")
-	private String ShiftId;
+	private String shiftId;
 
 	@Column(name = "Attid")
 	private String attendanceId;

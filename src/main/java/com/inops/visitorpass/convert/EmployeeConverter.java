@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.service.IEmployee;
 
-@Component
-@FacesConverter(value = "employeeConverter", managed = true)
+//@Component
+//@FacesConverter(value = "employeeConverter", managed = true)
 public class EmployeeConverter implements Converter<Employee> {
 
 	private List<Employee> employees;
@@ -34,7 +34,8 @@ public class EmployeeConverter implements Converter<Employee> {
 	public Employee getAsObject(FacesContext context, UIComponent component, String value) {
 		if (value != null && value.trim().length() > 0) {
 			try {
-				return employees.stream().filter(empl -> empl.getEmployeeId().equals(value)).findAny().orElse(null);
+				Employee emp =  employees.stream().filter(empl -> empl.getEmployeeId().equals(value)).findAny().orElse(null);
+				return emp;
 			} catch (NumberFormatException e) {
 				throw new ConverterException(
 						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Conversion Error", "Not a valid employee."));
