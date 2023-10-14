@@ -45,7 +45,7 @@ public class TransactionController {
 	public void init() {
 		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
 		LocalDate currentDate = LocalDate.now();
-		musters = musterService.findByAttendanceDateBetween(currentDate, currentDate.minusDays(2)).get();
+		musters = musterService.findByAttendanceDateBetween(currentDate.minusDays(2), currentDate).get();
 	}
 
 	public void openNew() {
@@ -53,8 +53,7 @@ public class TransactionController {
 	}
 
 	public void searchTransaction() {
-		musters = musterService.findAllByAttendanceDateBetweenAndEmployeeId(fromDate, toDate, employeeId)
-				.get();
+		musters = musterService.findAllByAttendanceDateBetweenAndEmployeeId(fromDate, toDate, employeeId).get();
 	}
-		
+
 }
