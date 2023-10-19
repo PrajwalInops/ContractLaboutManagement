@@ -30,6 +30,7 @@ public class InopsConstant {
 	public static final String ONELINE_CONSOLIDATED = "Oneline Consolidated";
 	public static final String PAYROLL_SHORT_HOURS = "Payroll Short Hours";
 	public static final String MANDAYS_DETAILED = "Mandays Detailed";
+	public static final String PERIODIC_CUTLIST = "Periodic Cutlist";
 	
 	
 

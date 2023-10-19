@@ -94,7 +94,8 @@ public class ReportController implements Serializable {
 						new SelectItem("Cutlist OverTime", "Cutlist OverTime"),
 						new SelectItem("Oneline Consolidated", "Oneline Consolidated"),
 						new SelectItem("Payroll Short Hours", "Payroll Short Hours"),
-						new SelectItem("Mandays Detailed", "Mandays Detailed")});
+						new SelectItem("Mandays Detailed", "Mandays Detailed"),
+						new SelectItem("Periodic Cutlist", "Periodic Cutlist")});
 
 		SelectItemGroup leaveReports = new SelectItemGroup("Leave Reports");
 		leaveReports.setSelectItems(new SelectItem[] { new SelectItem("Leave Transaction", "Leave Transaction"),
@@ -290,6 +291,11 @@ public class ReportController implements Serializable {
 
 		case InopsConstant.MANDAYS_DETAILED:
 			buffer = reportGenerationService.getMandaysDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+			
+		case InopsConstant.PERIODIC_CUTLIST:
+			buffer = reportGenerationService.getPeriodicCutlistDetails().generate(report.getDateRange().get(0), to,
 					filteredList, report.getReportName());
 			break;
 
