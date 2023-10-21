@@ -104,8 +104,10 @@ public class AppMenu {
 		
 		List<MenuItem> transactionMenuItems = new ArrayList<>();
 		transactionMenuItems.add(new MenuItem("Transactions", "/ui/transaction"));
+		transactionMenuItems.add(new MenuItem("Punches", "/ui/punches"));
 				
 		menuCategories.add(new MenuCategory("Transaction Management", transactionMenuItems));
+		
 		
 		
 		List<MenuItem> reportMenuItems = new ArrayList<>();

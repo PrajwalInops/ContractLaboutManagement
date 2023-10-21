@@ -1,6 +1,8 @@
 package com.inops.visitorpass.controller;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Muster;
+import com.inops.visitorpass.service.ICompute;
 import com.inops.visitorpass.service.IMuster;
 
 import lombok.Getter;
@@ -32,6 +35,9 @@ public class TransactionController {
 	ApplicationContext ctx;
 
 	private final IMuster musterService;
+	private final ICompute computeService;
+
+	ZoneId defaultZoneId = ZoneId.systemDefault();
 
 	private List<Muster> musters;
 	private Muster selectedMuster;
@@ -54,6 +60,11 @@ public class TransactionController {
 
 	public void searchTransaction() {
 		musters = musterService.findAllByAttendanceDateBetweenAndEmployeeId(fromDate, toDate, employeeId).get();
+	}
+
+	public void compute() {
+		computeService.computeByDateAndEmployee(employeeId, Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()),
+				Date.from(toDate.atStartOfDay(defaultZoneId).toInstant()));
 	}
 
 }
