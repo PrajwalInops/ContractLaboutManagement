@@ -4,18 +4,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.inops.visitorpass.domain.PeriodicCutlist;
 import com.inops.visitorpass.entity.Employee;
-import com.inops.visitorpass.entity.LeaveBalance;
-import com.inops.visitorpass.entity.Muster;
+import com.inops.visitorpass.repository.MonthlySummaryReportRepository;
 import com.inops.visitorpass.service.DataExtractionService;
-import com.inops.visitorpass.service.ILeaveBalance;
-import com.inops.visitorpass.service.IMuster;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,75 +21,41 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PeriodicCutlistReportService implements DataExtractionService {
 
-	private final IMuster musterService;
-	private final ILeaveBalance leaveBalanceService;
+	// private final IMuster musterService;
+	// private final ILeaveBalance leaveBalanceService;
+	private final MonthlySummaryReportRepository monthlySummaryReportRepository;
 
 	@Override
+	// @Transactional
 	public Collection<PeriodicCutlist> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds,
 			String type) {
 
-		List<PeriodicCutlist> finantialCutlists = new ArrayList<>();
+		List<PeriodicCutlist> finantialCutlists;
 
-		Optional<List<Muster>> muster = musterService.findAllByAttendanceDateBetweenAndEmployeeId(from, to,
-				employeeIds.stream().map(Employee::getEmployeeId).collect(Collectors.toList()));
+		employeeIds.forEach(employee -> {
+			monthlySummaryRecord(employee.getEmployeeId(), from);
+		});
 
-		List<LeaveBalance> leaveBalances = leaveBalanceService.findAllByEmployeeIds(from, to,
-				employeeIds.stream().map(Employee::getEmployeeId).collect(Collectors.toList())).get();
-
-		employeeIds.stream().forEach(employee -> {
-			PeriodicCutlist cutlist = new PeriodicCutlist(employee.getEmployeeName(),
-					employee.getDepartment().getDepartmentName(), employee.getEmployeeId(), 0, 0, 0, 0, 0, 0, 0, 0, 0,
-					0, 0);
-			muster.get().stream().filter(must -> must.getMusterId().getEmployeeId().equals(employee.getEmployeeId()))
-					.collect(Collectors.toList()).forEach(musterData -> {
-
-						if (musterData.getHoursWorked() != 0) {
-							cutlist.setRegularDays(cutlist.getRegularDays() + musterData.getHoursWorked());
-						}						
-
-						if (musterData.getSingleOt() != 0) {
-							cutlist.setOts(cutlist.getOts() + musterData.getSingleOt());
-						}
-						if (musterData.getDoubleOt() != 0) {
-							cutlist.setOtd(cutlist.getOtd() + musterData.getDoubleOt());
-						}
-						
-						if (!musterData.getAttendanceId().equals("AA") || !musterData.getLeaveTypeId().equals("00")) {
-							cutlist.setDa(cutlist.getDa() + 1);
-						}	
-
-					});
-			List<LeaveBalance> balance = leaveBalances.stream()
-					.filter(bal -> bal.getLeaveBalanceId().getEmployeeId().equals(employee.getEmployeeId()))
-					.collect(Collectors.toList());
-			cutlist.setRegularDays((cutlist.getRegularDays() / 60) / 8);
-			cutlist.setOts((cutlist.getOts() / 60) / 8);
-			cutlist.setOtd((cutlist.getOtd() / 60) / 8);
-			
-			if(!balance.isEmpty()) {
-			
-			LeaveBalance leaveBal = balance.stream()
-					.filter(bal -> bal.getLeaveBalanceId().getLeaveTypeId().equals("CL")).findAny().orElse(null);
-			cutlist.setCl(leaveBal.getBalance());
-			
-			leaveBal = balance.stream()
-					.filter(bal -> bal.getLeaveBalanceId().getLeaveTypeId().equals("VL")).findAny().orElse(null);
-			cutlist.setVl(leaveBal.getBalance());
-			
-			leaveBal = balance.stream()
-					.filter(bal -> bal.getLeaveBalanceId().getLeaveTypeId().equals("SL")).findAny().orElse(null);
-			cutlist.setSl(leaveBal.getBalance());
-			
-			leaveBal = balance.stream()
-					.filter(bal -> bal.getLeaveBalanceId().getLeaveTypeId().equals("ML")).findAny().orElse(null);
-			cutlist.setMl(leaveBal.getBalance());
-			
-			cutlist.setNh(cutlist.getRegularDays() / 60);
-			}
-			finantialCutlists.add(cutlist);
+		finantialCutlists = monthlySummaryReportRepository.findAll().stream()
+				.map(period -> new PeriodicCutlist(null, null, period.getEmployeeId(), period.getRegularDays(),
+						period.getVl(), period.getDa(), period.getOts(), period.getOtd(), period.getIbd(), period.getCl(),
+						period.getSl(), period.getNh(), 0.0, period.getNsa2()))
+				.collect(Collectors.toList());
+		
+		finantialCutlists.stream().forEach(checkList->{
+			Employee employee = employeeIds.stream().filter(emp->emp.getEmployeeId().equals(checkList.getEmployeeId())).findAny().get();
+			checkList.setName(employee.getEmployeeName());
+			checkList.setDepartment(employee.getDepartment().getDepartmentName()); 
 		});
 
 		return finantialCutlists;
+	}
+
+	@Transactional(readOnly = true)
+	private void monthlySummaryRecord(String empid, LocalDate from) {
+		System.out.println("Call procedure");
+		monthlySummaryReportRepository.monthlySummaryRecord(empid, String.valueOf(from.getYear()),
+				String.valueOf(from.getMonth().getValue()), 0);
 	}
 
 }
