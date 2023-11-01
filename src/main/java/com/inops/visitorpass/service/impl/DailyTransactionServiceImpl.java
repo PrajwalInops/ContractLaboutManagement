@@ -12,7 +12,6 @@ import com.inops.visitorpass.entity.Transaction;
 import com.inops.visitorpass.repository.DailyTransactionRepository;
 import com.inops.visitorpass.service.IDailyTransaction;
 
-
 @Service("dailyTransactionService")
 public class DailyTransactionServiceImpl implements IDailyTransaction {
 
@@ -46,6 +45,14 @@ public class DailyTransactionServiceImpl implements IDailyTransaction {
 		return dailyTransactionRepository.findAllByAttendanceDateBetweenAndTransactionIdEmployeeIdIn(
 				Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
 				Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId);
+	}
+
+	@Override
+	public Optional<List<Object[]>> findMinMaxPunchedTimeByDateRange(String employeeId, LocalDate start,
+			LocalDate end) {
+		return dailyTransactionRepository.findMinMaxPunchedTimeByDateRange(employeeId,
+				Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
+				Date.from(end.atStartOfDay(defaultZoneId).toInstant()));
 	}
 
 }

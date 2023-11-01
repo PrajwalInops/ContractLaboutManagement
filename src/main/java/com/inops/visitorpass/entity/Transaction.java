@@ -1,5 +1,6 @@
 package com.inops.visitorpass.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -33,7 +34,7 @@ public class Transaction {
 	private String oPFlag;
 	
 	@Column(name = "Punchedtime")
-	private Date punchedTime;
+	private LocalDateTime punchedTime;
 	
 	@Column(name = "Attendancedate")
 	private Date attendanceDate;

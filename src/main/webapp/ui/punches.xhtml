@@ -1,0 +1,132 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:p="http://primefaces.org/ui"
+  template="/WEB-INF/template.xhtml"
+>
+  <ui:define name="title">
+    Employee <span class="subitem">Punch Details</span>
+  </ui:define>
+
+  <ui:define name="description">
+    Tool provides an Outlook for endusers who is pertinant to operate the
+    employees daily punch operations process.
+  </ui:define>
+
+  <ui:param name="documentationLink" value="/components/schedule" />
+  <ui:param name="widgetLink" value="Schedule-1" />
+
+  <ui:define name="implementation">
+    <h:form id="form">
+      <p:growl id="messages" showDetail="true" />
+
+      <div class="card crud-demo">
+        <h5>Punch Details</h5>
+        <p:toolbar>
+          <p:toolbarGroup>
+              <p:commandButton value="Search" icon="pi pi-search" actionListener="#{punchController.openNew}"
+                  update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                  styleClass="ui-button-success" style="margin-right: .5rem">
+                  <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>             
+          </p:toolbarGroup>
+          <p:toolbarGroup align="right">             
+              <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                  <p:dataExporter type="pdf" target="dt-products" fileName="products" />
+              </p:commandButton>
+          </p:toolbarGroup>
+      </p:toolbar>
+    
+      <p:schedule id="scheduler" value="#{punchController.eventModel}" widgetVar="myschedule"
+                  timeZone="#{punchController.serverTimeZone}" clientTimeZone="#{punchController.serverTimeZone}">
+            <p:ajax event="dateSelect" listener="#{punchController.onDateSelect}" update="eventDetails"
+                  oncomplete="PF('eventDialog').show();"/>
+            <p:ajax event="eventSelect" listener="#{punchController.onEventSelect}" update="eventDetails"
+                  oncomplete="PF('eventDialog').show();"/>
+            <p:ajax event="eventMove" listener="#{punchController.onEventMove}" update="messages"/>
+            <p:ajax event="eventResize" listener="#{punchController.onEventResize}" update="messages"/>
+       </p:schedule>
+
+       <p:dialog id="addPunch" widgetVar="eventDialog" header="Event Details" showEffect="fade" hideEffect="fade">
+        <p:outputPanel rendered="#{not empty punchController.event}">    
+            <h:panelGrid id="eventDetails" columns="2" cellpadding="7">
+                <p:outputLabel for="title" value="Titles" styleClass="font-bold"/>
+              <p:inputText id="title" value="#{punchController.event.title}" required="true"/>
+
+            <p:outputLabel for="from" value="From" styleClass="font-bold"/>
+              <p:datePicker id="from" value="#{punchController.event.startDate}" pattern="dd/MM/yyyy"
+                            showTime="true" appendTo="@(body)"/>
+
+              <p:outputLabel for="to" value="To" styleClass="font-bold"/>
+              <p:datePicker id="to" value="#{punchController.event.endDate}" pattern="dd/MM/yyyy"
+                            showTime="true" appendTo="@(body)"/>
+
+              <p:outputLabel for="allDay" value="All Day" styleClass="font-bold"/>
+              <h:selectBooleanCheckbox id="allDay" value="#{punchController.event.allDay}"/> --> 
+            </h:panelGrid>
+          </p:outputPanel>
+            <div class="flex justify-content-between mt-3">
+              <p:commandButton type="reset" value="Reset" styleClass="font-bold ui-button-outlined"/>
+              <p:commandButton id="addButton" value="Save" action="#{punchController.addEvent}" 
+                          oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
+            </div>               
+       </p:dialog>
+     
+                       
+    </div>
+  </h:form>
+
+
+  <h:form id="dialogs">
+    <p:dialog id="search" header="Punch Search Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+        responsive="true">
+        <p:outputPanel id="manage-product-content" class="ui-fluid">
+           <!-- <p:outputPanel rendered="#{not empty punchController.transaction}">-->                                     
+            <p:outputPanel >
+                  <div class="field">
+                      <p:outputLabel for="employee">Employee</p:outputLabel>                    
+                      <p:selectOneMenu value="#{punchController.employeeId}" id="employee" 
+                      autoWidth="false" editable="false" maxlength="10"
+                      filter="true" filterMatchMode="startsWith">
+  
+                      <f:selectItems value="#{punchController.employees}" var="player"
+                          itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+                     
+                  </p:selectOneMenu>
+                  </div>    
+                  <div class="field">                    
+                      <p:outputLabel for="from">From Date</p:outputLabel>
+                      <p:datePicker  id="from" value="#{punchController.startDate}" required="true"  monthNavigator="true"
+                      yearNavigator="true"/>
+                  </div>            
+                  <div class="field">                    
+                      <p:outputLabel for="to">To Date</p:outputLabel>
+                      <p:datePicker  id="to" value="#{punchController.endDate}" required="true"  monthNavigator="true"
+                      yearNavigator="true"/>
+                  </div> 
+            </p:outputPanel>
+        </p:outputPanel>
+
+        <f:facet name="footer">  
+            <p:commandButton value="Compute" icon="pi pi-check" actionListener="#{transactionController.compute}"
+                update="manage-product-content,:form:messages,:form:scheduler" process="manage-product-content @this" />        
+            <p:commandButton value="Find" icon="pi pi-check" actionListener="#{punchController.searchPunchs}"
+                update="manage-product-content,:form:messages,:form:scheduler" process="manage-product-content @this" />
+            <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                class="ui-button-secondary" type="button" />
+        </f:facet>
+    </p:dialog>
+  
+
+    <p:confirmDialog global="true" showEffect="fade" width="300">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+            icon="pi pi-times" />
+    </p:confirmDialog>      
+
+  </h:form>
+
+  </ui:define>
+</ui:composition>
