@@ -39,7 +39,7 @@ dependencies {
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
 	implementation 'javax.xml.bind:jaxb-api:2.3.0'
-	implementation 'org.primefaces:primefaces:12.0.0'
+	implementation 'org.primefaces:primefaces:13.0.0'
 	//implementation 'org.glassfish:javax.faces:2.4.0'
 	implementation 'com.google.guava:guava:29.0-jre' 
 	implementation 'org.joinfaces:joinfaces-dependencies:3.3.0-rc2'

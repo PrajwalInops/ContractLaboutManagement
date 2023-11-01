@@ -1,5 +1,6 @@
 body {
-    background-color: #E0E0E0;
+    background-color: #ecd4d4;
+    place-items: center;
   }
   
   .ui-widget-content {
