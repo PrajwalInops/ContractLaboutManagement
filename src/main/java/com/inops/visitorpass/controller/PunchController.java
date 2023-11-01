@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Muster;
 import com.inops.visitorpass.entity.Transaction;
+import com.inops.visitorpass.entity.TransactionId;
 import com.inops.visitorpass.service.IDailyTransaction;
 import com.inops.visitorpass.service.IMuster;
 
@@ -90,8 +91,7 @@ public class PunchController {
 						+ dateOfBirths.stream().map(Employee::getEmployeeName).collect(Collectors.toList()))
 				.startDate(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0))
 				.endDate(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)).description("")
-				.backgroundColor("yellow")
-				.borderColor("#27AE60").allDay(true).build();
+				.backgroundColor("yellow").borderColor("#27AE60").allDay(true).build();
 		eventModel.addEvent(scheduleEventAllDay);
 
 	}
@@ -136,7 +136,9 @@ public class PunchController {
 		} else {
 			eventModel.updateEvent(event);
 		}
-
+		//Transaction transaction = new Transaction(new TransactionId(employeeId, null, employeeId), employeeId, employeeId, null, null, 0, employeeId, 0,
+			//	employeeId, serverTimeZone, employeeId);
+		dailyTransactionService.save(transaction);
 		event = new DefaultScheduleEvent<>();
 	}
 

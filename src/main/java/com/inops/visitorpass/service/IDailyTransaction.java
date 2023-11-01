@@ -19,4 +19,6 @@ public interface IDailyTransaction {
 			LocalDate end, List<String> employeeId);
 
 	Optional<List<Object[]>> findMinMaxPunchedTimeByDateRange(String employeeId, LocalDate start, LocalDate end);
+
+	Transaction save(Transaction transaction);
 }

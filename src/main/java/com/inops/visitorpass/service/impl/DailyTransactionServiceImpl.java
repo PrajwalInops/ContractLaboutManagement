@@ -55,4 +55,9 @@ public class DailyTransactionServiceImpl implements IDailyTransaction {
 				Date.from(end.atStartOfDay(defaultZoneId).toInstant()));
 	}
 
+	@Override
+	public Transaction save(Transaction transaction) {
+		return dailyTransactionRepository.save(transaction);
+	}
+
 }
