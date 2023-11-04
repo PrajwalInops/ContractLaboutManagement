@@ -82,16 +82,16 @@
         
                            
           <p:column exportable="false">
-              <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
-                  oncomplete="PF('manageProductDialog').show()"
+              <p:commandButton icon="pi pi-pencil" update=":dialogs:addPunch"
+                  oncomplete="PF('puchDialog').show()"
                   styleClass="edit-button rounded-button ui-button-success" process="@this">
-                  <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedEmployee}" />
-                  <p:resetInput target=":dialogs:manage-product-content" />
+                  <f:setPropertyActionListener value="#{product}" target="#{transactionController.selectedMuster}" />
+                  <p:resetInput target=":dialogs:addPunch" />
               </p:commandButton>
               <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
                                process="@this"
                                oncomplete="PF('deleteProductDialog').show()">
-                  <f:setPropertyActionListener value="#{product}" target="#{mastersController.selectedEmployee}" />
+                  <f:setPropertyActionListener value="#{product}" target="#{transactionController.selectedMuster}" />
               </p:commandButton>
           </p:column>
 
@@ -104,7 +104,7 @@
     <p:dialog header="Transaction Search Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
         responsive="true">
         <p:outputPanel id="manage-product-content" class="ui-fluid">
-            <p:outputPanel rendered="#{not empty transactionController.employee}">                                     
+            <p:outputPanel rendered="#{not empty transactionController.selectedMuster}">                                     
                   <div class="field">
                       <p:outputLabel for="employee">Employee</p:outputLabel>                    
                       <p:selectOneMenu value="#{transactionController.employeeId}" id="employee" 
@@ -140,6 +140,40 @@
                 class="ui-button-secondary" type="button" />
         </f:facet>
     </p:dialog>
+
+    <p:dialog id="addPunch" widgetVar="puchDialog" header="Edit Punches" showEffect="fade" hideEffect="fade">
+        <p:outputPanel rendered="#{not empty transactionController.selectedMuster}">    
+            <h:panelGrid id="eventDetails" columns="2" cellpadding="7">
+              <p:outputLabel for="title" value="Titles" styleClass="font-bold"/>
+              <p:inputText id="title" value="#{transactionController.title}" required="true"/>
+
+             
+              <p:outputLabel for="employeePunch"  value="Employee" styleClass="font-bold"/>                    
+              <p:selectOneMenu value="#{transactionController.employeeId}" id="employeePunch" 
+                autoWidth="false" editable="false" maxlength="15"
+                filter="true" filterMatchMode="startsWith">
+
+                <f:selectItems value="#{transactionController.employees}" var="player"
+                    itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+               
+            </p:selectOneMenu>
+
+              <p:outputLabel for="fromTime" value="From" styleClass="font-bold"/>
+              <p:datePicker id="fromTime" value="#{transactionController.startTime}" pattern="dd/MM/yyyy"
+                            showTime="true" appendTo="@(body)"/>
+
+              <p:outputLabel for="toTime" value="To" styleClass="font-bold"/>
+              <p:datePicker id="toTime" value="#{transactionController.endTime}" pattern="dd/MM/yyyy"
+                            showTime="true" appendTo="@(body)"/>
+             
+            </h:panelGrid>
+          </p:outputPanel>
+            <div class="flex justify-content-between mt-3">
+              <p:commandButton type="reset" value="Reset" styleClass="font-bold ui-button-outlined"/>
+              <p:commandButton id="addButton" value="Save" action="#{transactionController.addEvent}" update=":form:messages"
+                          oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
+            </div>               
+       </p:dialog>
   
 
     <p:confirmDialog global="true" showEffect="fade" width="300">
