@@ -15,6 +15,10 @@ public interface ComputeRepository extends JpaRepository<Muster, Long> {
 
 	@Procedure(name = "ComputeAttendanceFor")
 	void ComputeAttendanceFor(@Param("@EmpCode") String employeeId, @Param("@TDf5") Date fromDate,
-			@Param("@TDt5") Date toDate,@Param("@ComputeAttendanceFor") int computeOut);
+			@Param("@TDt5") Date toDate, @Param("@ComputeAttendanceFor") int computeOut);
+
+	@Procedure(name = "CreateMusterFor")
+	void CreateMusterFor(@Param("@Empcode") String employeeId, @Param("@Tempdate9") Date fromDate,
+			@Param("@Filenum") int fileNumber, @Param("@CreateMusterFor") int musterOut);
 
 }

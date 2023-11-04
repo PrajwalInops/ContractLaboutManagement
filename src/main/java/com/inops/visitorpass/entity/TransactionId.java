@@ -1,6 +1,7 @@
 package com.inops.visitorpass.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -24,7 +25,7 @@ public class TransactionId implements Serializable{
 	private String employeeId;
 
 	@Column(name = "transtime")
-	private Date transactionTime;
+	private LocalDateTime transactionTime;
 
 	
 	@Column(name = "ioflag")

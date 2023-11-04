@@ -9,4 +9,8 @@ public interface ICompute {
 	public void computeAll();
 
 	public void computeAllByDate(Date fromDate, Date toDate);
+	
+	public void createMusterByDateAndEmployee(String employeeId, Date fromDate);
+	
+	public void createMusterForAll(Date fromDate);
 }

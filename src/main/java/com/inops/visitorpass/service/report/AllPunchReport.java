@@ -3,6 +3,7 @@ package com.inops.visitorpass.service.report;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,8 +30,7 @@ public class AllPunchReport implements DataExtractionService {
 		super();
 		this.dailyTransactionService = dailyTransactionService;
 	}
-    
-	
+
 	@Override
 	public Collection<Punch> dataExtraction(LocalDate from, LocalDate to, List<Employee> employeeIds, String type) {
 
@@ -44,10 +44,10 @@ public class AllPunchReport implements DataExtractionService {
 					.filter(empId -> trans.getTransactionId().getEmployeeId().equals(empId.getEmployeeId())).findAny()
 					.orElse(null);
 			return new Punch(employee.getEmployeeName(), employee.getDepartment().getDepartmentName(),
-					employee.getEmployeeId(), trans.getAttendanceDate(), trans.getTransactionId().getTransactionTime(),
+					employee.getEmployeeId(), trans.getAttendanceDate(),
+					Date.from(trans.getTransactionId().getTransactionTime().atZone(ZoneId.systemDefault()).toInstant()),
 					trans.getActualIOFlag());
 		}).collect(Collectors.toList());
-			
 
 	}
 

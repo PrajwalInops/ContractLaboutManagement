@@ -69,7 +69,7 @@
           </p:outputPanel>
             <div class="flex justify-content-between mt-3">
               <p:commandButton type="reset" value="Reset" styleClass="font-bold ui-button-outlined"/>
-              <p:commandButton id="addButton" value="Save" action="#{punchController.addEvent}" 
+              <p:commandButton id="addButton" value="Save" action="#{punchController.addEvent}" update="messages"
                           oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
             </div>               
        </p:dialog>

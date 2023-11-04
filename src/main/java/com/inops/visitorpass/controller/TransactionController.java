@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -60,11 +62,28 @@ public class TransactionController {
 
 	public void searchTransaction() {
 		musters = musterService.findAllByAttendanceDateBetweenAndEmployeeId(fromDate, toDate, employeeId).get();
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+				"Transaction view for: " + employeeId);
 	}
 
 	public void compute() {
 		computeService.computeByDateAndEmployee(employeeId, Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()),
 				Date.from(toDate.atStartOfDay(defaultZoneId).toInstant()));
+		
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+				"Transaction computed successfully for: " + employeeId);
 	}
+
+	public void muster() {
+		computeService.createMusterByDateAndEmployee(employeeId,
+				Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()));
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+				"Muster created successfully for: " + employeeId);
+	}
+	
+	public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
+	}
+
 
 }

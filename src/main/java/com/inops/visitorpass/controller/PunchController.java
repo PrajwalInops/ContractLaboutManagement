@@ -1,8 +1,11 @@
 package com.inops.visitorpass.controller;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,6 +78,7 @@ public class PunchController {
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 	private double aspectRatio = Double.MIN_VALUE;
 	private String serverTimeZone = ZoneId.systemDefault().toString();
+	SimpleDateFormat dateFormate = new SimpleDateFormat("yyyy-MM-dd");
 
 	@PostConstruct
 	public void init() {
@@ -113,7 +117,7 @@ public class PunchController {
 				float hours = (muster.getHoursWorked() / 60);
 				String colour = hours >= 8 ? "green" : hours >= 4 && hours <= 6 ? "orange" : "red";
 				DefaultScheduleEvent<?> event = DefaultScheduleEvent.builder()
-						.title("Attendance " + muster.getAttendanceId() + "& Hours Worked " + hours)
+						.title("Attendance : " + muster.getAttendanceId() + "& Hours Worked : " + hours)
 						.startDate((LocalDateTime) trans[1]).endDate((LocalDateTime) trans[2])
 						.description("Employee " + employeeId + " Hours Worked " + muster.getHoursWorked())
 						.borderColor(colour).build();
@@ -121,25 +125,48 @@ public class PunchController {
 			}
 		});
 
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Punch searched successfully for: " + employeeId);
+
 	}
 
 	public void addEvent() {
-		if (event.isAllDay()) {
-			// see https://github.com/primefaces/primefaces/issues/1164
-			if (event.getStartDate().toLocalDate().equals(event.getEndDate().toLocalDate())) {
-				event.setEndDate(event.getEndDate().plusDays(1));
-			}
-		}
-
-		if (event.getId() == null) {
-			eventModel.addEvent(event);
+		if (employeeId == null) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message",
+					"exception at the time of punch addition, Please selesct employeeId  ");
 		} else {
-			eventModel.updateEvent(event);
+			if (event.isAllDay()) {
+				// see https://github.com/primefaces/primefaces/issues/1164
+				if (event.getStartDate().toLocalDate().equals(event.getEndDate().toLocalDate())) {
+					event.setEndDate(event.getEndDate().plusDays(1));
+				}
+			}
+
+			if (event.getId() == null) {
+				eventModel.addEvent(event);
+			} else {
+				eventModel.updateEvent(event);
+			}
+
+			Date attendanceDate = Date
+					.from(event.getStartDate().with(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant());
+
+			Transaction transaction = new Transaction(new TransactionId(employeeId, event.getStartDate(), "I"), "I",
+					"P", null, attendanceDate, 0, "Miss Punch Approved", 0, "F", null, null);
+			dailyTransactionService.save(transaction);
+
+			if (event.getEndDate().isAfter(event.getStartDate())) {
+				attendanceDate = Date
+						.from(event.getEndDate().with(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant());
+
+				transaction.getTransactionId().setTransactionTime(event.getEndDate());
+				transaction.getTransactionId().setInputOutputFlag("O");
+				transaction.setAttendanceDate(attendanceDate);
+				transaction.setActualIOFlag("O");
+				dailyTransactionService.save(transaction);
+			}
+			event = new DefaultScheduleEvent<>();
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Punch added successfully for: " + employeeId);
 		}
-		//Transaction transaction = new Transaction(new TransactionId(employeeId, event.getStartDate(), employeeId), employeeId, employeeId, null, null, 0, employeeId, 0,
-			//	employeeId, serverTimeZone, employeeId);
-		dailyTransactionService.save(transaction);
-		event = new DefaultScheduleEvent<>();
 	}
 
 	public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
@@ -167,6 +194,10 @@ public class PunchController {
 
 	private void addMessage(FacesMessage message) {
 		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+
+	public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
 	}
 
 }

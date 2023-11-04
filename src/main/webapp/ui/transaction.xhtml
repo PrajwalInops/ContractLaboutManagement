@@ -130,6 +130,8 @@
         </p:outputPanel>
 
         <f:facet name="footer">
+            <p:commandButton value="Muster" icon="pi pi-check" actionListener="#{transactionController.muster}"
+                update="manage-product-content,:form:messages,:form:dt-products" process="manage-product-content @this" />
             <p:commandButton value="Compute" icon="pi pi-check" actionListener="#{transactionController.compute}"
                 update="manage-product-content,:form:messages,:form:dt-products" process="manage-product-content @this" />
             <p:commandButton value="Find" icon="pi pi-check" actionListener="#{transactionController.searchTransaction}"

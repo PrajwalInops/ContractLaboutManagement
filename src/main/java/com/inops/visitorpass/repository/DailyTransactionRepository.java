@@ -1,6 +1,5 @@
 package com.inops.visitorpass.repository;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,7 @@ public interface DailyTransactionRepository extends JpaRepository<Transaction, T
 	Optional<List<Transaction>> findAllByAttendanceDateBetweenAndTransactionIdEmployeeIdIn(Date start, Date end,
 			List<String> employeeId);
 
-	@Query("SELECT t.attendanceDate, MIN(t.punchedTime), MAX(t.punchedTime) FROM Transaction t "
+	@Query("SELECT t.attendanceDate, MIN(t.transactionId.transactionTime), MAX(t.transactionId.transactionTime) FROM Transaction t "
 			+ "WHERE t.transactionId.employeeId = :employeeId " + "AND t.attendanceDate BETWEEN :start AND :end "
 			+ "GROUP BY t.attendanceDate")
 	Optional<List<Object[]>> findMinMaxPunchedTimeByDateRange(@Param("employeeId") String employeeId,
