@@ -12,7 +12,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
-import org.primefaces.model.DefaultScheduleEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -58,6 +57,8 @@ public class TransactionController {
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	private String title;
+	private String type = "Single";
+	private boolean enableAll;
 
 	@PostConstruct
 	public void init() {
@@ -72,21 +73,46 @@ public class TransactionController {
 	}
 
 	public void searchTransaction() {
-		musters = musterService.findAllByAttendanceDateBetweenAndEmployeeId(fromDate, toDate, employeeId).get();
-		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Transaction view for: " + employeeId);
+		if (type.equals("All")) {
+			addMessage(FacesMessage.SEVERITY_WARN, "Warn Message", "Please select one employee to view Transactions");
+		} else {
+			musters = musterService.findAllByAttendanceDateBetweenAndEmployeeId(fromDate, toDate, employeeId).get();
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Transaction view for: " + employeeId);
+		}
 	}
 
 	public void compute() {
-		computeService.computeByDateAndEmployee(employeeId, Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()),
-				Date.from(toDate.atStartOfDay(defaultZoneId).toInstant()));
+		if (type.equals("All")) {
+			employees.forEach(employee -> {
+				computeService.computeByDateAndEmployee(employee.getEmployeeId(),
+						Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()),
+						Date.from(toDate.atStartOfDay(defaultZoneId).toInstant()));
+			});
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+					"Transaction computed successfully for All employees");
+		} else {
+			computeService.computeByDateAndEmployee(employeeId,
+					Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()),
+					Date.from(toDate.atStartOfDay(defaultZoneId).toInstant()));
 
-		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Transaction computed successfully for: " + employeeId);
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message",
+					"Transaction computed successfully for: " + employeeId);
+		}
 	}
 
 	public void muster() {
-		computeService.createMusterByDateAndEmployee(employeeId,
-				Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()));
-		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Muster created successfully for: " + employeeId);
+		if (type.equals("All")) {
+			employees.forEach(employee -> {
+				computeService.createMusterByDateAndEmployee(employee.getEmployeeId(),
+						Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()));
+			});
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Muster created successfully for all employees ");
+
+		} else {
+			computeService.createMusterByDateAndEmployee(employeeId,
+					Date.from(fromDate.atStartOfDay(defaultZoneId).toInstant()));
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Muster created successfully for: " + employeeId);
+		}
 	}
 
 	public void addEvent() {
@@ -112,6 +138,14 @@ public class TransactionController {
 			}
 
 			addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Punch added successfully for: " + employeeId);
+		}
+	}
+
+	public void onTypeChange() {
+		if (type.equals("All")) {
+			enableAll = true;
+		} else {
+			enableAll = false;
 		}
 	}
 

@@ -11,4 +11,6 @@ public interface ILeaveBalance {
 	Optional<List<LeaveBalance>> findAll();
 	
 	Optional<List<LeaveBalance>> findAllByEmployeeIds(LocalDate start, LocalDate end, List<String> employeeId);
+	
+	Optional<List<LeaveBalance>> findAllByEmployeeId(LocalDate start, LocalDate end, String employeeId);
 }

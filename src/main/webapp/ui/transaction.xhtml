@@ -30,7 +30,12 @@
                   update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
                   styleClass="ui-button-success" style="margin-right: .5rem">
                   <p:resetInput target=":dialogs:manage-product-content" />
-              </p:commandButton>             
+              </p:commandButton>   
+              <p:commandButton value="Delete" id="delete-products-button" icon="pi pi-trash" actionListener="#{transactionController.openNew}"
+                    update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                    styleClass="ui-button-danger" style="margin-right: .5rem">
+                    <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>              
           </p:toolbarGroup>
           <p:toolbarGroup align="right">             
               <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
@@ -113,13 +118,20 @@
     <p:dialog header="Transaction Search Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
         responsive="true">
         <p:outputPanel id="manage-product-content" class="ui-fluid">
-            <p:outputPanel rendered="#{not empty transactionController.selectedMuster}">                                     
-                  <div class="field">
-                      <p:outputLabel for="employee">Employee</p:outputLabel>                    
-                      <p:selectOneMenu value="#{transactionController.employeeId}" id="employee" 
+            <p:outputPanel rendered="#{not empty transactionController.selectedMuster}"> 
+                  <div class="field"> 
+                    <p:outputLabel for="type">Type</p:outputLabel>
+                    <p:selectOneButton id="type" value="#{transactionController.type}">
+                        <p:ajax listener="#{transactionController.onTypeChange}" update=":dialogs:employee"/>
+                        <f:selectItem itemLabel="All" itemValue="All"/>
+                        <f:selectItem itemLabel="Single" itemValue="Single"/>                       
+                    </p:selectOneButton>       
+                  </div>                                                     
+                  <div class="field" >
+                      <p:outputLabel for="employee" >Employee</p:outputLabel>                    
+                      <p:selectOneMenu value="#{transactionController.employeeId}" id="employee" disabled="#{transactionController.enableAll}"
                       autoWidth="false" editable="false" maxlength="10"
-                      filter="true" filterMatchMode="startsWith">
-  
+                      filter="true" filterMatchMode="startsWith">                     
                       <f:selectItems value="#{transactionController.employees}" var="player"
                           itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
                      

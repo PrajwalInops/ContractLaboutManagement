@@ -13,5 +13,8 @@ public interface LeaveBalanceRepository extends JpaRepository<LeaveBalance, Leav
 
 	Optional<List<LeaveBalance>> findAllByLastCreditDateBetweenAndLeaveBalanceIdEmployeeIdIn(Date start, Date end,
 			List<String> employeeId);
+	
+	Optional<List<LeaveBalance>> findAllByLastCreditDateBetweenAndLeaveBalanceIdEmployeeId(Date start, Date end,
+			String employeeId);
 
 }

@@ -15,7 +15,6 @@ import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Transaction;
 import com.inops.visitorpass.service.DataExtractionService;
 import com.inops.visitorpass.service.IDailyTransaction;
-import com.inops.visitorpass.service.impl.ReportGenerationService;
 
 import lombok.extern.log4j.Log4j2;
 

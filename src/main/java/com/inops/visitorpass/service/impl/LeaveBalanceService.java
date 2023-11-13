@@ -33,8 +33,15 @@ public class LeaveBalanceService implements ILeaveBalance {
 
 	@Override
 	public Optional<List<LeaveBalance>> findAll() {
-		
+
 		return Optional.of(leaveBalanceRepository.findAll());
+	}
+
+	@Override
+	public Optional<List<LeaveBalance>> findAllByEmployeeId(LocalDate start, LocalDate end, String employeeId) {
+		return leaveBalanceRepository.findAllByLastCreditDateBetweenAndLeaveBalanceIdEmployeeId(
+				Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
+				Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId);
 	}
 
 }

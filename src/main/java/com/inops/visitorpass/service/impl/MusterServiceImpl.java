@@ -56,4 +56,9 @@ public class MusterServiceImpl implements IMuster {
 				Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId, from, to);
 	}
 
+	@Override
+	public Optional<List<Object[]>> countAllPresentDaysByEmployeeId(String employeeId, int year) {
+		return musterRepository.countAllPresentDaysByEmployeeId(employeeId, year);
+	}
+
 }

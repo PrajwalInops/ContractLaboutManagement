@@ -16,7 +16,9 @@ public interface IMuster {
 	Optional<List<Muster>> findAllByAttendanceDateBetweenAndEmployeeId(LocalDate start, LocalDate end,
 			List<String> employeeId);
 
-	Optional<List<Long>> countAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(LocalDate start,
-			LocalDate end, List<String> employeeId, long from, long to);
+	Optional<List<Long>> countAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(LocalDate start, LocalDate end,
+			List<String> employeeId, long from, long to);
+
+	Optional<List<Object[]>> countAllPresentDaysByEmployeeId(String employeeId, int year);
 
 }

@@ -1,0 +1,270 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2009-2022 PrimeTek
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package com.inops.visitorpass.controller;
+
+import java.io.Serializable;
+import java.text.DateFormatSymbols;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.CloseEvent;
+import org.primefaces.event.DashboardReorderEvent;
+import org.primefaces.event.ToggleEvent;
+import org.primefaces.model.ResponsiveOption;
+import org.primefaces.model.charts.ChartData;
+import org.primefaces.model.charts.axes.cartesian.CartesianScales;
+import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
+import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearTicks;
+import org.primefaces.model.charts.bar.BarChartDataSet;
+import org.primefaces.model.charts.bar.BarChartModel;
+import org.primefaces.model.charts.bar.BarChartOptions;
+import org.primefaces.model.charts.optionconfig.legend.Legend;
+import org.primefaces.model.charts.optionconfig.legend.LegendLabel;
+import org.primefaces.model.dashboard.DashboardModel;
+import org.primefaces.model.dashboard.DashboardWidget;
+import org.primefaces.model.dashboard.DefaultDashboardModel;
+import org.primefaces.model.charts.optionconfig.title.Title;
+import org.primefaces.model.charts.optionconfig.animation.Animation;
+import org.primefaces.model.dashboard.DefaultDashboardWidget;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import com.inops.visitorpass.entity.Employee;
+import com.inops.visitorpass.entity.LeaveBalance;
+import com.inops.visitorpass.entity.Muster;
+import com.inops.visitorpass.entity.User;
+import com.inops.visitorpass.service.ILeaveBalance;
+import com.inops.visitorpass.service.IMuster;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
+
+@Getter
+@Setter
+@Log4j2
+@Component("dashboardController")
+@Scope("session")
+@RequiredArgsConstructor
+public class DashboardController implements Serializable {
+
+	@Autowired
+	ApplicationContext ctx;
+
+	private final ILeaveBalance leaveBalanceService;
+	private final IMuster musterService;
+
+	private List<LeaveBalance> leaveBalances;
+	private List<Muster> musters;
+	private List<ResponsiveOption> responsiveOptions;
+	private List<Employee> employees;
+	private int presentCount, absentCount, lateCount, earlyCount;
+
+	private static final long serialVersionUID = 1L;
+	private static final String RESPONSIVE_CLASS = "col-12 lg:col-6 xl:col-6";
+
+	private DashboardModel responsiveModel;
+	ZoneId defaultZoneId = ZoneId.systemDefault();
+
+	private BarChartModel barModel;
+	
+	private String months[] = {"January", "February", "March", "April",
+            "May", "June", "July", "August", "September",
+            "October", "November", "December"};
+
+	@PostConstruct
+	public void init() {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = (User) auth.getPrincipal();
+		Employee employee = user.getEmployee();
+		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
+		leaveBalances = leaveBalanceService.findAllByEmployeeId(LocalDate.of(LocalDate.now().getYear(), 1, 1),
+				LocalDate.of(LocalDate.now().getYear(), 12, 31), employee.getEmployeeId()).get();
+
+		getTodaysCount();
+		presentCountBarModel(employee);
+
+		responsiveOptions = new ArrayList<>();
+		responsiveOptions.add(new ResponsiveOption("1024px", 3, 3));
+		responsiveOptions.add(new ResponsiveOption("768px", 2, 2));
+		responsiveOptions.add(new ResponsiveOption("560px", 1, 1));
+
+		responsiveModel = new DefaultDashboardModel();
+		responsiveModel.addWidget(new DefaultDashboardWidget("bar", RESPONSIVE_CLASS));
+		responsiveModel.addWidget(new DefaultDashboardWidget("stacked", RESPONSIVE_CLASS));
+		responsiveModel.addWidget(
+				new DefaultDashboardWidget("donut", RESPONSIVE_CLASS.replaceFirst("xl:col-\\d+", "xl:col-4")));
+		responsiveModel.addWidget(
+				new DefaultDashboardWidget("cartesian", RESPONSIVE_CLASS.replaceFirst("xl:col-\\d+", "xl:col-8")));
+
+	}
+
+	private void getTodaysCount() {
+		musters = musterService.findByAttendanceDateBetween(LocalDate.now(), LocalDate.now()).get();
+		presentCount = musters.stream().filter(attId -> !attId.getAttendanceId().equals("AA")
+				&& !attId.getAttendanceId().equals("HH") && !attId.getAttendanceId().equals("WW"))
+				.collect(Collectors.toList()).size();
+		absentCount = employees.size() - presentCount;
+		lateCount = musters.stream().filter(late -> late.getLatePunch() > '0').collect(Collectors.toList()).size();
+		earlyCount = musters.stream().filter(early -> early.getEarlyOut() > '0').collect(Collectors.toList()).size();
+	}
+
+	public void presentCountBarModel(Employee employee) {
+		List<Object[]> presentCount = musterService
+				.countAllPresentDaysByEmployeeId(employee.getEmployeeId(),2019).get();// LocalDate.now().getYear()).get();
+		
+		barModel = new BarChartModel();
+		ChartData data = new ChartData();
+
+		BarChartDataSet barDataSet = new BarChartDataSet();
+		barDataSet.setLabel("My Attendance Dataset");
+
+		List<Number> values = new ArrayList<>();
+		List<String> labels = new ArrayList<>();
+		presentCount.forEach(count->{
+			values.add((Number) count[0]);
+			labels.add(months[(int) count[1]]);
+		});
+					
+		barDataSet.setData(values);
+		data.setLabels(labels);
+		barModel.setData(data);
+
+		List<String> bgColor = new ArrayList<>();
+		bgColor.add("rgba(255, 99, 132, 0.2)");
+		bgColor.add("rgba(255, 159, 64, 0.2)");
+		bgColor.add("rgba(255, 205, 86, 0.2)");
+		bgColor.add("rgba(75, 192, 192, 0.2)");
+		bgColor.add("rgba(54, 162, 235, 0.2)");
+		bgColor.add("rgba(153, 102, 255, 0.2)");
+		bgColor.add("rgba(201, 203, 207, 0.2)");
+		barDataSet.setBackgroundColor(bgColor);
+
+		List<String> borderColor = new ArrayList<>();
+		borderColor.add("rgb(255, 99, 132)");
+		borderColor.add("rgb(255, 159, 64)");
+		borderColor.add("rgb(255, 205, 86)");
+		borderColor.add("rgb(75, 192, 192)");
+		borderColor.add("rgb(54, 162, 235)");
+		borderColor.add("rgb(153, 102, 255)");
+		borderColor.add("rgb(201, 203, 207)");
+		barDataSet.setBorderColor(borderColor);
+		barDataSet.setBorderWidth(1);
+
+		data.addChartDataSet(barDataSet);
+
+
+		// Options
+		BarChartOptions options = new BarChartOptions();
+		options.setMaintainAspectRatio(false);
+		CartesianScales cScales = new CartesianScales();
+		CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+		linearAxes.setOffset(true);
+		linearAxes.setBeginAtZero(true);
+		CartesianLinearTicks ticks = new CartesianLinearTicks();
+		linearAxes.setTicks(ticks);
+		cScales.addYAxesData(linearAxes);
+		options.setScales(cScales);
+
+		Title title = new Title();
+		title.setDisplay(true);
+		title.setText("Bar Chart");
+		options.setTitle(title);
+
+		Legend legend = new Legend();
+		legend.setDisplay(true);
+		legend.setPosition("top");
+		LegendLabel legendLabels = new LegendLabel();
+		legendLabels.setFontStyle("italic");
+		legendLabels.setFontColor("#2980B9");
+		legendLabels.setFontSize(24);
+		legend.setLabels(legendLabels);
+		options.setLegend(legend);
+
+		// disable animation
+		Animation animation = new Animation();
+		animation.setDuration(0);
+		options.setAnimation(animation);
+
+		barModel.setOptions(options);
+	}
+
+	public void handleReorder(DashboardReorderEvent event) {
+		FacesMessage message = new FacesMessage();
+		message.setSeverity(FacesMessage.SEVERITY_INFO);
+		message.setSummary("Reordered: " + event.getWidgetId());
+		String result = String.format("Dragged index: %d, Dropped Index: %d, Widget Index: %d",
+				event.getSenderColumnIndex(), event.getColumnIndex(), event.getItemIndex());
+		message.setDetail(result);
+
+		addMessage(message);
+	}
+
+	public void handleClose(CloseEvent event) {
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Panel Closed",
+				"Closed panel ID:'" + event.getComponent().getId() + "'");
+
+		addMessage(message);
+	}
+
+	public void handleToggle(ToggleEvent event) {
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Panel Toggled",
+				"Toggle panel ID:'" + event.getComponent().getId() + "' Status:" + event.getVisibility().name());
+
+		addMessage(message);
+	}
+
+	/**
+	 * Dashboard panel has been resized.
+	 *
+	 * @param widget the DashboardPanel
+	 * @param size   the new size CSS
+	 */
+	public void onDashboardResize(final String widget, final String size) {
+		final DashboardWidget dashboard = responsiveModel.getWidget(widget);
+		if (dashboard != null) {
+			final String newCss = dashboard.getStyleClass().replaceFirst("xl:col-\\d+", size);
+			dashboard.setStyleClass(newCss);
+		}
+	}
+
+	private void addMessage(FacesMessage message) {
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+
+}

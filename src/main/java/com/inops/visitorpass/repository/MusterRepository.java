@@ -25,4 +25,10 @@ public interface MusterRepository extends JpaRepository<Muster, MusterId> {
 	Optional<List<Long>> countAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(@Param("start") Date start,
 			@Param("end") Date end, @Param("employeeId") List<String> employeeId, @Param("from") long from,
 			@Param("to") long to);
+
+	@Query("select count(m),MONTH(m.musterId.attendanceDate) from Muster m where m.attendanceId not in ('AA' ,'WW','HH') "
+			+"and m.musterId.employeeId=:employeeId and year(m.musterId.attendanceDate)=:year group by Month(m.musterId.attendanceDate)")
+	Optional<List<Object[]>> countAllPresentDaysByEmployeeId(@Param("employeeId") String employeeId,
+			@Param("year") int year);
+
 }
