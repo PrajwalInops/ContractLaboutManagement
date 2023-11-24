@@ -24,7 +24,6 @@
 package com.inops.visitorpass.controller;
 
 import java.io.Serializable;
-import java.text.DateFormatSymbols;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -47,13 +46,19 @@ import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearTicks;
 import org.primefaces.model.charts.bar.BarChartDataSet;
 import org.primefaces.model.charts.bar.BarChartModel;
 import org.primefaces.model.charts.bar.BarChartOptions;
+import org.primefaces.model.charts.donut.DonutChartDataSet;
+import org.primefaces.model.charts.donut.DonutChartModel;
+import org.primefaces.model.charts.donut.DonutChartOptions;
+import org.primefaces.model.charts.line.LineChartDataSet;
+import org.primefaces.model.charts.line.LineChartModel;
+import org.primefaces.model.charts.line.LineChartOptions;
+import org.primefaces.model.charts.optionconfig.animation.Animation;
 import org.primefaces.model.charts.optionconfig.legend.Legend;
 import org.primefaces.model.charts.optionconfig.legend.LegendLabel;
+import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.dashboard.DashboardModel;
 import org.primefaces.model.dashboard.DashboardWidget;
 import org.primefaces.model.dashboard.DefaultDashboardModel;
-import org.primefaces.model.charts.optionconfig.title.Title;
-import org.primefaces.model.charts.optionconfig.animation.Animation;
 import org.primefaces.model.dashboard.DefaultDashboardWidget;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -101,10 +106,11 @@ public class DashboardController implements Serializable {
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 
 	private BarChartModel barModel;
-	
-	private String months[] = {"January", "February", "March", "April",
-            "May", "June", "July", "August", "September",
-            "October", "November", "December"};
+	private DonutChartModel donutModel;
+	private LineChartModel lineModel;
+
+	private String months[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
+			"October", "November", "December" };
 
 	@PostConstruct
 	public void init() {
@@ -117,6 +123,7 @@ public class DashboardController implements Serializable {
 				LocalDate.of(LocalDate.now().getYear(), 12, 31), employee.getEmployeeId()).get();
 
 		getTodaysCount();
+		leaveCountLineModel(employee);
 		presentCountBarModel(employee);
 
 		responsiveOptions = new ArrayList<>();
@@ -142,12 +149,86 @@ public class DashboardController implements Serializable {
 		absentCount = employees.size() - presentCount;
 		lateCount = musters.stream().filter(late -> late.getLatePunch() > '0').collect(Collectors.toList()).size();
 		earlyCount = musters.stream().filter(early -> early.getEarlyOut() > '0').collect(Collectors.toList()).size();
-	}
 
-	public void presentCountBarModel(Employee employee) {
-		List<Object[]> presentCount = musterService
-				.countAllPresentDaysByEmployeeId(employee.getEmployeeId(),2019).get();// LocalDate.now().getYear()).get();
-		
+		donutModel = new DonutChartModel();
+		ChartData data = new ChartData();
+		DonutChartOptions options = new DonutChartOptions();
+		options.setMaintainAspectRatio(false);
+		donutModel.setOptions(options);
+
+		DonutChartDataSet dataSet = new DonutChartDataSet();
+		List<Number> values = new ArrayList<>();
+		values.add(presentCount);
+		values.add(absentCount);
+		values.add(lateCount);
+		values.add(earlyCount);
+		dataSet.setData(values);
+
+		List<String> bgColors = new ArrayList<>();
+		bgColors.add("rgb(205, 255, 99)");
+		bgColors.add("rgb(255, 99, 132)");
+		bgColors.add("rgb(255, 205, 86)");
+		bgColors.add("rgb(54, 162, 235)");
+		dataSet.setBackgroundColor(bgColors);
+
+		data.addChartDataSet(dataSet);
+		List<String> labels = new ArrayList<>();
+		labels.add("Present");
+		labels.add("Absent");
+		labels.add("Late");
+		labels.add("Early");
+		data.setLabels(labels);
+
+		donutModel.setData(data);
+	}
+	
+	   public void leaveCountLineModel(Employee employee) {
+		   
+		   List<Object[]> leaveCount = musterService.countAllLeaveDaysByEmployeeId(employee.getEmployeeId(), 2019)
+					.get();// LocalDate.now().getYear()).get();
+		   
+	        lineModel = new LineChartModel();
+	        ChartData data = new ChartData();
+
+	        LineChartDataSet dataSet = new LineChartDataSet();
+	        List<Object> values = new ArrayList<>();
+	        List<String> labels = new ArrayList<>();
+	        
+	        leaveCount.forEach(count -> {
+				values.add((Number) count[0]);
+				labels.add(months[(int) count[1]-1]);
+			});	        
+	       
+	        dataSet.setData(values);
+	        dataSet.setFill(false);
+	        dataSet.setLabel("My Leaves Dataset");
+	        dataSet.setBorderColor("rgb(75, 192, 192)");
+	        dataSet.setTension(0.1);
+	        data.addChartDataSet(dataSet);
+	      
+	        data.setLabels(labels);
+
+	        //Options
+	        LineChartOptions options = new LineChartOptions();
+	        options.setMaintainAspectRatio(false);
+	        Title title = new Title();
+	        title.setDisplay(true);
+	        title.setText("Leave Chart");
+	        options.setTitle(title);
+
+	        Title subtitle = new Title();
+	        subtitle.setDisplay(true);
+	        subtitle.setText("Monthly Leave Availed");
+	        options.setSubtitle(subtitle);
+
+	        lineModel.setOptions(options);
+	        lineModel.setData(data);
+	    }
+
+	protected void presentCountBarModel(Employee employee) {
+		List<Object[]> presentCount = musterService.countAllPresentDaysByEmployeeId(employee.getEmployeeId(), 2019)
+				.get();// LocalDate.now().getYear()).get();
+
 		barModel = new BarChartModel();
 		ChartData data = new ChartData();
 
@@ -156,11 +237,11 @@ public class DashboardController implements Serializable {
 
 		List<Number> values = new ArrayList<>();
 		List<String> labels = new ArrayList<>();
-		presentCount.forEach(count->{
+		presentCount.forEach(count -> {
 			values.add((Number) count[0]);
-			labels.add(months[(int) count[1]]);
+			labels.add(months[(int) count[1]-1]);
 		});
-					
+
 		barDataSet.setData(values);
 		data.setLabels(labels);
 		barModel.setData(data);
@@ -187,7 +268,6 @@ public class DashboardController implements Serializable {
 		barDataSet.setBorderWidth(1);
 
 		data.addChartDataSet(barDataSet);
-
 
 		// Options
 		BarChartOptions options = new BarChartOptions();

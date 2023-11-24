@@ -20,5 +20,6 @@ public interface IMuster {
 			List<String> employeeId, long from, long to);
 
 	Optional<List<Object[]>> countAllPresentDaysByEmployeeId(String employeeId, int year);
-
+	
+	Optional<List<Object[]>> countAllLeaveDaysByEmployeeId(String employeeId, int year);
 }
