@@ -56,6 +56,7 @@ import org.primefaces.model.charts.optionconfig.animation.Animation;
 import org.primefaces.model.charts.optionconfig.legend.Legend;
 import org.primefaces.model.charts.optionconfig.legend.LegendLabel;
 import org.primefaces.model.charts.optionconfig.title.Title;
+import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 import org.primefaces.model.dashboard.DashboardModel;
 import org.primefaces.model.dashboard.DashboardWidget;
 import org.primefaces.model.dashboard.DefaultDashboardModel;
@@ -108,6 +109,7 @@ public class DashboardController implements Serializable {
 	private BarChartModel barModel;
 	private DonutChartModel donutModel;
 	private LineChartModel lineModel;
+	private BarChartModel stackedBarModel;
 
 	private String months[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
 			"October", "November", "December" };
@@ -125,6 +127,7 @@ public class DashboardController implements Serializable {
 		getTodaysCount();
 		leaveCountLineModel(employee);
 		presentCountBarModel(employee);
+		createStackedBarModel(employee);
 
 		responsiveOptions = new ArrayList<>();
 		responsiveOptions.add(new ResponsiveOption("1024px", 3, 3));
@@ -141,6 +144,93 @@ public class DashboardController implements Serializable {
 
 	}
 
+	public void createStackedBarModel(Employee employee) {
+		
+		 List<Object[]> lateCount = musterService.countAllLateDaysByEmployeeId(employee.getEmployeeId(), 2019)
+					.get();// LocalDate.now().getYear()).get();
+		 
+		 List<Object[]> earlyCount = musterService.countAllEarlyDaysByEmployeeId(employee.getEmployeeId(), 2019)
+					.get();// LocalDate.now().getYear()).get();
+		 
+		 List<Object[]> extraCount = musterService.countAllExtraDaysByEmployeeId(employee.getEmployeeId(), 2019)
+					.get();// LocalDate.now().getYear()).get();
+		
+        stackedBarModel = new BarChartModel();
+        ChartData data = new ChartData();
+
+        BarChartDataSet barDataSet = new BarChartDataSet();
+        barDataSet.setLabel("Late 1");
+        barDataSet.setBackgroundColor("rgb(255, 99, 132)");
+        List<Number> dataVal = new ArrayList<>();
+        lateCount.forEach(count -> {
+        	dataVal.add((Number) count[0]);			
+		});	     
+       
+        barDataSet.setData(dataVal);
+
+        BarChartDataSet barDataSet2 = new BarChartDataSet();
+        barDataSet2.setLabel("Early 2");
+        barDataSet2.setBackgroundColor("rgb(54, 162, 235)");
+        List<Number> dataVal2 = new ArrayList<>();
+        earlyCount.forEach(count -> {
+        	dataVal2.add((Number) count[0]);			
+		});	   
+       
+        barDataSet2.setData(dataVal2);
+
+        BarChartDataSet barDataSet3 = new BarChartDataSet();
+        barDataSet3.setLabel("Extra 3");
+        barDataSet3.setBackgroundColor("rgb(75, 192, 192)");
+        List<Number> dataVal3 = new ArrayList<>();
+        extraCount.forEach(count -> {
+        	dataVal3.add((Number) count[0]);			
+		});	   
+       
+        barDataSet3.setData(dataVal3);
+
+        data.addChartDataSet(barDataSet);
+        data.addChartDataSet(barDataSet2);
+        data.addChartDataSet(barDataSet3);
+
+        List<String> labels = new ArrayList<>();
+        labels.add("January");
+        labels.add("February");
+        labels.add("March");
+        labels.add("April");
+        labels.add("May");
+        labels.add("June");
+        labels.add("August");
+        labels.add("September");
+        labels.add("October");
+        labels.add("November");
+        labels.add("December");
+        data.setLabels(labels);
+        stackedBarModel.setData(data);
+
+        //Options
+        BarChartOptions options = new BarChartOptions();
+        options.setMaintainAspectRatio(false);
+        CartesianScales cScales = new CartesianScales();
+        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+        linearAxes.setStacked(true);
+        linearAxes.setOffset(true);
+        cScales.addXAxesData(linearAxes);
+        cScales.addYAxesData(linearAxes);
+        options.setScales(cScales);
+
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Bar Chart - Late,Early & Extra");
+        options.setTitle(title);
+
+        Tooltip tooltip = new Tooltip();
+        tooltip.setMode("index");
+        tooltip.setIntersect(false);
+        options.setTooltip(tooltip);
+
+        stackedBarModel.setOptions(options);
+    }
+	
 	private void getTodaysCount() {
 		musters = musterService.findByAttendanceDateBetween(LocalDate.now(), LocalDate.now()).get();
 		presentCount = musters.stream().filter(attId -> !attId.getAttendanceId().equals("AA")

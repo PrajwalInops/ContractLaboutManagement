@@ -38,5 +38,21 @@ public interface MusterRepository extends JpaRepository<Muster, MusterId> {
 	@Query("select count(m),MONTH(m.musterId.attendanceDate) from Muster m where m.leaveTypeId not in ('00' ,'WW','HH') "
 			+"and m.musterId.employeeId=:employeeId and year(m.musterId.attendanceDate)=:year group by Month(m.musterId.attendanceDate)")
 	Optional<List<Object[]>> countAllLeaveDaysByEmployeeId(@Param("employeeId") String employeeId,
+			@Param("year") int year);	
+
+	@Query("select count(m),MONTH(m.musterId.attendanceDate) from Muster m where m.extraHours > 0 "
+			+"and m.musterId.employeeId=:employeeId and year(m.musterId.attendanceDate)=:year group by Month(m.musterId.attendanceDate)")
+	Optional<List<Object[]>> countAllExtraDaysByEmployeeId(@Param("employeeId") String employeeId,
 			@Param("year") int year);
+	
+	@Query("select count(m),MONTH(m.musterId.attendanceDate) from Muster m where m.latePunch > 0 "
+			+"and m.musterId.employeeId=:employeeId and year(m.musterId.attendanceDate)=:year group by Month(m.musterId.attendanceDate)")
+	Optional<List<Object[]>> countAllLateDaysByEmployeeId(@Param("employeeId") String employeeId,
+			@Param("year") int year);
+	
+	@Query("select count(m),MONTH(m.musterId.attendanceDate) from Muster m where m.earlyOut > 0 "
+			+"and m.musterId.employeeId=:employeeId and year(m.musterId.attendanceDate)=:year group by Month(m.musterId.attendanceDate)")
+	Optional<List<Object[]>> countAllEarlyDaysByEmployeeId(@Param("employeeId") String employeeId,
+			@Param("year") int year);
+
 }

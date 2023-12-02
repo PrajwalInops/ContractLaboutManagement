@@ -66,4 +66,19 @@ public class MusterServiceImpl implements IMuster {
 		return musterRepository.countAllLeaveDaysByEmployeeId(employeeId, year);
 	}
 
+	@Override
+	public Optional<List<Object[]>> countAllExtraDaysByEmployeeId(String employeeId, int year) {
+		return musterRepository.countAllExtraDaysByEmployeeId(employeeId, year);
+	}
+
+	@Override
+	public Optional<List<Object[]>> countAllLateDaysByEmployeeId(String employeeId, int year) {
+		return musterRepository.countAllLateDaysByEmployeeId(employeeId, year);
+	}
+
+	@Override
+	public Optional<List<Object[]>> countAllEarlyDaysByEmployeeId(String employeeId, int year) {
+		return musterRepository.countAllEarlyDaysByEmployeeId(employeeId, year);
+	}
+
 }

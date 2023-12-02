@@ -22,4 +22,10 @@ public interface IMuster {
 	Optional<List<Object[]>> countAllPresentDaysByEmployeeId(String employeeId, int year);
 	
 	Optional<List<Object[]>> countAllLeaveDaysByEmployeeId(String employeeId, int year);
+	
+	Optional<List<Object[]>> countAllExtraDaysByEmployeeId(String employeeId, int year);
+	
+	Optional<List<Object[]>> countAllLateDaysByEmployeeId(String employeeId, int year);
+	
+	Optional<List<Object[]>> countAllEarlyDaysByEmployeeId(String employeeId, int year);
 }

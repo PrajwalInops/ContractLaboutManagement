@@ -14,5 +14,5 @@ public interface IMenuCategory {
 
 	Optional<MenuCategoryEntity> update(MenuCategoryEntity menuCategory);
 
-	void delete(long leaveTypeId);
+	void delete(long menuCategoryId);
 }

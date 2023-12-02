@@ -46,6 +46,10 @@ public class User implements UserDetails {
 	private String mobile;
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "entitlementRoleId", nullable = false)
+	private RoleEntitlement roleEntitlement;
+	
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "empid", nullable = false)
 	private Employee employee;
 
@@ -170,5 +174,14 @@ public class User implements UserDetails {
 	public void setEmployee(Employee employee) {
 		this.employee = employee;
 	}
+
+	public RoleEntitlement getRoleEntitlement() {
+		return roleEntitlement;
+	}
+
+	public void setRoleEntitlement(RoleEntitlement roleEntitlement) {
+		this.roleEntitlement = roleEntitlement;
+	}
+	
 
 }

@@ -3,16 +3,18 @@ package com.inops.visitorpass.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.inops.visitorpass.entity.Entitlement;
+import com.inops.visitorpass.entity.RoleEntitlement;
 
 public interface IEntitlement {
-	Optional<List<Entitlement>> findAll();
+	Optional<List<RoleEntitlement>> findAll();
 
-	Optional<Entitlement> findById(long id);
+	Optional<RoleEntitlement> findById(long id);
 
-	Optional<Entitlement> create(Entitlement entitlement);
+	Optional<RoleEntitlement> create(RoleEntitlement entitlement);
 
-	Optional<Entitlement> update(Entitlement entitlement);
+	Optional<RoleEntitlement> update(RoleEntitlement entitlement);
 
 	void delete(long entitlementId);
+	
+	void deleteAll(List<Long> entitelmentIds);
 }

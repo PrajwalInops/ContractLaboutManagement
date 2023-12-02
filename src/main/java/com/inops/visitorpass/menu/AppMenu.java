@@ -26,6 +26,7 @@ package com.inops.visitorpass.menu;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -34,16 +35,26 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.inops.visitorpass.entity.MenuCategoryEntity;
+import com.inops.visitorpass.entity.RoleEntitlement;
 import com.inops.visitorpass.entity.User;
+import com.inops.visitorpass.service.IEntitlement;
+import com.inops.visitorpass.service.IMenuCategory;
+
+import lombok.RequiredArgsConstructor;
 
 @Component("appMenu")
 @Scope("session")
+@RequiredArgsConstructor
 public class AppMenu {
+
+	private final IEntitlement entitlementService;
+	private final IMenuCategory menuCategoryService;
 
 	private List<MenuCategory> menuCategories;
 	private List<MenuItem> menuItems;
 	private String profileName;
-	private boolean approval;
+	private boolean approval = true;
 
 	// CHECKSTYLE:OFF
 	@PostConstruct
@@ -55,67 +66,96 @@ public class AppMenu {
 		menuCategories = new ArrayList<>();
 		menuItems = new ArrayList<>();
 
-		// GENERAL CATEGORY START
-		List<MenuItem> generalMenuItems = new ArrayList<>();
-		generalMenuItems.add(new MenuItem("Get Started", "/ui/home"));
-		generalMenuItems.add(new MenuItem("Documentation", ""));
-		generalMenuItems.add(new MenuItem("Content Security", ""));
-		menuCategories.add(new MenuCategory("General", generalMenuItems));
-		// GENERAL CATEGORY END
+		RoleEntitlement roleEntitlements = user.getRoleEntitlement();
 
-		// SUPPORT CATEGORY START
-		List<MenuItem> supportMenuItems = new ArrayList<>();
-		// supportMenuItems.add(new MenuItem("Forum", "https://forum.primefaces.org"));
-		// supportMenuItems.add(new MenuItem("Discord Chat",
-		// "https://discord.gg/gzKFYnpmCY"));
-		// supportMenuItems.add(new MenuItem("PRO Support", "/support"));
+		List<MenuCategoryEntity> menuCategoriesEntity = menuCategoryService.findAll().get();
 
-		if (user.getRole().name().equals("ADMIN")) {
-			supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));
-					
-			approval = true;
-		} else {
-			supportMenuItems.add(new MenuItem("Pre Approvals", "/ui/preApproval"));
-		}
-		supportMenuItems.add(new MenuItem("User Management", "/ui/usersManagement"));
-		menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
+		menuCategoriesEntity.forEach(menuCategory -> {
+			menuCategory.getMenuItem().removeIf(menuItem -> !roleEntitlements.getMenuItem().stream()
+					.anyMatch(obj -> menuItem.getLabel().equals(obj.getLabel())));
+		});
 
-		// DATA CATEGORY START
-		List<MenuItem> dataMenuItems = new ArrayList<>();
-		dataMenuItems.add(new MenuItem("Leave Settings", "/ui/leaveType"));
-		dataMenuItems.add(new MenuItem("Holiday Settings", "/ui/holiday"));
-		dataMenuItems.add(new MenuItem("Compensatory Off", "/ui/compensatoryOff"));
-		dataMenuItems.add(new MenuItem("Compensatory Off Scheduler", "/ui/compensatoryOffScheduler"));
-		dataMenuItems.add(new MenuItem("Leave Balance", "/ui/leaveBalance"));
-		dataMenuItems.add(new MenuItem("Leave Application", "/ui/leaveApplication"));
-				
-		menuCategories.add(new MenuCategory("Leave Management", dataMenuItems));
-		
-		List<MenuItem> masterMenuItems = new ArrayList<>();
-		masterMenuItems.add(new MenuItem("Company Settings", "/ui/master"));
-		masterMenuItems.add(new MenuItem("Division Settings", "/ui/division"));
-		masterMenuItems.add(new MenuItem("Department Settings", "/ui/department"));
-		masterMenuItems.add(new MenuItem("Designation Settings", "/ui/designation"));
-		masterMenuItems.add(new MenuItem("Cadre Settings", "/ui/cadre"));
-		masterMenuItems.add(new MenuItem("Shift Settings", "/ui/shift"));
-		masterMenuItems.add(new MenuItem("Employee Settings", "/ui/employee"));
-				
-		menuCategories.add(new MenuCategory("Masters Management", masterMenuItems));
-		
-		List<MenuItem> transactionMenuItems = new ArrayList<>();
-		transactionMenuItems.add(new MenuItem("Transactions", "/ui/transaction"));
-		transactionMenuItems.add(new MenuItem("Punches", "/ui/punches"));
-				
-		menuCategories.add(new MenuCategory("Transaction Management", transactionMenuItems));
-		
-		
-		
-		List<MenuItem> reportMenuItems = new ArrayList<>();
-		reportMenuItems.add(new MenuItem("Reports", "/ui/reporting"));	
-				
-		menuCategories.add(new MenuCategory("Reports Management", reportMenuItems));
-		// SUPPORT CATEGORY END
+		/*
+		 * roleEntitlements.getMenuItem().forEach(menuItem -> { MenuCategoryEntity
+		 * menuCategory = menuCategoriesEntity.stream().filter( menu ->
+		 * menu.getMenuItem().stream().anyMatch(item ->
+		 * item.getLabel().equals(menuItem.getLabel()))) .findAny().orElse(null);
+		 * 
+		 * if (menuCategory != null) { userMenuCategories.add(menuCategory); } });
+		 */
 
+		menuCategoriesEntity.forEach(menuCategory -> {
+			List<MenuItem> generalMenuItems = new ArrayList<>();
+			generalMenuItems.addAll(menuCategory.getMenuItem().stream()
+					.map(menuItem -> new MenuItem(menuItem.getLabel(), menuItem.getUrl()))
+					.collect(Collectors.toList()));
+			if (!generalMenuItems.isEmpty()) {
+				menuCategories.add(new MenuCategory(menuCategory.getLabel(), generalMenuItems));
+			}
+		});
+
+		/*
+		 * // GENERAL CATEGORY START List<MenuItem> generalMenuItems = new
+		 * ArrayList<>(); generalMenuItems.add(new MenuItem("Get Started", "/ui/home"));
+		 * generalMenuItems.add(new MenuItem("Documentation", ""));
+		 * generalMenuItems.add(new MenuItem("Content Security", ""));
+		 * menuCategories.add(new MenuCategory("General", generalMenuItems)); // GENERAL
+		 * CATEGORY END
+		 * 
+		 * // SUPPORT CATEGORY START List<MenuItem> supportMenuItems = new
+		 * ArrayList<>(); // supportMenuItems.add(new MenuItem("Forum",
+		 * "https://forum.primefaces.org")); // supportMenuItems.add(new
+		 * MenuItem("Discord Chat", // "https://discord.gg/gzKFYnpmCY")); //
+		 * supportMenuItems.add(new MenuItem("PRO Support", "/support"));
+		 * 
+		 * if (user.getRole().name().equals("ADMIN")) { supportMenuItems.add(new
+		 * MenuItem("Visitor Pass", "/ui/visitorPass"));
+		 * 
+		 * approval = true; } else { supportMenuItems.add(new MenuItem("Pre Approvals",
+		 * "/ui/preApproval")); }
+		 * 
+		 * menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
+		 * 
+		 * List<MenuItem> userMenuItems = new ArrayList<>(); userMenuItems.add(new
+		 * MenuItem("User Management", "/ui/usersManagement")); userMenuItems.add(new
+		 * MenuItem("Entitelment Management", "/ui/roleManagement"));
+		 * menuCategories.add(new MenuCategory("Users", userMenuItems));
+		 * 
+		 * // DATA CATEGORY START List<MenuItem> dataMenuItems = new ArrayList<>();
+		 * dataMenuItems.add(new MenuItem("Leave Settings", "/ui/leaveType"));
+		 * dataMenuItems.add(new MenuItem("Holiday Settings", "/ui/holiday"));
+		 * dataMenuItems.add(new MenuItem("Compensatory Off", "/ui/compensatoryOff"));
+		 * dataMenuItems.add(new MenuItem("Compensatory Off Scheduler",
+		 * "/ui/compensatoryOffScheduler")); dataMenuItems.add(new
+		 * MenuItem("Leave Balance", "/ui/leaveBalance")); dataMenuItems.add(new
+		 * MenuItem("Leave Application", "/ui/leaveApplication"));
+		 * 
+		 * menuCategories.add(new MenuCategory("Leave Management", dataMenuItems));
+		 * 
+		 * List<MenuItem> masterMenuItems = new ArrayList<>(); masterMenuItems.add(new
+		 * MenuItem("Company Settings", "/ui/master")); masterMenuItems.add(new
+		 * MenuItem("Division Settings", "/ui/division")); masterMenuItems.add(new
+		 * MenuItem("Department Settings", "/ui/department")); masterMenuItems.add(new
+		 * MenuItem("Designation Settings", "/ui/designation")); masterMenuItems.add(new
+		 * MenuItem("Cadre Settings", "/ui/cadre")); masterMenuItems.add(new
+		 * MenuItem("Shift Settings", "/ui/shift")); masterMenuItems.add(new
+		 * MenuItem("Employee Settings", "/ui/employee"));
+		 * 
+		 * menuCategories.add(new MenuCategory("Masters Management", masterMenuItems));
+		 * 
+		 * List<MenuItem> transactionMenuItems = new ArrayList<>();
+		 * transactionMenuItems.add(new MenuItem("Transactions", "/ui/transaction"));
+		 * transactionMenuItems.add(new MenuItem("Punches", "/ui/punches"));
+		 * 
+		 * menuCategories.add(new MenuCategory("Transaction Management",
+		 * transactionMenuItems));
+		 * 
+		 * List<MenuItem> reportMenuItems = new ArrayList<>(); reportMenuItems.add(new
+		 * MenuItem("Reports", "/ui/reporting"));
+		 * 
+		 * menuCategories.add(new MenuCategory("Reports Management", reportMenuItems));
+		 * // SUPPORT CATEGORY END
+		 */
 		/*
 		 * //RESOURCES CATEGORY START List<MenuItem> resourcesMenuItems = new
 		 * ArrayList<>(); resourcesMenuItems.add(new MenuItem("PrimeTV",

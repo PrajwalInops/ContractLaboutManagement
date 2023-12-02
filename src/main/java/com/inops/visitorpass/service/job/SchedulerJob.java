@@ -2,7 +2,6 @@ package com.inops.visitorpass.service.job;
 
 import java.util.Date;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.inops.visitorpass.service.ITaskScheduler;

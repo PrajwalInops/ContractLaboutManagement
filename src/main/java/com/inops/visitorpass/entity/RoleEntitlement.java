@@ -1,11 +1,17 @@
 package com.inops.visitorpass.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -27,12 +33,10 @@ public class RoleEntitlement {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long entitlementRoleId;
 
-	private String category;
-	private String menuItem;
-	
-	@ManyToOne
-	@JoinColumn(name = "entitlementId", nullable = false)	
-	private Entitlement entitlement;
-	
+	private String entitlementName;
+
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "Entitlement_Menu_Item", joinColumns = @JoinColumn(name = "Menu_Item_Id"), inverseJoinColumns = @JoinColumn(name = "entitlement_Role_Id"))
+	private Set<MenuItemEntity> menuItem = new HashSet<>();
 
 }
