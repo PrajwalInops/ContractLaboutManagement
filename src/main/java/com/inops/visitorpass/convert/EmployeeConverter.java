@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.service.IEmployee;
 
-//@Component
-//@FacesConverter(value = "employeeConverter", managed = true)
+@Component
+@FacesConverter(value = "employeeConverter", managed = true)
 public class EmployeeConverter implements Converter<Employee> {
 
 	private List<Employee> employees;

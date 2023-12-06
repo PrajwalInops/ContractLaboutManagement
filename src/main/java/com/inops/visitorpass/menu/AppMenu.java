@@ -80,11 +80,11 @@ public class AppMenu {
 		 * menuCategory = menuCategoriesEntity.stream().filter( menu ->
 		 * menu.getMenuItem().stream().anyMatch(item ->
 		 * item.getLabel().equals(menuItem.getLabel()))) .findAny().orElse(null);
-		 * 
+		 * g
 		 * if (menuCategory != null) { userMenuCategories.add(menuCategory); } });
 		 */
 
-		menuCategoriesEntity.forEach(menuCategory -> {
+		menuCategoriesEntity.stream().filter(cat->cat.isCustom()).forEach(menuCategory -> {
 			List<MenuItem> generalMenuItems = new ArrayList<>();
 			generalMenuItems.addAll(menuCategory.getMenuItem().stream()
 					.map(menuItem -> new MenuItem(menuItem.getLabel(), menuItem.getUrl()))

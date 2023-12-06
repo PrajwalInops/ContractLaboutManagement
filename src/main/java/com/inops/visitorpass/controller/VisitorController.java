@@ -30,12 +30,14 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.inops.visitorpass.constant.InopsConstant;
@@ -61,8 +63,8 @@ import lombok.extern.log4j.Log4j2;
 @Getter
 @Setter
 @Log4j2
-//@Component("visitorController")
-//@Scope("session")
+@Component("visitorController")
+@Scope("session")
 public class VisitorController implements Serializable {
 
 	private final IVisitorService visitorService;
@@ -134,22 +136,22 @@ public class VisitorController implements Serializable {
 	public void init() throws UnsupportedEncodingException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		user = (User) auth.getPrincipal();
-		getAllPreApprovedVisitors();
+		//getAllPreApprovedVisitors();
 		droppedVisitors = new ArrayList<>();
 
 		getVisitorIdByDate();
 		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
-		visitors = ((Optional<List<Visitor>>) ctx.getBean("getVisitors")).get();
+		//visitors = ((Optional<List<Visitor>>) ctx.getBean("getVisitors")).get();
 		divisions = division.findAll().get();
 		readerIpAddresses = readerIpAddress.findAll().get();
 		setDate(new Date());
 		fileDownload(null, "VisitorPass");
 
-		if (user.getRole().getValue().equals("User")) {
+		if (user.getRoleEntitlement().getEntitlementName().equals("User")) {
 			employees = employees.stream().filter(emp -> emp.getEmployeeId().equals(user.getEmployee().getEmployeeId()))
 					.collect(Collectors.toList());
 		}
-		getCards();
+		//getCards();
 
 	}
 

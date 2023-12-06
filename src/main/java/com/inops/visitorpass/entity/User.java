@@ -47,7 +47,7 @@ public class User implements UserDetails {
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "entitlementRoleId", nullable = false)
-	private RoleEntitlement roleEntitlement;
+	private RoleEntitlement roleEntitlement ;
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "empid", nullable = false)
@@ -73,7 +73,7 @@ public class User implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.name());
+		SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roleEntitlement.getEntitlementName());
 		return Collections.singletonList(authority);
 	}
 		

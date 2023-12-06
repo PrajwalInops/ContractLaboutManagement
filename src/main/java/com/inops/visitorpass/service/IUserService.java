@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import com.inops.visitorpass.domain.ResetPassword;
 import com.inops.visitorpass.entity.User;
 
-public interface IUserService extends UserDetailsService {
+public interface IUserService   {
 
 	public void saveUser(User user);
 
@@ -17,5 +17,9 @@ public interface IUserService extends UserDetailsService {
 	public boolean resetPassword(ResetPassword restPassword);
 	
 	Optional<List<User>> findAll();
+	
+	void delete(User user);
+	
+	void deleteAll(List<User> users);
 
 }

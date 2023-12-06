@@ -6,9 +6,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
 import com.inops.visitorpass.domain.ResetPassword;
 import com.inops.visitorpass.entity.User;
@@ -16,7 +16,7 @@ import com.inops.visitorpass.repository.UserRepository;
 import com.inops.visitorpass.service.IUserService;
 
 //@Service("userServiceImpl")
-public class UserServiceImpl implements IUserService  {
+public class UserServiceImpl implements IUserService ,UserDetailsService {
 
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -82,6 +82,16 @@ public class UserServiceImpl implements IUserService  {
 	public Optional<List<User>> findAll() {
 		// TODO Auto-generated method stub
 		return Optional.of(userRepository.findAll());
+	}
+
+	@Override
+	public void delete(User user) {
+		userRepository.delete(user);		
+	}
+
+	@Override
+	public void deleteAll(List<User> users) {
+		userRepository.deleteAll(users);
 	}
 
 }

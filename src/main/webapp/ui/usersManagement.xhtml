@@ -1,63 +1,187 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-    xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
-    template="/WEB-INF/template.xhtml">
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:p="http://primefaces.org/ui"
+  template="/WEB-INF/template.xhtml"
+>
+  <ui:define name="title">
+    Users <span class="subitem"> Management configuration</span>
+  </ui:define>
 
-    <ui:define name="title">
-        User <span class="subitem">Management</span>
-    </ui:define>
+  <ui:define name="description">
+    Tool provides an Outlook for endusers who is pertinant to operate the
+    user genereation request process.
+  </ui:define>
 
-    <ui:define name="description">
-        User can change the password and Admin can manage the users.
-    </ui:define>
+  <ui:param name="documentationLink" value="/components/schedule" />
+  <ui:param name="widgetLink" value="Schedule-1" />
 
-    <ui:param name="documentationLink" value="/components/schedule" />
-    <ui:param name="widgetLink" value="Schedule-1" />
+  <ui:define name="implementation">
+    <h:form id="form">
+      <p:growl id="messages" showDetail="true" />
 
-    <ui:define name="implementation">
-        <div class="card">
-            <h:form id="form">
-                <p:growl id="messages" showDetail="true" />
+      <div class="card crud-demo">
+        <h5>User Details</h5>
+        <p:toolbar>
+          <p:toolbarGroup>
+              <p:commandButton value="New" icon="pi pi-plus" actionListener="#{userController.openNew}"
+                  update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                  styleClass="ui-button-success" style="margin-right: .5rem">
+                  <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>
+              <p:commandButton id="delete-products-button" value="#{userController.deleteUsersButtonMessage}"
+                  icon="pi pi-trash" actionListener="#{userController.deleteUsers}"
+                  styleClass="ui-button-danger" disabled="#{!userController.hasSelectedUsers()}" update="@this">
+                  <p:confirm header="Confirmation" message="Delete the selected users?"
+                      icon="pi pi-exclamation-triangle" />
+              </p:commandButton>
+          </p:toolbarGroup>
+          <p:toolbarGroup align="right">
+              <p:fileUpload mode="simple" skinSimple="true" label="Import" chooseIcon="pi pi-download" />
+              <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                  <p:dataExporter type="pdf" target="dt-products" fileName="products" />
+              </p:commandButton>
+          </p:toolbarGroup>
+      </p:toolbar>
 
-                <h5 class="mt-0">Change Password</h5>
-                <div class="field grid">
-                    <p:outputLabel for="mailId" styleClass="col-fixed" style="width:100px" value="Mail-Id" />
-                    <div class="col">
-                        <p:inputText id="mailId" value="#{userController.emailId}" />
+      <p:dataTable id="dt-products" widgetVar="dtProducts" var="product" value="#{userController.users}"
+          reflow="true" styleClass="products-table" selection="#{userController.selectedUsers}"
+          rowKey="#{product.id}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+          <f:facet name="header">
+              <div class="products-table-header">
+                  <span style="font-weight: bold">User</span>
+                  <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                      <p:inputText id="globalFilter" onkeyup="PF('dtProducts').filter()" placeholder="Search" />
+                  </span>
+              </div>
+          </f:facet>
 
-                    </div>
+          <p:ajax event="rowSelect" update=":form:delete-products-button" />
+          <p:ajax event="rowUnselect" update=":form:delete-products-button" />
+          <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button" />
+          <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button" />
+          <p:ajax event="toggleSelect" update=":form:delete-products-button" />
+
+          <p:column selectionMode="multiple" exportable="false"></p:column>
+
+          <p:column headerText="Code" sortBy="#{product.id}" filterBy="#{product.id}">
+              <h:outputText value="#{product.id}" />
+          </p:column>
+          <p:column headerText="FirsName" sortBy="#{product.firstName}" filterBy="#{product.firstName}">
+              <h:outputText value="#{product.firstName}" />
+          </p:column>
+         
+          <p:column headerText="FirsName" sortBy="#{product.lastName}" filterBy="#{product.lastName}">
+              <h:outputText value="#{product.lastName}" />
+          </p:column>
+
+          <p:column headerText="UserId" sortBy="#{product.email}" filterBy="#{product.email}">
+              <h:outputText value="#{product.email}" />
+          </p:column>
+
+          <p:column headerText="Role" sortBy="#{product.roleEntitlement.entitlementName}">
+            <h:outputText value="#{product.roleEntitlement.entitlementName}" />              
+          </p:column>
+
+          <p:column headerText="EmployeeId" sortBy="#{product.employee.employeeId}">
+            <h:outputText value="#{product.employee.employeeId}" />
+          </p:column>
+         
+          <p:column exportable="false">
+              <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
+                  oncomplete="PF('manageProductDialog').show()"
+                  styleClass="edit-button rounded-button ui-button-success" process="@this">
+                  <f:setPropertyActionListener value="#{product}" target="#{userController.selectedUser}" />
+                  <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>
+              <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                               process="@this"
+                               oncomplete="PF('deleteProductDialog').show()">
+                  <f:setPropertyActionListener value="#{product}" target="#{userController.selectedUser}" />
+              </p:commandButton>
+          </p:column>
+
+      </p:dataTable>
+    </div>
+  </h:form>
+
+  <h:form id="dialogs">
+      <p:dialog header="User Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+          responsive="true">
+          <p:outputPanel id="manage-product-content" class="ui-fluid">
+              <p:outputPanel rendered="#{not empty userController.selectedUser}">
+                  
+                  <div class="field">
+                      <p:outputLabel for="firstName">First Name</p:outputLabel>
+                      <p:inputText id="firstName" value="#{userController.selectedUser.firstName}" required="true" />
+                  </div>
+                  <div class="field">
+                    <p:outputLabel for="lastName">Last Name</p:outputLabel>
+                    <p:inputText id="lastName" value="#{userController.selectedUser.lastName}" required="false" />
                 </div>
-
-                <div class="field grid">
-                    <p:outputLabel for="oldPassword" styleClass="col-fixed" style="width:100px" value="Old Password" />
-                    <div class="col">
-                        <p:password id="oldPassword" value="#{userController.oldPassword}" redisplay="true"
-                            label="Old Password" required="true" />
-                    </div>
+                <div class="field">
+                    <p:outputLabel for="email">User Id</p:outputLabel>
+                    <p:inputText id="email" value="#{userController.selectedUser.email}" required="true" />
                 </div>
-
-                <div class="field grid">
-                    <p:outputLabel for="newPassword" styleClass="col-fixed" style="width:100px" value="New Password" />
-                    <div class="col">
-                        <p:password id="newPassword" value="#{userController.newPassword}" match="confirmNewPassword"
-                            toggleMask="true" redisplay="true" label="new Password" required="true" />
+                                  
+                  <div class="formgrid grid">
+                    <div class="field col">
+                        <p:outputLabel for="password">Password</p:outputLabel>
+                        <p:password id="password" value="#{userController.selectedUser.password}"  required="true" feedback="true" toggleMask="true" redisplay="true"/>
                     </div>
-                </div>
+                    
+                      <div class="field col">
+                          <p:outputLabel for="employee">Employee</p:outputLabel>
+                          <p:selectOneMenu value="#{userController.employeeId}" 
+                            id="employee" autoWidth="true" filter="true"
+                            filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItems value="#{userController.employees}" var="player"
+                                itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />  
+                                <p:ajax update="firstName,lastName"
+                                listener="#{userController.getFirstAndLastName}" />                            
+                         </p:selectOneMenu>
+                      </div>
+                      <div class="field col">
+                        <p:outputLabel for="entitlement">Entitlement</p:outputLabel>
+                        <p:selectOneMenu value="#{userController.entitlementId}"
+                            id="entitlement" autoWidth="true" filter="true"
+                            filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItems value="#{userController.dbRoleEntitlements}" var="player"
+                                itemLabel="#{player.entitlementName}" itemValue="#{player.entitlementRoleId}" />                          
+                         </p:selectOneMenu>
+                    </div>                      
+                  </div>
+              </p:outputPanel>
+          </p:outputPanel>
 
-                <div class="field grid">
-                    <p:outputLabel for="confirmNewPassword" styleClass="col-fixed" style="width:100px"
-                        value="Confirm New Password" />
-                    <div class="col">
-                        <p:password id="confirmNewPassword" value="#{userController.newPassword}"
-                            label="Confirm New Password " redisplay="true" required="true" />
-                    </div>
-                </div>
+          <f:facet name="footer">
+              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{userController.saveUser}"
+                  update="manage-product-content,:form:dt-products,:form:messages" process="manage-product-content @this" />
+              <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                  class="ui-button-secondary" type="button" />
+          </f:facet>
+      </p:dialog>
 
-                <p:commandButton update="@form,messages,mailId,oldPassword,newPassword,confirmNewPassword"
-                    value="Reset Password" action="#{userController.resetPassword}" styleClass="mr-2" />
+      <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+          message="Delete the user?" header="Confirm" severity="warn">
+          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{userController.deleteUser}"
+              process="@this" update=":form:delete-products-button"
+              oncomplete="PF('deleteProductDialog').hide()" />
+          <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+              onclick="PF('deleteProductDialog').hide()" />
+      </p:confirmDialog>
 
-
-            </h:form>
-        </div>
-    </ui:define>
-
+      <p:confirmDialog global="true" showEffect="fade" width="300">
+          <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+          <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+              icon="pi pi-times" />
+      </p:confirmDialog>      
+  
+    </h:form>
+ 
+  </ui:define>
 </ui:composition>

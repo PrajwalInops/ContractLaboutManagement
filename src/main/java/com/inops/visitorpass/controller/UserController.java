@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,16 +15,22 @@ import javax.faces.model.SelectItem;
 import javax.faces.model.SelectItemGroup;
 
 import org.primefaces.PrimeFaces;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.inops.visitorpass.domain.Entitlements;
 import com.inops.visitorpass.domain.ResetPassword;
+import com.inops.visitorpass.entity.Department;
+import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.MenuItemEntity;
 import com.inops.visitorpass.entity.RoleEntitlement;
+import com.inops.visitorpass.entity.User;
 import com.inops.visitorpass.service.IEntitlement;
 import com.inops.visitorpass.service.IMenuCategory;
 import com.inops.visitorpass.service.IUserService;
+import com.inops.visitorpass.service.impl.UserServiceImpl;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +49,9 @@ public class UserController {
 	private final IMenuCategory menuCategoryService;
 	private final IEntitlement entitlementService;
 
+	@Autowired
+	ApplicationContext ctx;
+
 	private String emailId;
 	private String oldPassword;
 	private String newPassword;
@@ -55,15 +65,27 @@ public class UserController {
 
 	private List<RoleEntitlement> dbRoleEntitlements;
 
+	private User selectedUser;
+	private List<User> users;
+	private List<User> selectedUsers;
+
+	private List<Employee> employees;
+	private String employeeId;
+	private long entitlementId;
+
 	@PostConstruct
 	public void init() {
 		selectedMenuCategories = new String[100];
+		users = userService.findAll().get();
+		dbRoleEntitlements = entitlementService.findAll().get();
+		employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
 		rollMenue();
 		getRoles();
 	}
 
 	public void openNew() {
 		this.roleEntitlement = new Entitlements();
+		this.selectedUser = new User();
 	}
 
 	public void resetPassword() {
@@ -127,7 +149,6 @@ public class UserController {
 	}
 
 	private void getRoles() {
-		dbRoleEntitlements = entitlementService.findAll().get();
 		roleEntitlements = dbRoleEntitlements
 				.stream().map(
 						entitel -> new Entitlements(entitel.getEntitlementRoleId(), entitel.getEntitlementName(),
@@ -170,6 +191,86 @@ public class UserController {
 
 	public boolean hasSelectedRoles() {
 		return this.selectedRoleEntitlements != null && !this.selectedRoleEntitlements.isEmpty();
+	}
+
+	public void saveUser() {
+		try {			
+			
+			if (this.selectedUser.getId() == null) {
+				selectedUser.setEmployee(employees.stream().filter(emp -> emp.getEmployeeId().equals(employeeId)).findAny()
+						.orElse(null));
+				selectedUser.setRoleEntitlement(dbRoleEntitlements.stream()
+						.filter(role -> role.getEntitlementRoleId()==entitlementId).findAny().orElse(null));
+				userService.saveUser(selectedUser);
+				this.users.add(selectedUser);
+				addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "User Added successfully");
+
+			} else {
+				User user = users.stream().filter(usr -> usr.getId() == selectedUser.getId()).findAny().orElse(null);
+				if (user == null) {	
+					user = new User();
+					user.setEmployee(employees.stream().filter(emp -> emp.getEmployeeId().equals(employeeId)).findAny()
+							.orElse(null));
+					user.setRoleEntitlement(dbRoleEntitlements.stream()
+							.filter(role -> role.getEntitlementRoleId().equals(entitlementId)).findAny().orElse(null));
+					userService.saveUser(user);
+				} else {
+					user.setEmployee(employees.stream().filter(emp -> emp.getEmployeeId().equals(employeeId)).findAny()
+							.orElse(null));
+					user.setRoleEntitlement(dbRoleEntitlements.stream()
+							.filter(role -> role.getEntitlementRoleId()==entitlementId).findAny().orElse(null));
+					user.setEmail(selectedUser.getEmail());
+					user.setFirstName(selectedUser.getFirstName());
+					user.setLastName(selectedUser.getLastName());
+					user.setPassword(selectedUser.getPassword());
+					user.setMobile(selectedUser.getMobile());
+
+				}
+				addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "User updated successfully");
+			}
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", e.getMessage());
+		}
+	}
+
+	public void deleteUser() {
+
+		userService.delete(selectedUser);
+		this.users.remove(this.selectedUser);
+		if (this.selectedUser != null) {
+			this.selectedUsers.remove(this.selectedUser);
+		}
+		this.selectedUser = null;
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "User deleted successfully");
+	}
+
+	public void deleteUsers() {
+		userService.deleteAll(this.selectedUsers);
+		this.users.removeAll(this.selectedUsers);
+		this.selectedUsers = null;
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Users deleted successfully");
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		PrimeFaces.current().executeScript("PF('dtProducts').clearFilters()");
+	}
+
+	public String getDeleteUsersButtonMessage() {
+		if (hasSelectedUsers()) {
+			int size = this.selectedUsers.size();
+			return size > 1 ? size + " Users selected" : "1 User selected";
+		}
+
+		return "Delete";
+	}
+
+	public boolean hasSelectedUsers() {
+		return this.selectedUsers != null && !this.selectedUsers.isEmpty();
+	}
+
+	public void getFirstAndLastName() {
+		Employee employee = employees.stream().filter(emp -> emp.getEmployeeId().equals(employeeId)).findAny()
+				.orElse(null);
+		selectedUser.setFirstName(employee.getEmployeeName());
 	}
 
 	private void cleanUp() {

@@ -24,7 +24,7 @@ public class SecurityConfig {
 	    @Autowired
 	    private CustomLoginSucessHandler sucessHandler;
 
-	    @Bean("userDetailsService")
+	    @Bean
 	    public UserDetailsService userDetailsService() {
 	        return new UserServiceImpl();
 	    }
