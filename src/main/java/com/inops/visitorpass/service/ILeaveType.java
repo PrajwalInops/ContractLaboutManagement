@@ -15,6 +15,8 @@ public interface ILeaveType {
 	
 	Optional<LeaveTypeEntity> update(LeaveTypeEntity leaveType);
 	
-	void delete(long leaveTypeId);
+	void delete(LeaveTypeEntity leaveTypeId);
+	
+	void deleteAll(List<LeaveTypeEntity> leaveTypes);
 	
 }

@@ -1,6 +1,5 @@
 package com.inops.visitorpass.controller;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +28,13 @@ import com.inops.visitorpass.entity.Holiday;
 import com.inops.visitorpass.entity.LeaveBalance;
 import com.inops.visitorpass.entity.LeaveTransactions;
 import com.inops.visitorpass.entity.LeaveTypeEntity;
+import com.inops.visitorpass.entity.RoleEntitlement;
 import com.inops.visitorpass.entity.User;
 import com.inops.visitorpass.service.ICompensatoryOff;
 import com.inops.visitorpass.service.ICompensatoryOffScheduler;
 import com.inops.visitorpass.service.IDivision;
 import com.inops.visitorpass.service.IEmployee;
+import com.inops.visitorpass.service.IEntitlement;
 import com.inops.visitorpass.service.IHoliday;
 import com.inops.visitorpass.service.ILeaveBalance;
 import com.inops.visitorpass.service.ILeaveTransactions;
@@ -55,6 +56,7 @@ public class LeaveTypeController {
 	@Autowired
 	ApplicationContext ctx;
 
+	private final IEntitlement entitlementService;
 	private final ILeaveType leaveTypeService;
 	private final IHoliday holidayService;
 	private final ICompensatoryOff compensatoryOffService;
@@ -88,59 +90,7 @@ public class LeaveTypeController {
 
 	private Holiday selectedHoliday;
 	private List<Holiday> selectedHolidays;
-
-	private String leaveName;
-	private String leaveCode;
-	private String leaveType;
-	private String leaveUnits;
-	private String leaveBalanceBasedOn;
-	private Date validFrom;
-	private Date validTo;
-	private String leaveDescription;
-
-	private String applicableFor;
-	private String applicableRole;
-	private String applicableLocation;
-	private String applicableGender;
-	private String applicableMaritalStatus;
-
-	private boolean quarterDay;
-	private boolean halfDay;
-	private boolean beyondPermittedLeave;
-	private boolean roundOffPermittedLeave;
-	private boolean excludeHolidays;
-	private boolean excludeWeekEndsDays;
-	private boolean includeAllHolidaysAndWeeklyOffs;
-	private float maxConsecutiveDays;
-	private int holidayWeekendConsicutive;
-	private int applicationSubmitBefore;
-
-	private int effectiveAfter;
-	private String entitlementInterval;
-	private String effectiveFrom;
-
-	private boolean accrual;
-	private String accrualType;
-	private String accrualOn;
-	private String accrualMonth;
-	private float noOfDays;
-
-	private boolean reset;
-	private String resetType;
-	private String resetOn;
-	private String resetMonth;
-
-	private String carryForwardType;
-	private int unit;
-	private String carryForwardScale;
-	private int carryForwardMaxLimit;
-	private int expiresIn;
-	private String carryForwardInterval;
-
-	private int encashment;
-	private String encashmentScale;
-	private int encashmentMaxLimit;
-	private String prorateAccrual;
+	private long leaveTypeId;
 
 	private List<LeaveTypeEntity> leaveTypes;
 	private LeaveTypeEntity leaveTypeObject;
@@ -148,6 +98,8 @@ public class LeaveTypeController {
 	private List<Holiday> holidays;
 	private List<CompensatoryOff> compensatoryOffs;
 	private List<CompensatoryOffScheduler> compensatoryOffSchedulers;
+
+	private List<RoleEntitlement> dbRoleEntitlements;
 
 	@PostConstruct
 	public void init() {
@@ -161,25 +113,67 @@ public class LeaveTypeController {
 		leaveBalances = leaveBalanceService.findAll().get();
 		leaveTransactions = leaveTransactionsService.findAll().get();
 		divisions = division.findAll().get();
+		dbRoleEntitlements = entitlementService.findAll().get();
 	}
 
 	public void leaveDetails() {
-		leaveCode = leaveTypeObject.getLeaveCode();
+		this.selectedLeaveTypeEntity = leaveTypes.stream().filter(leave -> leave.getLeaveTypeId() == leaveTypeId)
+				.findAny().orElse(null);
 	}
 
-	public void save() {
-		LeaveTypeEntity leaveTypeObj = new LeaveTypeEntity(0L, leaveName, leaveCode, leaveType, leaveUnits,
-				leaveBalanceBasedOn, validFrom, validTo, leaveDescription, applicableFor, applicableRole,
-				applicableLocation, applicableGender, applicableMaritalStatus, quarterDay, halfDay,
-				beyondPermittedLeave, roundOffPermittedLeave, excludeHolidays, excludeWeekEndsDays,
-				includeAllHolidaysAndWeeklyOffs, maxConsecutiveDays, holidayWeekendConsicutive, applicationSubmitBefore,
-				effectiveAfter, entitlementInterval, effectiveFrom, accrual, accrualType, accrualOn, accrualMonth,
-				noOfDays, reset, resetType, resetOn, resetMonth, carryForwardType, unit, carryForwardScale,
-				carryForwardMaxLimit, expiresIn, carryForwardInterval, encashment, encashmentScale, encashmentMaxLimit,
-				prorateAccrual);
-		leaveTypeService.create(leaveTypeObj);
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage("Leave " + leaveName + " " + leaveCode + " created successfully"));
+	public void saveLeave() {
+		try {
+			if (this.selectedLeaveTypeEntity.getLeaveTypeId() == 0l) {
+				leaveTypeService.create(selectedLeaveTypeEntity);
+				leaveTypes.add(selectedLeaveTypeEntity);
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage("Leave " + selectedLeaveTypeEntity.getLeaveName() + " created successfully"));
+			} else {
+				leaveTypeService.create(selectedLeaveTypeEntity);
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage("Leave " + selectedLeaveTypeEntity.getLeaveName() + " updated successfully"));
+			}
+
+			PrimeFaces.current().executeScript("PF('manageProductDialog').hide()");
+			PrimeFaces.current().ajax().update("leaveNameAdvanced", "manage-product-content", ":form:messages",
+					":form:dt-products");
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", e.getMessage());
+		}
+	}
+	
+	public void deleteLeave() {
+
+		leaveTypeService.delete(selectedLeaveTypeEntity);
+		this.leaveTypes.remove(this.selectedLeaveTypeEntity);
+		if (this.selectedLeaveTypeEntitys != null) {
+			this.selectedLeaveTypeEntitys.remove(this.selectedLeaveTypeEntity);
+		}
+		this.selectedLeaveTypeEntity = null;
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "LeaveType deleted successfully");
+	}
+
+	public void deleteLeaves() {
+		leaveTypeService.deleteAll(this.selectedLeaveTypeEntitys);
+		this.leaveTypes.removeAll(this.selectedLeaveTypeEntitys);
+		this.selectedLeaveTypeEntitys = null;
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "LeaveTypes deleted successfully");
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		PrimeFaces.current().executeScript("PF('dtProducts').clearFilters()");
+	}
+
+	public String getDeleteLeaveButtonMessage() {
+		if (hasSelectedLeavess()) {
+			int size = this.selectedLeaveTypeEntitys.size();
+			return size > 1 ? size + " leaves selected" : "1 leave selected";
+		}
+
+		return "Delete";
+	}
+
+	public boolean hasSelectedLeavess() {
+		return this.selectedLeaveTypeEntitys != null && !this.selectedLeaveTypeEntitys.isEmpty();
 	}
 
 	public void onTabChange(TabChangeEvent event) {

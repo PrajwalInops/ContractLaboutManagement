@@ -42,9 +42,15 @@ public class LeaveTypeService implements ILeaveType {
 	}
 
 	@Override
-	public void delete(long leaveTypeId) {
-		Optional<LeaveTypeEntity> leaveType = leaveTypeRepository.findById(leaveTypeId);
-		leaveTypeRepository.delete(leaveType.get());	
+	public void delete(LeaveTypeEntity leaveTypeId) {
+		leaveTypeRepository.delete(leaveTypeId);
+
+	}
+
+	@Override
+	public void deleteAll(List<LeaveTypeEntity> leaveTypes) {
+		leaveTypeRepository.deleteAll(leaveTypes);
+
 	}
 
 }

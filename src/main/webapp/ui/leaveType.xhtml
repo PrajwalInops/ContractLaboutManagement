@@ -33,10 +33,10 @@
                         <p:resetInput target=":dialogs:manage-advanced-product-content" />
                     </p:commandButton>
 
-                    <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteButtonMessage}"
-                        icon="pi pi-trash" actionListener="#{leaveTypeController.deleteSelectedProducts}"
-                        styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedProducts()}" update="@this">
-                        <p:confirm header="Confirmation" message="Delete the selected products?"
+                    <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteLeaveButtonMessage}"
+                        icon="pi pi-trash" actionListener="#{leaveTypeController.deleteLeaves}"
+                        styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedLeavess()}" update="@this">
+                        <p:confirm header="Confirmation" message="Delete the selected leaveTypes?"
                             icon="pi pi-exclamation-triangle" />
                     </p:commandButton>                               
                 </p:toolbarGroup>
@@ -127,23 +127,8 @@
                     <p:outputPanel rendered="#{not empty leaveTypeController.selectedLeaveTypeEntity}">
                         
                         <div class="field">
-                            <p:outputLabel for="leaveName">Name :</p:outputLabel>
-                            <p:selectOneMenu value="#{leaveTypeController.selectedLeaveTypeEntity}" id="leaveName" var="c"
-                            converter="#{leaveTypeConverter}" autoWidth="false" editable="true" maxlength="10"
-                            filter="true" filterMatchMode="startsWith">
-
-                            <p:ajax update="leaveCode" event="itemSelect"
-                                listener="#{leaveTypeController.leaveDetails}" />
-                            <f:selectItems value="#{leaveTypeController.leaveTypes}" var="player"
-                                itemLabel="#{player.leaveName}" itemValue="#{player}" />
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Name" />
-                                </f:facet>
-                                <h:outputText value="#{c.leaveName}" />
-                            </p:column>
-                        </p:selectOneMenu>
-
+                            <p:outputLabel for="leaveName">Name :</p:outputLabel>                            
+                            <p:inputText id="leaveName" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveName}" />
                         </div>
                         <div class="field">
                             <p:outputLabel for="leaveCode" value="Code :" />
@@ -174,26 +159,28 @@
                                    
                         <div class="formgrid grid">
                             <div class="field col">
-                                <p:outputLabel for="role">For Role:</p:outputLabel>
-                                <p:selectOneMenu value="#{visitorController.visitingEmployee}" id="role"
-                                autoWidth="false" filter="true" filterMatchMode="startsWith">
-                                <f:selectItem itemLabel="" itemValue="" />
-                                <f:selectItems value="#{visitorController.employees}" var="player"
-                                    itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
-                            </p:selectOneMenu>
-                            </div>
-                            <div class="field col">
-                                <p:outputLabel for="location">For Location:</p:outputLabel>
-                                <p:selectOneMenu value="#{visitorController.visitingEmployee}" id="location"
+                                <p:outputLabel for="location">For Division:</p:outputLabel>
+                                <p:selectOneMenu value="#{leaveTypeController.selectedLeaveTypeEntity.divisionId}" id="location"
                                     autoWidth="false" filter="true" filterMatchMode="startsWith">
                                     <f:selectItem itemLabel="" itemValue="" />
-                                    <f:selectItems value="#{visitorController.employees}" var="player"
-                                        itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
+                                    <f:selectItems value="#{leaveTypeController.divisions}" var="player"
+                                        itemLabel="#{player.divisionName}" itemValue="#{player.divisionId}" />
                                 </p:selectOneMenu>
                             </div>
+
+                            <div class="field col">
+                                <p:outputLabel for="role">For Role:</p:outputLabel>
+                                <p:selectOneMenu value="#{leaveTypeController.selectedLeaveTypeEntity.entitlementRoleId}" id="role"
+                                autoWidth="false" filter="true" filterMatchMode="startsWith">
+                                <f:selectItem itemLabel="" itemValue="" />
+                                <f:selectItems value="#{leaveTypeController.dbRoleEntitlements}" var="player"
+                                    itemLabel="#{player.entitlementName}" itemValue="#{player.entitlementRoleId}" />
+                            </p:selectOneMenu>
+                            </div>
+                            
                             <div class="field col">
                               <p:outputLabel for="employee">For Employee </p:outputLabel>
-                              <p:selectOneMenu value="#{visitorController.visitingEmployee}" id="employee"
+                              <p:selectOneMenu value="#{leaveTypeController.selectedLeaveTypeEntity.employeeId}" id="employee"
                               autoWidth="false" filter="true" filterMatchMode="startsWith">
                               <f:selectItem itemLabel="" itemValue="" />
                               <f:selectItems value="#{visitorController.employees}" var="player"
@@ -222,7 +209,7 @@
                         <div class="formgrid grid">
                             <div class="field col">
                                 <p:outputLabel for="period">Period </p:outputLabel>
-                                <p:selectOneMenu id="period" >
+                                <p:selectOneMenu id="period" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveBalanceBasedOn}">
                                     <f:selectItem itemLabel="Select Type" itemValue="" />
                                     <f:selectItem itemLabel="Beginning Of Accrual Period" itemValue="1" />
                                     <f:selectItem itemLabel="End Of Accrual Period" itemValue="2" />
@@ -232,30 +219,30 @@
                             </div>
                             <div class="field col">
                                 <p:outputLabel for="for">For </p:outputLabel>
-                                <p:selectOneRadio id="for" value="">
+                                <p:selectOneRadio id="for" value="#{leaveTypeController.selectedLeaveTypeEntity.applicableFor}">
                                     <f:selectItem itemLabel="All" itemValue="All" />
                                     <f:selectItem itemLabel="Experienced based" itemValue="Experienced based" />
                                 </p:selectOneRadio>
                             </div>
                             <div class="field col">
                               <p:outputLabel for="count">Leave Count </p:outputLabel>
-                              <p:inputText id="count" value=""/>
+                              <p:inputNumber id="count" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveCount}"/>
                           </div>
                             <div class="field col">
                                 <p:outputLabel for="newJoinee">For New Joinee </p:outputLabel>                        
-                                <p:inputText id="newJoinee" value=""/>
+                                <p:inputNumber id="newJoinee" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.newJoinee}"/>
                             </div>
                             <div class="field col">
                                 <p:outputLabel for="afterSixMonths">After six months </p:outputLabel>                        
-                                <p:inputText id="afterSixMonths" value=""/>
+                                <p:inputNumber id="afterSixMonths" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.afterSixMonths}"/>
                             </div>
                         </div>                       
                     </p:outputPanel>
                 </p:outputPanel>
       
                 <f:facet name="footer">
-                    <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveProduct}"
-                        update="manage-product-content" process="manage-product-content @this" />
+                    <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveLeave}"
+                    update="manage-product-content,:form:messages,:form:dt-products" process="manage-product-content @this" />
                     <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
                         class="ui-button-secondary" type="button" />
                 </f:facet>
@@ -268,30 +255,25 @@
                 <p:outputPanel rendered="#{not empty leaveTypeController.selectedLeaveTypeEntity}">
                     <div class="field">
                         <p:outputLabel for="leaveNameAdvanced">Name :</p:outputLabel>
-                        <p:selectOneMenu value="#{leaveTypeController.selectedLeaveTypeEntity}" id="leaveNameAdvanced" var="c"
-                        converter="#{leaveTypeConverter}" autoWidth="false" editable="true" maxlength="10"
+                        <p:selectOneMenu value="#{leaveTypeController.leaveTypeId}" id="leaveNameAdvanced" 
+                        autoWidth="false" editable="false" maxlength="10"
                         filter="true" filterMatchMode="startsWith">
 
-                        <p:ajax update="leaveCode" event="itemSelect"
+                        <p:ajax update="start,end,quarter,halfDay,beyond,joining,permitted,holidays,week,allHolidays,rollOver,reset,encashement,probationPeriod,duringProbation,businessPeriod,joiningMonthLess,joiningMonthGreater,exceeds,leaveDays,submitBefore,restType,resetOn,resetMonth,maxRollOver,maximumEncashement" event="itemSelect"
                             listener="#{leaveTypeController.leaveDetails}" />
+                        <f:selectItem itemLabel="" itemValue="" />
                         <f:selectItems value="#{leaveTypeController.leaveTypes}" var="player"
-                            itemLabel="#{player.leaveName}" itemValue="#{player}" />
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="Name" />
-                            </f:facet>
-                            <h:outputText value="#{c.leaveName}" />
-                        </p:column>
+                            itemLabel="#{player.leaveName}" itemValue="#{player.leaveTypeId}" />                       
                     </p:selectOneMenu>
 
                     </div>
                     <div class="field ">                               
                         <p:outputLabel for="start">Start date </p:outputLabel> 
-                        <p:datePicker id="start" showIcon="true"  />
+                        <p:datePicker id="start" showIcon="true"  value="#{leaveTypeController.selectedLeaveTypeEntity.validFrom}"/>
                     </div>   
                     <div class="field ">                               
-                        <p:outputLabel for="reset">End date </p:outputLabel> 
-                        <p:datePicker id="end" showIcon="true"  />
+                        <p:outputLabel for="end">End date </p:outputLabel> 
+                        <p:datePicker id="end" showIcon="true" value="#{leaveTypeController.selectedLeaveTypeEntity.validTo}" />
                     </div>
                     <div class="formgrid grid">
                        
@@ -309,7 +291,7 @@
                         </div> 
                         <div class="field col">                               
                             <p:outputLabel for="joining"> </p:outputLabel>                            
-                            <p:selectBooleanCheckbox id="joining" value="" itemLabel="Consider date of joining" />
+                            <p:selectBooleanCheckbox id="joining" value="#{leaveTypeController.selectedLeaveTypeEntity.considerDoj}" itemLabel="Consider date of joining" />
                         </div>
                     </div>
                     <div class="formgrid grid">
@@ -334,20 +316,20 @@
                     <div class="formgrid grid">
                         <div class="field col">                               
                             <p:outputLabel for="rollOver">  </p:outputLabel> 
-                            <p:selectBooleanCheckbox id="rollOver" itemLabel="Roll over / Carry forword" />
+                            <p:selectBooleanCheckbox id="rollOver" itemLabel="Roll over / Carry forword" value="#{leaveTypeController.selectedLeaveTypeEntity.carryForward}"/>
                         </div>   
                         <div class="field col">                               
                             <p:outputLabel for="reset"> </p:outputLabel> 
-                            <p:selectBooleanCheckbox id="reset" itemLabel="Reset " />
+                            <p:selectBooleanCheckbox id="reset" itemLabel="Reset " value="#{leaveTypeController.selectedLeaveTypeEntity.reset}"/>
                         </div>
                         <div class="field col">                               
                             <p:outputLabel for="encashement"></p:outputLabel> 
-                            <p:selectBooleanCheckbox id="encashement" itemLabel="Encashement" />
+                            <p:selectBooleanCheckbox id="encashement" itemLabel="Encashement" value="#{leaveTypeController.selectedLeaveTypeEntity.encashment}"/>
 
                         </div>
                         <div class="field col">                               
                             <p:outputLabel for="probationPeriod">Probation Period  </p:outputLabel> 
-                            <p:selectOneRadio id="probationPeriod" value="">
+                            <p:selectOneRadio id="probationPeriod" value="#{leaveTypeController.selectedLeaveTypeEntity.probationPeriod}">
                                     <f:selectItem itemLabel="Calender days" itemValue="calanderDays" />
                                     <f:selectItem itemLabel="Business period" itemValue="businessPeriod" />
                              </p:selectOneRadio>
@@ -357,30 +339,30 @@
                        
                         <div class="field col">                               
                             <p:outputLabel for="businessPeriod">Mention period for Calander days/ Business period </p:outputLabel> 
-                            <p:inputText id="businessPeriod"  value="#{leaveTypeController.selectedLeaveTypeEntity.maxConsecutiveDays}"/>
+                            <p:inputText id="businessPeriod"  value="#{leaveTypeController.selectedLeaveTypeEntity.businessPeriod}"/>
                         </div>   
                         <div class="field col">                               
                             <p:outputLabel for="duringProbation">Inetial value during probation period </p:outputLabel> 
-                            <p:inputText id="duringProbation"  value="#{leaveTypeController.selectedLeaveTypeEntity.holidayWeekendConsicutive}"/>
+                            <p:inputText id="duringProbation"  value="#{leaveTypeController.selectedLeaveTypeEntity.duringProbation}"/>
                         </div>
                         <div class="field col">                               
-                            <p:outputLabel for="joiningMonth">Joining month leave count less than 15 days</p:outputLabel> 
-                            <p:inputText id="joiningMonth"  value="#{leaveTypeController.selectedLeaveTypeEntity.applicationSubmitBefore}"/>
+                            <p:outputLabel for="joiningMonthLess">Joining month leave count less than 15 days</p:outputLabel> 
+                            <p:inputText id="joiningMonthLess"  value="#{leaveTypeController.selectedLeaveTypeEntity.joiningMonthLesserThan}"/>
                         </div>
                         <div class="field col">                               
                             <p:outputLabel for="joiningMonthGreater">Joining month leave count > 15 days</p:outputLabel> 
-                            <p:inputText id="joiningMonthGreater"  value="#{leaveTypeController.selectedLeaveTypeEntity.applicationSubmitBefore}"/>
+                            <p:inputText id="joiningMonthGreater"  value="#{leaveTypeController.selectedLeaveTypeEntity.joiningMonthGreaterThan}"/>
                         </div>
                     </div>        
                     <div class="formgrid grid">
                         
                         <div class="field col">                               
                             <p:outputLabel for="exceeds">For the consigutive days applied days exceeds </p:outputLabel> 
-                            <p:inputText id="exceeds"  value="#{leaveTypeController.selectedLeaveTypeEntity.maxConsecutiveDays}"/>
+                            <p:inputText id="exceeds"  value="#{leaveTypeController.selectedLeaveTypeEntity.consigutiveDaysExceeds}"/>
                         </div>   
                         <div class="field col">                               
                             <p:outputLabel for="leaveDays">Maximum number of consiguitive leave days allowed </p:outputLabel> 
-                            <p:inputText id="leaveDays"  value="#{leaveTypeController.selectedLeaveTypeEntity.holidayWeekendConsicutive}"/>
+                            <p:inputText id="leaveDays"  value="#{leaveTypeController.selectedLeaveTypeEntity.maxconsiguitiveLeaves}"/>
                         </div>
                         <div class="field col">                               
                             <p:outputLabel for="submitBefore">Leave application should be submitted before </p:outputLabel> 
@@ -388,45 +370,50 @@
                         </div>
                         <div class="field col">                               
                             <p:outputLabel for="restType">Based on reset type</p:outputLabel> 
-                            <p:selectOneMenu id="restType">
+                            <p:selectOneMenu id="restType" value="#{leaveTypeController.selectedLeaveTypeEntity.resetType}">
                                     <f:selectItem itemLabel="Select Type" itemValue="" />
                                     <f:selectItem itemLabel="Yearly" itemValue="1" />
                                     <f:selectItem itemLabel="Half yearly" itemValue="2" />
                                     <f:selectItem itemLabel="Quarterly" itemValue="3" />
                                     <f:selectItem itemLabel="Monthly" itemValue="4" />
                                 </p:selectOneMenu>
-                        </div>
-                       
+                        </div>                       
                     </div>
-                   
-                    <div class="formgrid grid">
-                       
+                    
+                    <div class="formgrid grid">   
+                        <div class="field col">                               
+                            <p:outputLabel for="resetOn">resetOn </p:outputLabel> 
+                            <p:inputNumber id="resetOn" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.resetOn}"/>
+                        </div>     
+                        <div class="field col">                               
+                            <p:outputLabel for="resetMonth">resetMonth </p:outputLabel> 
+                            <p:inputNumber id="resetMonth" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.resetMonth}"/>
+                        </div>                      
                         <div class="field col">                               
                             <p:outputLabel for="maxRollOver">Maximum roll over accumulation count </p:outputLabel> 
-                            <p:inputText id="maxRollOver"  value=""/>
+                            <p:inputText id="maxRollOver"  value="#{leaveTypeController.selectedLeaveTypeEntity.maxAccumulationCount}"/>
                         </div>  
                        
                         <div class="field col">                               
                             <p:outputLabel for="maximumEncashement">Maximum Encashement count  </p:outputLabel> 
-                            <p:inputText id="maximumEncashement"  value=""/>
-                        </div>   
-                       
+                            <p:inputText id="maximumEncashement"  value="#{leaveTypeController.selectedLeaveTypeEntity.encashmentMaxLimit}"/>
+                        </div>                          
                     </div>  
                     
                 </p:outputPanel>
             </p:outputPanel>
   
             <f:facet name="footer">
-                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveProduct}"
-                    update="manage-advanced-product-content" process="manage-advanced-product-content @this" />
+                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveLeave}"
+                update="manage-product-content,:form:messages,:form:dt-products" process="manage-advanced-product-content @this" />
                 <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageAdvancedProductDialog').hide()"
                     class="ui-button-secondary" type="button" />
             </f:facet>
         </p:dialog>
       
             <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
-                message="Delete the product?" header="Confirm" severity="warn">
-                <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteProduct}"
+                message="Delete the leaveType?" header="Confirm" severity="warn">
+                <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteLeave}"
                     process="@this" update=":form:delete-products-button"
                     oncomplete="PF('deleteProductDialog').hide()" />
                 <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
