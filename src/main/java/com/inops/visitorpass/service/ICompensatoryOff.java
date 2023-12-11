@@ -5,10 +5,15 @@ import java.util.Optional;
 
 import com.inops.visitorpass.entity.CompensatoryOff;
 import com.inops.visitorpass.entity.Division;
+import com.inops.visitorpass.entity.Holiday;
 
 public interface ICompensatoryOff {
 
 	Optional<List<CompensatoryOff>> findAll();
 
-	Optional<List<CompensatoryOff>> findAllByDivisionId(Division divisionId);
+	CompensatoryOff save(CompensatoryOff compensatoryOff);
+
+	void delete(CompensatoryOff compensatoryOff);
+
+	void deleteAll(List<CompensatoryOff> compensatoryOffs);
 }

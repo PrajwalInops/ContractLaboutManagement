@@ -39,11 +39,11 @@
             </p:commandButton>
             <p:commandButton
               id="delete-products-button"
-              value="#{leaveTypeController.deleteButtonMessage}"
+              value="#{leaveTypeController.deleteCompOffButtonMessage}"
               icon="pi pi-trash"
-              actionListener="#{leaveTypeController.deleteSelectedProducts}"
+              actionListener="#{leaveTypeController.deleteCompOffs}"
               styleClass="ui-button-danger"
-              disabled="#{!leaveTypeController.hasSelectedProducts()}"
+              disabled="#{!leaveTypeController.hasSelectedCompOffs()}"
               update="@this"
             >
               <p:confirm
@@ -152,18 +152,18 @@
           </p:column>
 
           <p:column headerText="Expires In" sortBy="#{product.expiresIn}">
-            <h:outputText value="#{holiday.expiresIn}" />
+            <h:outputText value="#{product.expiresIn}" />
           </p:column>
 
           <p:column headerText="Units Allowed" sortBy="#{product.unitsAllowed}">
-            <h:outputText value="#{holiday.unitsAllowed}" />
+            <h:outputText value="#{product.unitsAllowed}" />
           </p:column>
 
           <p:column
             headerText="Duration Allowed"
             sortBy="#{product.durationAllowed}"
           >
-            <h:outputText value="#{holiday.durationAllowed}" />
+            <h:outputText value="#{product.durationAllowed}" />
           </p:column>
 
           <p:column exportable="false">
@@ -285,7 +285,7 @@
                 
                 <p:selectManyCheckbox
                   id="durationAllowed"
-                  value="#{leaveTypeController.selectedCompensatoryOff.durationAllowed}"
+                  value="#{leaveTypeController.durationAllowed}"
                   widgetVar="blub"
                 >                  
                   <f:selectItem itemLabel="Full Day" itemValue="Full Day" />
@@ -302,8 +302,8 @@
           <p:commandButton
             value="Save"
             icon="pi pi-check"
-            actionListener="#{leaveTypeController.saveProduct}"
-            update="manage-product-content"
+            actionListener="#{leaveTypeController.saveCompOff}"
+            update="manage-product-content,:form:messages,:form:dt-products"
             process="manage-product-content @this"
           />
           <p:commandButton
@@ -320,14 +320,14 @@
         widgetVar="deleteProductDialog"
         showEffect="fade"
         width="300"
-        message="Delete the product?"
+        message="Delete the CompOff?"
         header="Confirm"
         severity="warn"
       >
         <p:commandButton
           value="Yes"
           icon="pi pi-check"
-          actionListener="#{leaveTypeController.deleteProduct}"
+          actionListener="#{leaveTypeController.deleteCompOff}"
           process="@this"
           update=":form:delete-products-button"
           oncomplete="PF('deleteProductDialog').hide()"

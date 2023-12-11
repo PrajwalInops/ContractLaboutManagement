@@ -2,17 +2,22 @@ package com.inops.visitorpass.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
@@ -34,9 +39,11 @@ public class LeaveTypeEntity implements Serializable {
 	private String leaveType;
 	private String leaveUnits;
 	private String leaveDescription;
-	private long entitlementRoleId;
-	private long divisionId;
-	private String employeeId;
+	
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	@JoinTable(name = "Leave_Type_Entitlements", joinColumns = @JoinColumn(name = "Leave_Type_Id"), inverseJoinColumns = @JoinColumn(name = "entitlement_Role_Id"))
+	private List<RoleEntitlement> entitlementRoles;
+	
 	private String applicableGender;
 	private String applicableMaritalStatus;
 	private String leaveBalanceBasedOn;
@@ -70,8 +77,8 @@ public class LeaveTypeEntity implements Serializable {
 	private int applicationSubmitBefore;
 
 	private String resetType;
-	private String resetOn;
-	private String resetMonth;
+	private int resetOn;
+	private int resetMonth;
 
 	private int maxAccumulationCount;
 	private int encashmentMaxLimit;
@@ -98,18 +105,6 @@ public class LeaveTypeEntity implements Serializable {
 
 	public void setLeaveDescription(String leaveDescription) {
 		this.leaveDescription = leaveDescription;
-	}
-
-	public void setEntitlementRoleId(long entitlementRoleId) {
-		this.entitlementRoleId = entitlementRoleId;
-	}
-
-	public void setDivisionId(long divisionId) {
-		this.divisionId = divisionId;
-	}
-
-	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
 	}
 
 	public void setApplicableGender(String applicableGender) {
@@ -224,14 +219,7 @@ public class LeaveTypeEntity implements Serializable {
 		this.resetType = resetType;
 	}
 
-	public void setResetOn(String resetOn) {
-		this.resetOn = resetOn;
-	}
-
-	public void setResetMonth(String resetMonth) {
-		this.resetMonth = resetMonth;
-	}
-
+	
 	public void setMaxAccumulationCount(int maxAccumulationCount) {
 		this.maxAccumulationCount = maxAccumulationCount;
 	}
@@ -242,6 +230,18 @@ public class LeaveTypeEntity implements Serializable {
 
 	public void setProbationPeriod(String probationPeriod) {
 		this.probationPeriod = probationPeriod;
+	}
+
+	public void setEntitlementRoles(List<RoleEntitlement> entitlementRoles) {
+		this.entitlementRoles = entitlementRoles;
+	}
+
+	public void setResetOn(int resetOn) {
+		this.resetOn = resetOn;
+	}
+
+	public void setResetMonth(int resetMonth) {
+		this.resetMonth = resetMonth;
 	}
 
 }

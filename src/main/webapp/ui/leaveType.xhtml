@@ -128,15 +128,15 @@
                         
                         <div class="field">
                             <p:outputLabel for="leaveName">Name :</p:outputLabel>                            
-                            <p:inputText id="leaveName" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveName}" />
+                            <p:inputText id="leaveName" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveName}" required="true"/>
                         </div>
                         <div class="field">
                             <p:outputLabel for="leaveCode" value="Code :" />
-                            <p:inputText id="leaveCode" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveCode}" />
+                            <p:inputText id="leaveCode" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveCode}" required="true"/>
                         </div>
                         <div class="field">
                             <p:outputLabel for="leaveType" value="Type :" />
-                            <p:selectOneMenu id="leaveType" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveType}">
+                            <p:selectOneMenu id="leaveType" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveType}" required="true">
                                 <f:selectItem itemLabel="Select Type" itemValue="" />
                                 <f:selectItem itemLabel="Paid" itemValue="1" />
                                 <f:selectItem itemLabel="un-paid" itemValue="2" />
@@ -145,7 +145,7 @@
                         </div>
                         <div class="field">
                             <p:outputLabel for="leaveUnit" value="Leave Unit :" />
-                                <p:selectOneRadio id="leaveUnit" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveUnits}">
+                                <p:selectOneRadio id="leaveUnit" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveUnits}" required="true">
                                     <f:selectItem itemLabel="Days" itemValue="1" />
                                     <f:selectItem itemLabel="Hours" itemValue="2" />
                                 </p:selectOneRadio>
@@ -153,43 +153,27 @@
                         </div>
                         <div class="field">
                             <p:outputLabel for="description" value="Description :" />
-                            <p:inputTextarea id="description" rows="3" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveDescription}"/>
+                            <p:inputTextarea id="description" rows="3" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveDescription}" required="true"/>
                          
                         </div>    
                                    
                         <div class="formgrid grid">
                             <div class="field col">
-                                <p:outputLabel for="location">For Division:</p:outputLabel>
-                                <p:selectOneMenu value="#{leaveTypeController.selectedLeaveTypeEntity.divisionId}" id="location"
-                                    autoWidth="false" filter="true" filterMatchMode="startsWith">
-                                    <f:selectItem itemLabel="" itemValue="" />
-                                    <f:selectItems value="#{leaveTypeController.divisions}" var="player"
-                                        itemLabel="#{player.divisionName}" itemValue="#{player.divisionId}" />
-                                </p:selectOneMenu>
-                            </div>
-
-                            <div class="field col">
                                 <p:outputLabel for="role">For Role:</p:outputLabel>
-                                <p:selectOneMenu value="#{leaveTypeController.selectedLeaveTypeEntity.entitlementRoleId}" id="role"
-                                autoWidth="false" filter="true" filterMatchMode="startsWith">
-                                <f:selectItem itemLabel="" itemValue="" />
-                                <f:selectItems value="#{leaveTypeController.dbRoleEntitlements}" var="player"
-                                    itemLabel="#{player.entitlementName}" itemValue="#{player.entitlementRoleId}" />
-                            </p:selectOneMenu>
+                                
+                            <p:selectCheckboxMenu value="#{leaveTypeController.selectedRoleEntitlements}" id="role"  required="true"
+                                    autoWidth="false"   filter="true" filterMatchMode="startsWith"  
+                                    label="RoleEntitlements" multiple="true" emptyLabel="Please select..." updateLabel="true"
+                                    style="min-width: 15rem" panelStyle="width: 30rem" scrollHeight="250">
+                                
+                                    <f:selectItems value="#{leaveTypeController.dbRoleEntitlements}" var="player"
+                                        itemLabel="#{player.entitlementName}" itemValue="#{player.entitlementRoleId}" />                         
+                            </p:selectCheckboxMenu>    
                             </div>
-                            
-                            <div class="field col">
-                              <p:outputLabel for="employee">For Employee </p:outputLabel>
-                              <p:selectOneMenu value="#{leaveTypeController.selectedLeaveTypeEntity.employeeId}" id="employee"
-                              autoWidth="false" filter="true" filterMatchMode="startsWith">
-                              <f:selectItem itemLabel="" itemValue="" />
-                              <f:selectItems value="#{visitorController.employees}" var="player"
-                                  itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}" />
-                          </p:selectOneMenu>
-                          </div>
+                          
                             <div class="field col">
                                 <p:outputLabel for="gender">Gender </p:outputLabel>                        
-                                <p:selectOneRadio id="gender" value="#{leaveTypeController.selectedLeaveTypeEntity.applicableGender}">
+                                <p:selectOneRadio id="gender" value="#{leaveTypeController.selectedLeaveTypeEntity.applicableGender}" required="true">
                                     <f:selectItem itemLabel="All" itemValue="All" />
                                     <f:selectItem itemLabel="Male" itemValue="Male" />
                                     <f:selectItem itemLabel="Female" itemValue="Female" />
@@ -197,19 +181,26 @@
                             </div>
                             <div class="field col">
                                 <p:outputLabel for="marital">Marital Status </p:outputLabel>                        
-                                <p:selectOneRadio id="marital" value="#{leaveTypeController.selectedLeaveTypeEntity.applicableMaritalStatus}">
+                                <p:selectOneRadio id="marital" value="#{leaveTypeController.selectedLeaveTypeEntity.applicableMaritalStatus}" required="true">
                                     <f:selectItem itemLabel="All" itemValue="All" />
                                     <f:selectItem itemLabel="Married" itemValue="Married" />
                                     <f:selectItem itemLabel="Un-Married" itemValue="Un-Married" />
                                 </p:selectOneRadio>
 
                             </div>
+                            <div class="field col">
+                                <p:outputLabel for="for">For </p:outputLabel>
+                                <p:selectOneRadio id="for" value="#{leaveTypeController.selectedLeaveTypeEntity.applicableFor}" required="true">
+                                    <f:selectItem itemLabel="All" itemValue="All" />
+                                    <f:selectItem itemLabel="Experienced based" itemValue="Experienced based" />
+                                </p:selectOneRadio>
+                            </div>
                         </div>
 
                         <div class="formgrid grid">
                             <div class="field col">
                                 <p:outputLabel for="period">Period </p:outputLabel>
-                                <p:selectOneMenu id="period" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveBalanceBasedOn}">
+                                <p:selectOneMenu id="period" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveBalanceBasedOn}" required="true">
                                     <f:selectItem itemLabel="Select Type" itemValue="" />
                                     <f:selectItem itemLabel="Beginning Of Accrual Period" itemValue="1" />
                                     <f:selectItem itemLabel="End Of Accrual Period" itemValue="2" />
@@ -217,24 +208,18 @@
                                     <f:selectItem itemLabel="Annual Period" itemValue="4" />
                                 </p:selectOneMenu>
                             </div>
-                            <div class="field col">
-                                <p:outputLabel for="for">For </p:outputLabel>
-                                <p:selectOneRadio id="for" value="#{leaveTypeController.selectedLeaveTypeEntity.applicableFor}">
-                                    <f:selectItem itemLabel="All" itemValue="All" />
-                                    <f:selectItem itemLabel="Experienced based" itemValue="Experienced based" />
-                                </p:selectOneRadio>
-                            </div>
+                           
                             <div class="field col">
                               <p:outputLabel for="count">Leave Count </p:outputLabel>
-                              <p:inputNumber id="count" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveCount}"/>
+                              <p:inputNumber id="count" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveCount}" required="true"/>
                           </div>
                             <div class="field col">
                                 <p:outputLabel for="newJoinee">For New Joinee </p:outputLabel>                        
-                                <p:inputNumber id="newJoinee" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.newJoinee}"/>
+                                <p:inputNumber id="newJoinee" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.newJoinee}" required="true"/>
                             </div>
                             <div class="field col">
                                 <p:outputLabel for="afterSixMonths">After six months </p:outputLabel>                        
-                                <p:inputNumber id="afterSixMonths" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.afterSixMonths}"/>
+                                <p:inputNumber id="afterSixMonths" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.afterSixMonths}" required="true"/>
                             </div>
                         </div>                       
                     </p:outputPanel>

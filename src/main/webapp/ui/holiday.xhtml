@@ -31,10 +31,10 @@
                   styleClass="ui-button-success" style="margin-right: .5rem">
                   <p:resetInput target=":dialogs:manage-product-content" />
               </p:commandButton>
-              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteButtonMessage}"
-                  icon="pi pi-trash" actionListener="#{leaveTypeController.deleteSelectedProducts}"
-                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedProducts()}" update="@this">
-                  <p:confirm header="Confirmation" message="Delete the selected products?"
+              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteHolidayButtonMessage}"
+                  icon="pi pi-trash" actionListener="#{leaveTypeController.deleteHolidays}"
+                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedHolidays()}" update="@this">
+                  <p:confirm header="Confirmation" message="Delete the selected holidays?"
                       icon="pi pi-exclamation-triangle" />
               </p:commandButton>
           </p:toolbarGroup>
@@ -48,7 +48,7 @@
 
       <p:dataTable id="dt-products" widgetVar="dtProducts" var="product" value="#{leaveTypeController.holidays}"
           reflow="true" styleClass="products-table" selection="#{leaveTypeController.selectedHolidays}"
-          rowKey="#{product.id}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+          rowKey="#{product.holidayId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
           <f:facet name="header">
               <div class="products-table-header">
                   <span style="font-weight: bold">Holiday</span>
@@ -66,8 +66,8 @@
 
           <p:column selectionMode="multiple" exportable="false"></p:column>
 
-          <p:column headerText="Code" sortBy="#{product.id}" filterBy="#{product.id}">
-              <h:outputText value="#{product.id}" />
+          <p:column headerText="Code" sortBy="#{product.holidayId}" filterBy="#{product.holidayId}">
+              <h:outputText value="#{product.holidayId}" />
           </p:column>
           <p:column headerText="Name" sortBy="#{product.holidayName}" filterBy="#{product.holidayName}">
               <h:outputText value="#{product.holidayName}" />
@@ -88,7 +88,7 @@
           </p:column>
 
           <p:column headerText="Reminder Before" sortBy="#{product.reminderBefore}">
-            <h:outputText value="#{holiday.reminderBefore}" />
+            <h:outputText value="#{product.reminderBefore}" />
           </p:column>
          
           <p:column exportable="false">
@@ -128,6 +128,17 @@
                       <p:datePicker id="holidayOn" value="#{leaveTypeController.selectedHoliday.holidayDate}" />
                      
                   </div>
+                <div class="field">
+                    <p:outputLabel for="division">Division</p:outputLabel>                   
+                    <p:selectCheckboxMenu value="#{leaveTypeController.selectedDivisions}" id="division"  
+                        autoWidth="false"   filter="true" filterMatchMode="startsWith"  
+                        label="Divisions" multiple="true" emptyLabel="Please select..." updateLabel="true"
+                        style="min-width: 15rem" panelStyle="width: 30rem" scrollHeight="250">
+                       
+                        <f:selectItems value="#{leaveTypeController.divisions}" var="player"
+                            itemLabel="#{player.divisionName}" itemValue="#{player.divisionId}" />                         
+                </p:selectCheckboxMenu>                   
+                </div>
                   <div class="formgrid grid">
                       <div class="field col">
                           <p:outputLabel for="year">Holiday Year</p:outputLabel>
@@ -135,7 +146,7 @@
                               />
                       </div>
                       <div class="field col">
-                        <p:outputLabel for="reminder">Reminder Before Year</p:outputLabel>
+                        <p:outputLabel for="reminder">Reminder Before in days</p:outputLabel>
                         <p:inputText id="reminder" value="#{leaveTypeController.selectedHoliday.reminderBefore}" 
                             />
                     </div>
@@ -152,16 +163,16 @@
           </p:outputPanel>
 
           <f:facet name="footer">
-              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveProduct}"
-                  update="manage-product-content" process="manage-product-content @this" />
+              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveHoliday}"
+                  update="manage-product-content,:form:messages" process="manage-product-content @this" />
               <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
                   class="ui-button-secondary" type="button" />
           </f:facet>
       </p:dialog>
 
       <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
-          message="Delete the product?" header="Confirm" severity="warn">
-          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteProduct}"
+          message="Delete the holiday?" header="Confirm" severity="warn">
+          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteHoliday}"
               process="@this" update=":form:delete-products-button"
               oncomplete="PF('deleteProductDialog').hide()" />
           <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"

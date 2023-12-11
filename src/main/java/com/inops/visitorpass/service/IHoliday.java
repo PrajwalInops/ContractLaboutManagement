@@ -11,4 +11,10 @@ public interface IHoliday {
 	Optional<List<Holiday>> findAll();
 	
 	Optional<List<Holiday>> findAllByDivisionId(Division divisionId);
+	
+	Holiday save(Holiday holiday);
+
+	void delete(Holiday holiday);
+
+	void deleteAll(List<Holiday> holidays);
 }

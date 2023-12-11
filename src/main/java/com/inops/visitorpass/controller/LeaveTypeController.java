@@ -1,9 +1,12 @@
 package com.inops.visitorpass.controller;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -67,7 +70,10 @@ public class LeaveTypeController {
 	private final IDivision division;
 
 	private List<Employee> employees;
+	private List<Long> selectedEmployees;
+
 	private List<Division> divisions;
+	private Set<Long> selectedDivisions;
 	private Division divisionObj;
 
 	private LeaveTransactions selectedLeaveTransaction;
@@ -100,6 +106,9 @@ public class LeaveTypeController {
 	private List<CompensatoryOffScheduler> compensatoryOffSchedulers;
 
 	private List<RoleEntitlement> dbRoleEntitlements;
+	private List<Long> selectedRoleEntitlements;
+
+	private String[] durationAllowed;
 
 	@PostConstruct
 	public void init() {
@@ -116,6 +125,14 @@ public class LeaveTypeController {
 		dbRoleEntitlements = entitlementService.findAll().get();
 	}
 
+	public void openNew() {
+		this.selectedHoliday = new Holiday();
+		this.selectedLeaveTransaction = new LeaveTransactions();
+		this.selectedLeaveTypeEntity = new LeaveTypeEntity();
+		this.selectedCompensatoryOff = new CompensatoryOff();
+		this.selectedCompensatoryOffScheduler = new CompensatoryOffScheduler();
+	}
+
 	public void leaveDetails() {
 		this.selectedLeaveTypeEntity = leaveTypes.stream().filter(leave -> leave.getLeaveTypeId() == leaveTypeId)
 				.findAny().orElse(null);
@@ -123,11 +140,18 @@ public class LeaveTypeController {
 
 	public void saveLeave() {
 		try {
+			if (!selectedRoleEntitlements.isEmpty()) {
+				selectedLeaveTypeEntity.setEntitlementRoles(dbRoleEntitlements.stream()
+						.filter(ent -> selectedRoleEntitlements.contains(ent.getEntitlementRoleId()))
+						.collect(Collectors.toList()));
+			}
 			if (this.selectedLeaveTypeEntity.getLeaveTypeId() == 0l) {
+
 				leaveTypeService.create(selectedLeaveTypeEntity);
 				leaveTypes.add(selectedLeaveTypeEntity);
 				FacesContext.getCurrentInstance().addMessage(null,
 						new FacesMessage("Leave " + selectedLeaveTypeEntity.getLeaveName() + " created successfully"));
+
 			} else {
 				leaveTypeService.create(selectedLeaveTypeEntity);
 				FacesContext.getCurrentInstance().addMessage(null,
@@ -141,7 +165,7 @@ public class LeaveTypeController {
 			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", e.getMessage());
 		}
 	}
-	
+
 	public void deleteLeave() {
 
 		leaveTypeService.delete(selectedLeaveTypeEntity);
@@ -176,27 +200,110 @@ public class LeaveTypeController {
 		return this.selectedLeaveTypeEntitys != null && !this.selectedLeaveTypeEntitys.isEmpty();
 	}
 
-	public void onTabChange(TabChangeEvent event) {
-		FacesMessage msg = new FacesMessage("Tab Changed", "Active Tab: " + event.getTab().getTitle());
-		FacesContext.getCurrentInstance().addMessage(null, msg);
-	}
-
-	public void onTabClose(TabCloseEvent event) {
-		FacesMessage msg = new FacesMessage("Tab Closed", "Closed tab: " + event.getTab().getTitle());
-		FacesContext.getCurrentInstance().addMessage(null, msg);
-	}
-
 	public void saveHoliday() {
+		try {
 
+			selectedHoliday.setDivisions(divisions.stream()
+					.filter(div -> selectedDivisions.contains(div.getDivisionId())).collect(Collectors.toList()));
+			holidayService.save(selectedHoliday);
+			holidays.add(selectedHoliday);
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Holiday " + selectedHoliday.getHolidayName() + " created successfully"));
+
+			PrimeFaces.current().executeScript("PF('manageProductDialog').hide()");
+			PrimeFaces.current().ajax().update("leaveNameAdvanced", "manage-product-content", ":form:messages",
+					":form:dt-products");
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", e.getMessage());
+		}
 	}
 
-	public void deleteHoliday(Holiday holiday) {
+	public void deleteHoliday() {
+
+		holidayService.delete(selectedHoliday);
+		this.holidays.remove(this.selectedHoliday);
+		if (this.selectedHolidays != null) {
+			this.selectedHolidays.remove(this.selectedHoliday);
+		}
+		this.selectedHoliday = null;
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "Holiday deleted successfully");
+	}
+
+	public void deleteHolidays() {
+		holidayService.deleteAll(this.selectedHolidays);
+		this.holidays.removeAll(this.selectedHolidays);
+		this.selectedHolidays = null;
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "holidays deleted successfully");
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		PrimeFaces.current().executeScript("PF('dtProducts').clearFilters()");
+	}
+
+	public String getDeleteHolidayButtonMessage() {
+		if (hasSelectedHolidays()) {
+			int size = this.selectedHolidays.size();
+			return size > 1 ? size + " holidays selected" : "1 holiday selected";
+		}
+
+		return "Delete";
+	}
+
+	public boolean hasSelectedHolidays() {
+		return this.selectedHolidays != null && !this.selectedHolidays.isEmpty();
 	}
 
 	public void saveCompOff() {
+		try {
+			if (durationAllowed.length > 0) {
+				selectedCompensatoryOff.setDurationAllowed(String.join(",", durationAllowed));
+			}
+			if (this.selectedCompensatoryOff.getId() == 0l) {
+				compensatoryOffService.save(selectedCompensatoryOff);
+				this.compensatoryOffs.add(selectedCompensatoryOff);
+			} else {
+				compensatoryOffService.save(selectedCompensatoryOff);
+			}
+			addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "CompOff Added successfully");
+
+			PrimeFaces.current().executeScript("PF('manageProductDialog').hide()");
+			PrimeFaces.current().ajax().update("manage-product-content", "form:messages", "form:dt-products");
+
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", e.getMessage());
+		}
 	}
 
-	public void deleteCompOff(CompensatoryOff compOff) {
+	public void deleteCompOff() {
+
+		compensatoryOffService.delete(selectedCompensatoryOff);
+		this.compensatoryOffs.remove(this.selectedCompensatoryOff);
+		if (this.selectedCompensatoryOffs != null) {
+			this.selectedCompensatoryOffs.remove(this.selectedCompensatoryOff);
+		}
+		this.selectedCompensatoryOff = null;
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "CompOff deleted successfully");
+	}
+
+	public void deleteCompOffs() {
+		compensatoryOffService.deleteAll(this.selectedCompensatoryOffs);
+		this.compensatoryOffs.removeAll(this.selectedCompensatoryOffs);
+		this.selectedCompensatoryOffs = null;
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "CompOffs deleted successfully");
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		PrimeFaces.current().executeScript("PF('dtProducts').clearFilters()");
+	}
+
+	public String getDeleteCompOffButtonMessage() {
+		if (hasSelectedCompOffs()) {
+			int size = this.selectedCompensatoryOffs.size();
+			return size > 1 ? size + " compOffs selected" : "1 compOff selected";
+		}
+		return "Delete";
+	}
+
+	public boolean hasSelectedCompOffs() {
+		return this.selectedCompensatoryOffs != null && !this.selectedCompensatoryOffs.isEmpty();
 	}
 
 	public void saveCompOffScheduler() {
@@ -257,16 +364,8 @@ public class LeaveTypeController {
 		return this.selectedCompensatoryOffSchedulers != null && !this.selectedCompensatoryOffSchedulers.isEmpty();
 	}
 
-	public void openNew() {
-		this.selectedHoliday = new Holiday();
-		this.selectedLeaveTransaction = new LeaveTransactions();
-		this.selectedLeaveTypeEntity = new LeaveTypeEntity();
-		this.selectedCompensatoryOff = new CompensatoryOff();
-		this.selectedCompensatoryOffScheduler = new CompensatoryOffScheduler();
-	}
-
 	public void saveProduct() {
-		if (this.selectedHoliday.getId() == null) {
+		if (this.selectedHoliday.getHolidayId() == 0l) {
 			// this.selectedHoliday.setCode(UUID.randomUUID().toString().replaceAll("-",
 			// "").substring(0, 9));
 			// this.products.add(this.selectedProduct);
@@ -323,6 +422,16 @@ public class LeaveTypeController {
 		Map<String, Object> options = new HashMap<String, Object>();
 		options.put("modal", true);
 		PrimeFaces.current().dialog().openDynamic("level1", options, null);
+	}
+
+	public void onTabChange(TabChangeEvent event) {
+		FacesMessage msg = new FacesMessage("Tab Changed", "Active Tab: " + event.getTab().getTitle());
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
+
+	public void onTabClose(TabCloseEvent event) {
+		FacesMessage msg = new FacesMessage("Tab Closed", "Closed tab: " + event.getTab().getTitle());
+		FacesContext.getCurrentInstance().addMessage(null, msg);
 	}
 
 	public void onReturnFromLevel1(SelectEvent event) {

@@ -28,11 +28,11 @@ public class Division {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long divisionId;
-	
+
 	private String divisionName;
 
-	@OneToMany(mappedBy = "division", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private Set<Cards> cards;
+	@OneToMany(mappedBy = "division", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	private Set<Cards> cards;	
 
 	public void setDivisionId(long divisionId) {
 		this.divisionId = divisionId;
@@ -46,5 +46,4 @@ public class Division {
 		this.cards = cards;
 	}
 
-	
 }

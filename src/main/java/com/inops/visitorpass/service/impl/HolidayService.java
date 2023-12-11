@@ -24,8 +24,24 @@ public class HolidayService implements IHoliday {
 	}
 
 	@Override
-	public Optional<List<Holiday>> findAllByDivisionId(Division division) {
-		return holidayRepository.findAllByDivision(division);
+	public Optional<List<Holiday>> findAllByDivisionId(Division division) { 
+		return null;//holidayRepository.findAllByDivision(division);
+	}
+
+	@Override
+	public Holiday save(Holiday holiday) {
+
+		return holidayRepository.save(holiday);
+	}
+
+	@Override
+	public void delete(Holiday holiday) {
+		holidayRepository.delete(holiday);
+	}
+
+	@Override
+	public void deleteAll(List<Holiday> holidays) {
+		holidayRepository.deleteAll(holidays);
 	}
 
 }
