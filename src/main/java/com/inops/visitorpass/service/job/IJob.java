@@ -1,5 +1,6 @@
 package com.inops.visitorpass.service.job;
 
-public class LeaveJob {
-
+interface IJob {
+	
+	public void execute();
 }

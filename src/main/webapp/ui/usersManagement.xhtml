@@ -85,6 +85,10 @@
             <h:outputText value="#{product.roleEntitlement.entitlementName}" />              
           </p:column>
 
+          <p:column headerText="entitlement" sortBy="#{product.roleEntitlement.entitlementName}">
+            <h:outputText value="#{product.roleEntitlement.entitlementName}" />              
+          </p:column>
+
           <p:column headerText="EmployeeId" sortBy="#{product.employee.employeeId}">
             <h:outputText value="#{product.employee.employeeId}" />
           </p:column>
@@ -153,6 +157,16 @@
                             <f:selectItems value="#{userController.dbRoleEntitlements}" var="player"
                                 itemLabel="#{player.entitlementName}" itemValue="#{player.entitlementRoleId}" />                          
                          </p:selectOneMenu>
+                    </div>       
+                    <div class="field col">
+                        <p:outputLabel for="role">Role</p:outputLabel>                        
+                         <p:selectOneMenu id="role" value="#{userController.roleName}">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItem itemLabel="Super_Admin" itemValue="Super_Admin"/>
+                            <f:selectItem itemLabel="Admin" itemValue="Admin"/>
+                            <f:selectItem itemLabel="Super_User" itemValue="Super_User"/>
+                            <f:selectItem itemLabel="User" itemValue="User"/>                           
+                        </p:selectOneMenu>
                     </div>                      
                   </div>
               </p:outputPanel>

@@ -27,6 +27,7 @@ import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.MenuItemEntity;
 import com.inops.visitorpass.entity.RoleEntitlement;
 import com.inops.visitorpass.entity.User;
+import com.inops.visitorpass.model.Role;
 import com.inops.visitorpass.service.IEntitlement;
 import com.inops.visitorpass.service.IMenuCategory;
 import com.inops.visitorpass.service.IUserService;
@@ -71,7 +72,8 @@ public class UserController {
 
 	private List<Employee> employees;
 	private String employeeId;
-	private long entitlementId;
+	private long entitlementId;	
+	private String roleName;
 
 	@PostConstruct
 	public void init() {
@@ -195,7 +197,7 @@ public class UserController {
 
 	public void saveUser() {
 		try {			
-			
+			selectedUser.setRole(Role.findByValue(roleName));
 			if (this.selectedUser.getId() == null) {
 				selectedUser.setEmployee(employees.stream().filter(emp -> emp.getEmployeeId().equals(employeeId)).findAny()
 						.orElse(null));

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
@@ -64,12 +66,15 @@ public class VisitorConfig {
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
 	}
-	
-	 @Bean
-	    public ThreadPoolTaskScheduler taskScheduler() {
-	        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-	        scheduler.setPoolSize(5); // Set the thread pool size
-	        scheduler.setThreadNamePrefix("TaskScheduler-");
-	        return scheduler;
-	    }
+
+	@Bean
+	@Scope("prototype")
+	public TaskScheduler taskScheduler() {
+		ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+		taskScheduler.setPoolSize(5); // Set your desired pool size
+		taskScheduler.setThreadNamePrefix("MyScheduler-");
+		taskScheduler.initialize();
+		return taskScheduler;
+	}
+
 }

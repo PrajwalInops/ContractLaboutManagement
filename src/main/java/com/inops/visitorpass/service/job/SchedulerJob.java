@@ -1,31 +1,34 @@
 package com.inops.visitorpass.service.job;
 
-import java.util.Date;
+import java.util.concurrent.ScheduledFuture;
 
-import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
-import com.inops.visitorpass.service.ITaskScheduler;
-
-import lombok.RequiredArgsConstructor;
-
-@Service("schedulerJob")
-@RequiredArgsConstructor
+//@Component
 public class SchedulerJob {
 
-	private final ITaskScheduler taskSchedulerService;
+	private String cronExpression;
+		
+	private ScheduledFuture<?> scheduledFuture;
+
+	@Scheduled(cron = "#{schedulerJob.cronExpression}") // Execute every 10 seconds
+	public void runTask() {
+
+		// Your task logic here
+		System.out.println("My Task is running...");
+
+	}
 	
-	 //@Scheduled(fixedRate = 10000) // Execute every 10 seconds
-	    public void runTask() {
-	        if (taskSchedulerService.isTaskRunning("myTask")) {
-	            // Task is already running, do not start a new instance
-	            return;
-	        }
+	public void changeSchedule(String newCronExpression) {
+        if (scheduledFuture != null) {
+            scheduledFuture.cancel(true);
+        }
+	}
 
-	        Runnable task = () -> {
-	            // Your task logic here
-	            System.out.println("My Task is running...");
-	        };
-
-	        taskSchedulerService.startTask("myTask", task, new Date(), 5000); // Start the task with a 5-second delay
-	    }
+	public void setCronExpression(String cronExpression) {
+		this.cronExpression = cronExpression;
+	}
+	
+	
 }
