@@ -39,7 +39,7 @@
           </p:toolbarGroup>
       </p:toolbar>
     
-      <p:schedule id="scheduler" value="#{punchController.eventModel}" widgetVar="myschedule"
+      <p:schedule id="scheduler" value="#{punchController.eventModel}" widgetVar="myschedule" showWeekends="true" selectable="true"
                   timeZone="#{punchController.serverTimeZone}" clientTimeZone="#{punchController.serverTimeZone}">
             <p:ajax event="dateSelect" listener="#{punchController.onDateSelect}" update="eventDetails"
                   oncomplete="PF('eventDialog').show();"/>

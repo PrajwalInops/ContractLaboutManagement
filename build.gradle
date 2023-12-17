@@ -62,6 +62,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/javax.el/el-api
 	implementation 'javax.el:el-api:2.2'
 	implementation 'org.glassfish.web:el-impl:2.2'
+	implementation 'org.overviewproject:mime-types:2.0.0'
 	
 	implementation 'org.glassfish:jakarta.faces:2.3.18'
 	

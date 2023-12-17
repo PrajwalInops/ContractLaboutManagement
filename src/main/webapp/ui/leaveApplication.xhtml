@@ -25,30 +25,33 @@
       <div class="card crud-demo">
         <h5>Leave Applications</h5>
         <p:toolbar>
-          <p:toolbarGroup>
-              <p:commandButton value="New" icon="pi pi-plus" actionListener="#{leaveTypeController.openNew}"
-                  update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
-                  styleClass="ui-button-success" style="margin-right: .5rem">
-                  <p:resetInput target=":dialogs:manage-product-content" />
-              </p:commandButton>
+          <p:toolbarGroup>  
+            <p:commandButton value="New" icon="pi pi-plus" actionListener="#{leaveTypeController.openNew}"
+                update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                styleClass="ui-button-success" style="margin-right: .5rem">
+                <p:resetInput target=":dialogs:manage-product-content" />
+           </p:commandButton>           
               <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteButtonMessage}"
-                  icon="pi pi-trash" actionListener="#{leaveTypeController.deleteSelectedProducts}"
-                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedProducts()}" update="@this">
-                  <p:confirm header="Confirmation" message="Delete the selected products?"
+                  icon="pi pi-trash" actionListener="#{leaveTypeController.deleteLeaveApplications}"
+                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedLeaveApplication()}" update="@this">
+                  <p:confirm header="Confirmation" message="Delete the selected LeaveApplication?"
                       icon="pi pi-exclamation-triangle" />
               </p:commandButton>
           </p:toolbarGroup>
           <p:toolbarGroup align="right">
-              <p:fileUpload mode="simple" skinSimple="true" label="Import" chooseIcon="pi pi-download" />
+            <p:fileUpload id="upload" value="#{leaveTypeController.file}"
+                              mode="simple" skinSimple="true" auto="true"
+                              process="@this" update="messages"
+                              listener="#{leaveTypeController.handleFileUpload}" />
               <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
                   <p:dataExporter type="pdf" target="dt-products" fileName="products" />
               </p:commandButton>
           </p:toolbarGroup>
       </p:toolbar>
 
-      <p:dataTable id="dt-products" widgetVar="dtProducts" var="product" value="#{leaveTypeController.leaveTransactions}"
-          reflow="true" styleClass="products-table" selection="#{leaveTypeController.selectedLeaveTransactions}"
-          rowKey="#{product.leaveTransactionId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+      <p:dataTable id="dt-products" widgetVar="dtProducts" var="product" value="#{leaveTypeController.leaveApplications}"
+          reflow="true" styleClass="products-table" selection="#{leaveTypeController.selectedLeaveApplications}"
+          rowKey="#{product.applicationId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
           <f:facet name="header">
               <div class="products-table-header">
                   <span style="font-weight: bold">Leave Applications view</span>
@@ -66,37 +69,28 @@
 
           <p:column selectionMode="multiple" exportable="false"></p:column>
           
-          <p:column headerText="Employee Name" sortBy="#{product.leaveTransactionId.employeeId}" filterBy="#{product.leaveTransactionId.employeeId}">
-              <h:outputText value="#{product.leaveTransactionId.employeeId}" />
+          <p:column headerText="EmployeeId" sortBy="#{product.employeeId}" filterBy="#{product.employeeId}">
+              <h:outputText value="#{product.employeeId}" />
           </p:column>
          
-          <p:column headerText="Leave Name" sortBy="#{product.leaveTypeId}">
-            <h:outputText value="#{product.leaveTypeId}" >
+          <p:column headerText="From Date" sortBy="#{product.fromDate}">
+            <h:outputText value="#{product.fromDate}" >
+              <f:convertDateTime pattern="dd-MMM-YYYY" />
             </h:outputText>     
           </p:column>
 
-          <p:column headerText="From Halfday flag" sortBy="#{product.leaveTransactionId.fromHalfDayFlag}" filterBy="#{product.leaveTransactionId.fromHalfDayFlag}">
-              <h:outputText value="#{product.leaveTransactionId.fromHalfDayFlag}" />
+          <p:column headerText="TO Date" sortBy="#{product.toDate}">
+            <h:outputText value="#{product.fromDate}" >
+              <f:convertDateTime pattern="dd-MMM-YYYY" />
+            </h:outputText>     
+          </p:column>
+          
+          <p:column headerText="Comments " sortBy="#{product.comments}">
+            <h:outputText value="#{product.comments}" />              
           </p:column>
 
-          <p:column headerText="TO Halfday flag" sortBy="#{product.toHalfDayFlag}" filterBy="#{product.toHalfDayFlag}">
-              <h:outputText value="#{product.toHalfDayFlag}" />
-          </p:column>
-
-          <p:column headerText="Applied Number of Days " sortBy="#{product.noOfDays}">
-            <h:outputText value="#{product.noOfDays}" />              
-          </p:column>
-
-          <p:column headerText="From Date " sortBy="#{product.leaveTransactionId.fromDate}">
-            <h:outputText value="#{product.leaveTransactionId.fromDate}" ><f:convertDateTime pattern="MM/dd/yyyy" /></h:outputText>              
-          </p:column>
-
-          <p:column headerText="To Date " sortBy="#{product.toDate}">
-            <h:outputText value="#{product.toDate}" ><f:convertDateTime pattern="MM/dd/yyyy" /></h:outputText>              
-          </p:column>
-
-          <p:column headerText="Status " sortBy="#{product.remark}">
-            <h:outputText value="#{product.remark}" />              
+          <p:column headerText="Status " sortBy="#{product.applicationStatus}">
+            <h:outputText value="#{product.applicationStatus}" styleClass="customer-badge status-#{product.applicationStatus}"/>            
           </p:column>
          
           <p:column exportable="false">           
@@ -104,13 +98,18 @@
               <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
                   oncomplete="PF('manageProductDialog').show()"
                   styleClass="edit-button rounded-button ui-button-success" process="@this">
-                  <f:setPropertyActionListener value="#{product}" target="#{leaveTypeController.selectedLeaveTransaction}" />
+                  <f:setPropertyActionListener value="#{product}" target="#{leaveTypeController.selectedLeaveApplication}" />
                   <p:resetInput target=":dialogs:manage-product-content" />
+              </p:commandButton>
+              <p:commandButton icon="pi pi-search" update=":dialogs:manage-view-product-content"
+                  oncomplete="PF('manageViewProductDialog').show()"
+                  styleClass=" rounded-button ui-button-success" process="@this">
+                  <f:setPropertyActionListener value="#{product}" target="#{leaveTypeController.selectedLeaveApplication}" />                
               </p:commandButton>
               <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
                                process="@this"
                                oncomplete="PF('deleteProductDialog').show()">
-                  <f:setPropertyActionListener value="#{product}" target="#{leaveTypeController.selectedLeaveTransaction}" />
+                  <f:setPropertyActionListener value="#{product}" target="#{leaveTypeController.selectedLeaveApplication}" />
               </p:commandButton>
           </p:column>
 
@@ -122,27 +121,28 @@
       <p:dialog header="Leave Application Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
           responsive="true">
           <p:outputPanel id="manage-product-content" class="ui-fluid">
-              <p:outputPanel rendered="#{not empty leaveTypeController.selectedLeaveTransaction}">
+              <p:outputPanel rendered="#{not empty leaveTypeController.selectedLeaveApplication}">
                   
                   <div class="field">
-                      <p:outputLabel for="name">Employee Name</p:outputLabel>
-                      <p:inputText id="name" value="#{leaveTypeController.selectedCompensatoryOffScheduler.name}" required="true" />
+                      <p:outputLabel for="name">Employee Name</p:outputLabel>                      
+                      <p:selectOneMenu value="#{leaveTypeController.selectedLeaveApplication.employeeId}" id="Employee" required="true">
+                      <f:selectItems value="#{leaveTypeController.employees}" var="player" id="name"
+                                      itemLabel="#{player.employeeName}" itemValue="#{player.employeeId}"/>
+                  </p:selectOneMenu>
                   </div>
                   <div class="field">
-                      <p:outputLabel for="dateBefore">Days before schedule date</p:outputLabel>
-                      <p:spinner id="dateBefore" value="#{leaveTypeController.selectedCompensatoryOffScheduler.dateBefore}" buttons="vertical"
-                      upButtonStyleClass="ui-button-secondary" downButtonStyleClass="ui-button-secondary"/>                      
+                      <p:outputLabel for="comments">Comments</p:outputLabel>                   
+                      <p:inputTextarea rows="4" cols="33" id="comments" value="#{leaveTypeController.selectedLeaveApplication.comments}" required="true" />                    
                   </div>
                  
                   <div class="formgrid grid">
                     <div class="field">
-                      <p:outputLabel for="timeToSchedule">Time to Schedule</p:outputLabel>     
-                      <p:datePicker id="timeToSchedule" value="#{leaveTypeController.selectedCompensatoryOffScheduler.timeToSchedule}"	timeOnly="true" pattern="HH:mm" />
+                      <p:outputLabel for="fromDate">From Date</p:outputLabel>     
+                      <p:datePicker id="fromDate" value="#{leaveTypeController.selectedLeaveApplication.fromDate}" required="true"/>
                     </div>
                       <div class="field col">
-                        <p:outputLabel for="reminder">Include OverTime done on working day</p:outputLabel>
-                        <p:inputText id="reminder" value="#{leaveTypeController.selectedCompensatoryOffScheduler.includeOverTime}" 
-                            />
+                        <p:outputLabel for="toDate">To Date</p:outputLabel>
+                        <p:datePicker id="toDate" value="#{leaveTypeController.selectedLeaveApplication.toDate}" required="true"/>
                     </div>
                      
                   </div>
@@ -150,16 +150,96 @@
           </p:outputPanel>
 
           <f:facet name="footer">
-              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveProduct}"
-                  update="manage-product-content" process="manage-product-content @this" />
+              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveLeaveApplication}"
+                  update="manage-product-content,:form:messages,:form:dt-products" process="manage-product-content @this" />
+
               <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
                   class="ui-button-secondary" type="button" />
           </f:facet>
       </p:dialog>
 
+      <p:dialog header="Leave Type Details" showEffect="fade" modal="true" widgetVar="manageViewProductDialog"
+      responsive="true">
+      <p:outputPanel id="manage-view-product-content" class="ui-fluid">
+          <p:outputPanel rendered="#{not empty leaveTypeController.selectedLeaveApplication}">
+              
+          <p:dataTable id="applicationType" var="product" value="#{leaveTypeController.selectedLeaveApplication.applicationTypes}" editable="#{leaveTypeController.selectedLeaveApplication.editable}"
+          style="margin-bottom:20px">
+
+            <p:ajax event="rowEdit" listener="#{leaveTypeController.edidLeaveApplicationType}" update=":form:messages"/>
+            <p:ajax event="rowEditCancel"  />
+           
+            <p:column headerText="Leave Name">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.leaveTypeCode}"/>
+                    </f:facet>
+                    <f:facet name="input">                      
+                    <p:selectOneMenu value="#{product.leaveTypeCode}" style="width:100%">
+                      <f:selectItems value="#{leaveTypeController.leaveTypes}" var="player"
+                                      itemLabel="#{player.leaveName}" itemValue="#{player.leaveCode}"/>
+                  </p:selectOneMenu>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="Applied Date">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{product.appliedDate}"> <f:convertDateTime pattern="dd-MMM-YYYY" />
+                  </h:outputText>     </f:facet>
+                    <f:facet name="input">
+                      <p:datePicker value="#{product.appliedDate}" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="Count">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{product.dayType}">
+                            <f:convertNumber type="currency" currencySymbol="$"/>
+                        </h:outputText>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:inputNumber value="#{product.dayType}" style="width:100%" label="Price" symbol="#"/>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="Status">                                                    
+                   <h:outputText value="#{product.status}" styleClass="customer-badge status-#{product.status}"/>                               
+          </p:column>
+
+            <p:column style="width:6rem">
+                <p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit" saveTitle="Save Row"/>
+            </p:column>
+            </p:dataTable>   
+          <div class="field">
+              <p:outputLabel for="approvalComments">Approve / Reject Comments</p:outputLabel>                   
+              <p:inputTextarea rows="4" cols="33"  value="#{leaveTypeController.selectedLeaveApplication.comments}" id="approvalComments"/>                    
+          </div>
+          <div class="field">
+            <p:outputLabel for="appstatus">Approve / Reject </p:outputLabel>                               
+            <p:selectOneButton value="#{leaveTypeController.selectedLeaveApplication.applicationStatus}" id="appstatus">
+              <f:selectItem itemLabel="Approve" itemValue="qualified"/>
+              <f:selectItem itemLabel="Reject" itemValue="unqualified"/>              
+          </p:selectOneButton>               
+        </div>
+          </p:outputPanel>
+      </p:outputPanel>  
+
+      <f:facet name="footer">
+        <p:commandButton value="save" icon="pi pi-check" actionListener="#{leaveTypeController.saveLeaveApplication}"
+        update="manage-view-product-content,:form:messages,:form:dt-products,applicationType" process="manage-view-product-content @this" />
+
+        <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageViewProductDialog').hide()"
+              class="ui-button-secondary" type="button" />
+    </f:facet>
+  </p:dialog>
+
       <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
-          message="Delete the product?" header="Confirm" severity="warn">
-          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteProduct}"
+          message="Delete the application?" header="Confirm" severity="warn">
+          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteLeaveApplication}"
               process="@this" update=":form:delete-products-button"
               oncomplete="PF('deleteProductDialog').hide()" />
           <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"

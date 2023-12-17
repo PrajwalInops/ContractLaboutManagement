@@ -1,21 +1,30 @@
 package com.inops.visitorpass.controller;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.TabCloseEvent;
+import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -28,17 +37,21 @@ import com.inops.visitorpass.entity.CompensatoryOffScheduler;
 import com.inops.visitorpass.entity.Division;
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.Holiday;
+import com.inops.visitorpass.entity.LeaveApplication;
+import com.inops.visitorpass.entity.LeaveApplicationType;
 import com.inops.visitorpass.entity.LeaveBalance;
 import com.inops.visitorpass.entity.LeaveTransactions;
 import com.inops.visitorpass.entity.LeaveTypeEntity;
 import com.inops.visitorpass.entity.RoleEntitlement;
 import com.inops.visitorpass.entity.User;
+import com.inops.visitorpass.repository.LeaveApplicationTypeRepository;
 import com.inops.visitorpass.service.ICompensatoryOff;
 import com.inops.visitorpass.service.ICompensatoryOffScheduler;
 import com.inops.visitorpass.service.IDivision;
 import com.inops.visitorpass.service.IEmployee;
 import com.inops.visitorpass.service.IEntitlement;
 import com.inops.visitorpass.service.IHoliday;
+import com.inops.visitorpass.service.ILeaveApplication;
 import com.inops.visitorpass.service.ILeaveBalance;
 import com.inops.visitorpass.service.ILeaveTransactions;
 import com.inops.visitorpass.service.ILeaveType;
@@ -68,7 +81,10 @@ public class LeaveTypeController {
 	private final IEmployee employeeService;
 	private final ILeaveTransactions leaveTransactionsService;
 	private final IDivision division;
+	private final ILeaveApplication leaveApplicationService;
+	private final LeaveApplicationTypeRepository leaveApplicationTypeRepository;
 
+	ZoneId defaultZoneId = ZoneId.systemDefault();
 	private List<Employee> employees;
 	private List<Long> selectedEmployees;
 
@@ -79,6 +95,10 @@ public class LeaveTypeController {
 	private LeaveTransactions selectedLeaveTransaction;
 	private List<LeaveTransactions> selectedLeaveTransactions;
 	private List<LeaveTransactions> leaveTransactions;
+
+	private LeaveApplication selectedLeaveApplication;
+	private List<LeaveApplication> selectedLeaveApplications;
+	private List<LeaveApplication> leaveApplications;
 
 	private LeaveBalance selectedLeaveBalance;
 	private List<LeaveBalance> selectedLeaveBalances;
@@ -110,6 +130,8 @@ public class LeaveTypeController {
 
 	private String[] durationAllowed;
 
+	private UploadedFile file;
+
 	@PostConstruct
 	public void init() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -120,14 +142,15 @@ public class LeaveTypeController {
 		compensatoryOffs = compensatoryOffService.findAll().get();
 		compensatoryOffSchedulers = compensatoryOffSchedulerService.findAll().get();
 		leaveBalances = leaveBalanceService.findAll().get();
-		leaveTransactions = leaveTransactionsService.findAll().get();
+		// leaveTransactions = leaveTransactionsService.findAll().get();
 		divisions = division.findAll().get();
 		dbRoleEntitlements = entitlementService.findAll().get();
+		leaveApplications = leaveApplicationService.findAll().get();
 	}
 
 	public void openNew() {
 		this.selectedHoliday = new Holiday();
-		this.selectedLeaveTransaction = new LeaveTransactions();
+		this.selectedLeaveApplication = new LeaveApplication();
 		this.selectedLeaveTypeEntity = new LeaveTypeEntity();
 		this.selectedCompensatoryOff = new CompensatoryOff();
 		this.selectedCompensatoryOffScheduler = new CompensatoryOffScheduler();
@@ -364,11 +387,104 @@ public class LeaveTypeController {
 		return this.selectedCompensatoryOffSchedulers != null && !this.selectedCompensatoryOffSchedulers.isEmpty();
 	}
 
+	public void edidLeaveApplicationType(RowEditEvent<LeaveApplicationType> event) {
+
+		leaveApplicationTypeRepository.save(event.getObject());
+		FacesMessage msg = new FacesMessage("Product Edited", String.valueOf(event.getObject().getApplicationTypeId()));
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+
+	}
+
+	public void saveLeaveApplication() {
+		try {
+			List<LeaveApplicationType> applicationTypes = new ArrayList<>();
+			if (selectedLeaveApplication.getApplicationTypes() == null) {
+
+				long daysDifference = ChronoUnit.DAYS.between(
+						convertToLocalDate(selectedLeaveApplication.getFromDate()),
+						convertToLocalDate(selectedLeaveApplication.getToDate()));
+				LongStream.rangeClosed(1, daysDifference).forEach(range -> {
+					LeaveApplicationType appType = new LeaveApplicationType();
+
+					appType.setAppliedDate(Date.from(convertToLocalDate(selectedLeaveApplication.getFromDate())
+							.plusDays(range - 1).atStartOfDay(defaultZoneId).toInstant()));
+					appType.setLeaveApplication(selectedLeaveApplication);
+					appType.setStatus("new");
+					applicationTypes.add(appType);
+				});
+
+				selectedLeaveApplication.setApplicationTypes(applicationTypes);
+
+			}
+
+			if (selectedLeaveApplication.getApplicationId() == 0l) {
+				selectedLeaveApplication.setApplicationStatus("new");
+				selectedLeaveApplication.setEditable(true);
+				leaveApplicationService.save(selectedLeaveApplication);
+				leaveApplications.add(selectedLeaveApplication);
+
+			} else {
+				selectedLeaveApplication.getApplicationTypes()
+						.forEach(type -> type.setStatus(selectedLeaveApplication.getApplicationStatus()));
+				if (!selectedLeaveApplication.getApplicationStatus().equals("new"))
+					selectedLeaveApplication.setEditable(false);
+				leaveApplicationService.save(selectedLeaveApplication);
+			}
+
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("LeaveApplication created successfully"));
+
+			PrimeFaces.current().executeScript("PF('manageProductDialog').hide()");
+			PrimeFaces.current().ajax().update("leaveNameAdvanced", "manage-product-content", ":form:messages",
+					":form:dt-products");
+		} catch (Exception e) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Error Message", e.getMessage());
+		}
+	}
+
+	public void deleteLeaveApplication() {
+
+		leaveApplicationService.delete(selectedLeaveApplication);
+		this.leaveApplications.remove(this.selectedLeaveApplication);
+		if (this.selectedLeaveApplications != null) {
+			this.selectedLeaveApplications.remove(this.selectedLeaveApplication);
+		}
+		this.selectedHoliday = null;
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "selectedLeaveApplication deleted successfully");
+	}
+
+	public void deleteLeaveApplications() {
+		leaveApplicationService.deleteAll(this.selectedLeaveApplications);
+		this.leaveApplications.removeAll(this.selectedLeaveApplications);
+		this.selectedLeaveApplications = null;
+		addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "selectedLeaveApplication deleted successfully");
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
+		PrimeFaces.current().executeScript("PF('dtProducts').clearFilters()");
+	}
+
+	public String getDeleteLeaveApplicationButtonMessage() {
+		if (hasSelectedLeaveApplication()) {
+			int size = this.selectedLeaveApplications.size();
+			return size > 1 ? size + " LeaveApplication selected" : "1 LeaveApplication selected";
+		}
+
+		return "Delete";
+	}
+
+	public boolean hasSelectedLeaveApplication() {
+		return this.selectedLeaveApplications != null && !this.selectedLeaveApplications.isEmpty();
+	}
+
+	public void handleFileUpload(FileUploadEvent event) {
+		FacesMessage message = new FacesMessage("Successful", event.getFile().getFileName() + " is uploaded.");
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+
 	public void saveProduct() {
 		if (this.selectedHoliday.getHolidayId() == 0l) {
 			// this.selectedHoliday.setCode(UUID.randomUUID().toString().replaceAll("-",
-			// "").substring(0, 9));
-			// this.products.add(this.selectedProduct);
+			// "").substring(0, 9)); // this.products.add(this.selectedProduct);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Added"));
 		} else {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Updated"));
@@ -399,8 +515,8 @@ public class LeaveTypeController {
 		return this.selectedHolidays != null && !this.selectedHolidays.isEmpty();
 	}
 
-	public void deleteSelectedProducts() {
-		// this.holidays.removeAll(this.selectedHolidays);
+	public void deleteSelectedProducts() { //
+		this.holidays.removeAll(this.selectedHolidays);
 		this.selectedHolidays = null;
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Products Removed"));
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
@@ -437,6 +553,16 @@ public class LeaveTypeController {
 	public void onReturnFromLevel1(SelectEvent event) {
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage("Data Returned", event.getObject().toString()));
+	}
+
+	private static LocalDate convertToLocalDate(Date utilDate) {
+		// Convert java.util.Date to java.time.Instant
+		Instant instant = utilDate.toInstant();
+
+		// Convert Instant to java.time.LocalDate
+		LocalDate localDate = instant.atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+		return localDate;
 	}
 
 	public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
