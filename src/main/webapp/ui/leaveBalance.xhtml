@@ -26,15 +26,15 @@
         <h5>Leave Balance Details</h5>
         <p:toolbar>
           <p:toolbarGroup>
-              <p:commandButton value="New" icon="pi pi-plus" actionListener="#{leaveTypeController.openNew}"
+              <!--<p:commandButton value="New" icon="pi pi-plus" actionListener="#{leaveTypeController.openNew}"
                   update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
                   styleClass="ui-button-success" style="margin-right: .5rem">
                   <p:resetInput target=":dialogs:manage-product-content" />
-              </p:commandButton>
-              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteButtonMessage}"
+              </p:commandButton>-->
+              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteLeaveBalanceButtonMessage}"
                   icon="pi pi-trash" actionListener="#{leaveTypeController.deleteSelectedProducts}"
-                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedProducts()}" update="@this">
-                  <p:confirm header="Confirmation" message="Delete the selected products?"
+                  styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedLeaveBalances()}" update="@this">
+                  <p:confirm header="Confirmation" message="Delete the selected Balanes?"
                       icon="pi pi-exclamation-triangle" />
               </p:commandButton>
           </p:toolbarGroup>
@@ -66,30 +66,48 @@
 
           <p:column selectionMode="multiple" exportable="false"></p:column>
 
-          <p:headerRow field="leaveBalanceId.employeeId"  expandable="true" >
-
-            <p:column colspan="6">
-                <div class="inline-flex align-items-center" style="vertical-align: middle">
-                    
-                    <h:outputText styleClass="ml-2" value="#{product.leaveBalanceId.employeeId}"/>
-                </div>
-            </p:column>
-          </p:headerRow>
-
-          <p:column headerText="Employee Name" sortBy="#{product.leaveBalanceId.employeeId}" groupRow="true" filterBy="#{product.leaveBalanceId.employeeId}">
-              <h:outputText value="#{product.leaveBalanceId.employeeId}" />
+          <p:column headerText="Code" sortBy="#{product.leaveBalanceId}" filterBy="#{product.leaveBalanceId}">
+                    <h:outputText value="#{product.leaveBalanceId}" />
           </p:column>
-          <p:column headerText="Leave Type Name" sortBy="#{product.leaveBalanceId.leaveTypeId}" filterBy="#{product.leaveBalanceId.leaveTypeId}">
-              <h:outputText value="#{product.leaveBalanceId.leaveTypeId}" />
+
+          <p:column headerText="Employee Name" sortBy="#{product.employee.employeeName}" groupRow="true" filterBy="#{product.employee.employeeName}">
+              <h:outputText value="#{product.employee.employeeName}" />
+          </p:column>
+          <p:column headerText="Leave Type Name" sortBy="#{product.leaveType.leaveCode}" filterBy="#{product.leaveType.leaveCode}">
+              <h:outputText value="#{product.leaveType.leaveCode}" />
           </p:column>
          
-          <p:column headerText="Leave Balance" sortBy="#{product.balance}">
-            <h:outputText value="#{product.balance}" >              
+          <p:column headerText="Previous" sortBy="#{product.previousBalance}">
+            <h:outputText value="#{product.previousBalance}" >              
+            </h:outputText>     
+          </p:column>
+         
+          <p:column headerText="Earbed" sortBy="#{product.earnedBalance}">
+            <h:outputText value="#{product.earnedBalance}" >              
+            </h:outputText>     
+          </p:column>
+          <p:column headerText="Redeemed" sortBy="#{product.redeemedBalance}">
+            <h:outputText value="#{product.redeemedBalance}" >              
             </h:outputText>     
           </p:column>
 
-          <p:column headerText="Date" sortBy="#{product.lastCreditDate}" filterBy="#{product.lastCreditDate}">
-            <h:outputText value="#{product.lastCreditDate}">
+          <p:column headerText="RollOver" sortBy="#{product.carryForwardBalance}">
+            <h:outputText value="#{product.carryForwardBalance}" >              
+            </h:outputText>     
+          </p:column>
+
+          <p:column headerText="Encashed " sortBy="#{product.encashedBalance}">
+            <h:outputText value="#{product.encashedBalance}" >              
+            </h:outputText>     
+          </p:column>
+
+          <p:column headerText="Closing Balance" sortBy="#{product.closingBalance}">
+            <h:outputText value="#{product.closingBalance}" >              
+            </h:outputText>     
+          </p:column>
+         
+          <p:column headerText="Date" sortBy="#{product.creditDate}" filterBy="#{product.creditDate}">
+            <h:outputText value="#{product.creditDate}">
               <f:convertDateTime pattern="MM/dd/yyyy" />
           </h:outputText>
           </p:column>
@@ -114,30 +132,50 @@
   </h:form>
 
   <h:form id="dialogs">
-      <p:dialog header="Compensatory Off Scheduler  Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+      <p:dialog header="Leave Balance Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
           responsive="true">
           <p:outputPanel id="manage-product-content" class="ui-fluid">
-              <p:outputPanel rendered="#{not empty leaveTypeController.selectedCompensatoryOffScheduler}">
+              <p:outputPanel rendered="#{not empty leaveTypeController.selectedLeaveBalance}">
                   
-                  <div class="field">
-                      <p:outputLabel for="name">Schedule Name</p:outputLabel>
-                      <p:inputText id="name" value="#{leaveTypeController.selectedCompensatoryOffScheduler.name}" required="true" />
-                  </div>
-                  <div class="field">
-                      <p:outputLabel for="dateBefore">Days before schedule date</p:outputLabel>
-                      <p:spinner id="dateBefore" value="#{leaveTypeController.selectedCompensatoryOffScheduler.dateBefore}" buttons="vertical"
-                      upButtonStyleClass="ui-button-secondary" downButtonStyleClass="ui-button-secondary"/>                      
-                  </div>
-                 
-                  <div class="formgrid grid">
                     <div class="field">
-                      <p:outputLabel for="timeToSchedule">Time to Schedule</p:outputLabel>     
-                      <p:datePicker id="timeToSchedule" value="#{leaveTypeController.selectedCompensatoryOffScheduler.timeToSchedule}"	timeOnly="true" pattern="HH:mm" />
+                      <p:outputLabel for="employeeName">Employee Name</p:outputLabel>
+                      <p:inputText id="employeeName" value="#{leaveTypeController.selectedLeaveBalance.employee.employeeName}" required="true" />
+                  </div>
+                  <div class="field">
+                      <p:outputLabel for="leaveCode">Leave Name</p:outputLabel>
+                      <p:inputText id="leaveCode" value="#{leaveTypeController.selectedLeaveBalance.leaveType.leaveCode}" required="true" />
+                  </div>
+                                  
+                  <div class="formgrid grid">
+                    <div class="field col">
+                      <p:outputLabel for="previousBalance">Previous Balance</p:outputLabel>     
+                      <p:inputNumber id="previousBalance" minValue="0" decimalPlaces="2" value="#{leaveTypeController.selectedLeaveBalance.previousBalance}" required="true"/>
                     </div>
-                      <div class="field col">
-                        <p:outputLabel for="reminder">Include OverTime done on working day</p:outputLabel>
-                        <p:inputText id="reminder" value="#{leaveTypeController.selectedCompensatoryOffScheduler.includeOverTime}" 
-                            />
+
+                    <div class="field col">
+                      <p:outputLabel for="earnedBalance">Earned Balance</p:outputLabel>     
+                      <p:inputNumber id="earnedBalance" minValue="0" decimalPlaces="2" value="#{leaveTypeController.selectedLeaveBalance.earnedBalance}" required="true"/>
+                    </div>
+
+                    <div class="field col">
+                      <p:outputLabel for="redeemedBalance">Redeemed Balance</p:outputLabel>     
+                      <p:inputNumber id="redeemedBalance" minValue="0" decimalPlaces="2" value="#{leaveTypeController.selectedLeaveBalance.redeemedBalance}" required="true"/>
+                    </div>
+                    </div>
+                    <div class="formgrid grid">
+                    <div class="field col">
+                      <p:outputLabel for="carryForwardBalance">CarryForward Balance</p:outputLabel>     
+                      <p:inputNumber id="carryForwardBalance" minValue="0" decimalPlaces="2" value="#{leaveTypeController.selectedLeaveBalance.carryForwardBalance}" required="true"/>
+                    </div>
+
+                    <div class="field col">
+                      <p:outputLabel for="encashedBalance">Encashed Balance</p:outputLabel>     
+                      <p:inputNumber id="encashedBalance" minValue="0" decimalPlaces="2" value="#{leaveTypeController.selectedLeaveBalance.encashedBalance}" required="true"/>
+                    </div>
+                     
+                    <div class="field col">
+                      <p:outputLabel for="closingBalance">Closing Balance</p:outputLabel>     
+                      <p:inputNumber id="closingBalance" minValue="0" decimalPlaces="2" value="#{leaveTypeController.selectedLeaveBalance.closingBalance}" required="true"/>
                     </div>
                      
                   </div>
@@ -145,7 +183,7 @@
           </p:outputPanel>
 
           <f:facet name="footer">
-              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveProduct}"
+              <p:commandButton value="Save" icon="pi pi-check" actionListener="#{leaveTypeController.saveLeaveBalance}"
                   update="manage-product-content" process="manage-product-content @this" />
               <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
                   class="ui-button-secondary" type="button" />
@@ -153,8 +191,8 @@
       </p:dialog>
 
       <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
-          message="Delete the product?" header="Confirm" severity="warn">
-          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteProduct}"
+          message="Delete the Balance" header="Confirm" severity="warn">
+          <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{leaveTypeController.deleteLeaveBalance}"
               process="@this" update=":form:delete-products-button"
               oncomplete="PF('deleteProductDialog').hide()" />
           <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"

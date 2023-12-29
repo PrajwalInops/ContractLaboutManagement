@@ -221,6 +221,20 @@
                                 <p:outputLabel for="afterSixMonths">After six months </p:outputLabel>                        
                                 <p:inputNumber id="afterSixMonths" minValue="1" decimalPlaces="0" value="#{leaveTypeController.selectedLeaveTypeEntity.afterSixMonths}" required="true"/>
                             </div>
+                            </div>
+                            <div class="formgrid grid">
+                            <div class="field col">
+                                <p:outputLabel for="leaveCreditDuration" value="Leave Credit on Every:" />
+                                <p:selectOneMenu id="leaveCreditDuration" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveCreditDuration}" required="true">
+                                    <f:selectItem itemLabel="Select Type" itemValue="" />
+                                    <f:selectItem itemLabel="Once in Month" itemValue="Monthly" />
+                                    <f:selectItem itemLabel="Once in Year" itemValue="Yearly" />                                    
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="field col">
+                                <p:outputLabel for="leaveCredit">Leave Credit </p:outputLabel>
+                                <p:inputNumber id="leaveCredit" minValue="1" decimalPlaces="2" value="#{leaveTypeController.selectedLeaveTypeEntity.leaveCredit}" required="true"/>
+                            </div>
                         </div>                       
                     </p:outputPanel>
                 </p:outputPanel>

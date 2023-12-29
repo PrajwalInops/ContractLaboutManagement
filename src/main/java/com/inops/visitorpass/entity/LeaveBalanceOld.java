@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Entity
 @Table(name = "Tblempleavebalmaster")
-public class LeaveBalance {
+public class LeaveBalanceOld {
 	
 	private static final long serialVersionUID = 1L;
 

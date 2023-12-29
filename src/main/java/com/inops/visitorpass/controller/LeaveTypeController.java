@@ -40,6 +40,7 @@ import com.inops.visitorpass.entity.Holiday;
 import com.inops.visitorpass.entity.LeaveApplication;
 import com.inops.visitorpass.entity.LeaveApplicationType;
 import com.inops.visitorpass.entity.LeaveBalance;
+import com.inops.visitorpass.entity.LeaveBalanceHistory;
 import com.inops.visitorpass.entity.LeaveTransactions;
 import com.inops.visitorpass.entity.LeaveTypeEntity;
 import com.inops.visitorpass.entity.RoleEntitlement;
@@ -53,6 +54,7 @@ import com.inops.visitorpass.service.IEntitlement;
 import com.inops.visitorpass.service.IHoliday;
 import com.inops.visitorpass.service.ILeaveApplication;
 import com.inops.visitorpass.service.ILeaveBalance;
+import com.inops.visitorpass.service.ILeaveBalanceHistory;
 import com.inops.visitorpass.service.ILeaveTransactions;
 import com.inops.visitorpass.service.ILeaveType;
 
@@ -78,6 +80,7 @@ public class LeaveTypeController {
 	private final ICompensatoryOff compensatoryOffService;
 	private final ICompensatoryOffScheduler compensatoryOffSchedulerService;
 	private final ILeaveBalance leaveBalanceService;
+	private final ILeaveBalanceHistory leaveBalanceHistoryService;
 	private final IEmployee employeeService;
 	private final ILeaveTransactions leaveTransactionsService;
 	private final IDivision division;
@@ -154,6 +157,7 @@ public class LeaveTypeController {
 		this.selectedLeaveTypeEntity = new LeaveTypeEntity();
 		this.selectedCompensatoryOff = new CompensatoryOff();
 		this.selectedCompensatoryOffScheduler = new CompensatoryOffScheduler();
+		this.selectedLeaveBalance = new LeaveBalance();
 	}
 
 	public void leaveDetails() {
@@ -481,44 +485,49 @@ public class LeaveTypeController {
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
 
-	public void saveProduct() {
-		if (this.selectedHoliday.getHolidayId() == 0l) {
-			// this.selectedHoliday.setCode(UUID.randomUUID().toString().replaceAll("-",
-			// "").substring(0, 9)); // this.products.add(this.selectedProduct);
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Added"));
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Updated"));
-		}
+	public void saveLeaveBalance() {
+
+		LeaveBalanceHistory leaveBalanceHistory = new LeaveBalanceHistory(0l, LocalDate.now().getMonth().getValue(),
+				LocalDate.now().getYear(), new Date(), selectedLeaveBalance.getPreviousBalance(),
+				selectedLeaveBalance.getEarnedBalance(), selectedLeaveBalance.getRedeemedBalance(),
+				selectedLeaveBalance.getClosingBalance(), selectedLeaveBalance.getCarryForwardBalance(),
+				selectedLeaveBalance.getEncashedBalance(), selectedLeaveBalance);
+		selectedLeaveBalance.getLeaveBalanceHistorys().add(leaveBalanceHistory);
+
+		leaveBalanceService.save(selectedLeaveBalance);
+
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("balance updated"));
 
 		PrimeFaces.current().executeScript("PF('manageProductDialog').hide()");
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
 	}
 
-	public void deleteProduct() {
-		this.holidays.remove(this.selectedHoliday);
-		this.selectedHolidays.remove(this.selectedHoliday);
-		this.selectedHoliday = null;
+	public void deleteLeaveBalance() {
+		this.leaveBalances.remove(this.selectedLeaveBalance);
+		this.leaveBalanceService.delete(this.selectedLeaveBalance);
+		this.selectedLeaveBalance = null;
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Removed"));
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
 	}
 
-	public String getDeleteButtonMessage() {
-		if (hasSelectedProducts()) {
-			int size = this.selectedHolidays.size();
-			return size > 1 ? size + " products selected" : "1 product selected";
+	public String getDeleteLeaveBalanceButtonMessage() {
+		if (hasSelectedLeaveBalances()) {
+			int size = this.selectedLeaveBalances.size();
+			return size > 1 ? size + " Leave Balance selected" : "1 Leave Balance selected";
 		}
 
 		return "Delete";
 	}
 
-	public boolean hasSelectedProducts() {
-		return this.selectedHolidays != null && !this.selectedHolidays.isEmpty();
+	public boolean hasSelectedLeaveBalances() {
+		return this.selectedLeaveBalances != null && !this.selectedLeaveBalances.isEmpty();
 	}
 
 	public void deleteSelectedProducts() { //
-		this.holidays.removeAll(this.selectedHolidays);
-		this.selectedHolidays = null;
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Products Removed"));
+		this.leaveBalanceService.deleteAll(this.selectedLeaveBalances);
+		this.leaveBalances.removeAll(this.selectedLeaveBalances);
+		this.selectedLeaveBalances = null;
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Leave Balances Removed"));
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-products");
 		PrimeFaces.current().executeScript("PF('dtProducts').clearFilters()");
 	}

@@ -27,20 +27,23 @@ public class ScheduledTaskManager implements IScheduled {
 
 	private final IScheduledTask schedulerTaskService;
 	private final ApplicationContext ctx;
-	
-	//private final TaskScheduler taskScheduler;
+	private final IJobService jobService;
+	// private final TaskScheduler taskScheduler;
 
 	private Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
 	@Override
 	public void scheduleTask(ScheduledTask task) {
-		
+
 		if (task.isActive()) {
 			try {
 				TaskScheduler taskScheduler = ctx.getBean(TaskScheduler.class);
 				ScheduledFuture<?> future = taskScheduler.schedule(() -> {
-					System.out.println(Thread.currentThread().getName() + " The Task1 executed at " + new Date()+" and task "+task.getId());
 					Date now = new Date();
+					Log.info(Thread.currentThread().getName() + " The Task1 executed at " + now + " and task "
+							+ task.getTaskName());
+					IJob job = jobService.getJob(task.getTaskType());
+					job.execute(now, now);
 					task.setLastActualExecutionTime(now);
 					task.setLastCompletionTime(now);
 					task.setLastScheduledExecutionTime(now);

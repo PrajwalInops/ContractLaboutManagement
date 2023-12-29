@@ -31,7 +31,7 @@
                 styleClass="ui-button-success" style="margin-right: .5rem">
                 <p:resetInput target=":dialogs:manage-product-content" />
            </p:commandButton>           
-              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteButtonMessage}"
+              <p:commandButton id="delete-products-button" value="#{leaveTypeController.deleteLeaveApplicationButtonMessage}"
                   icon="pi pi-trash" actionListener="#{leaveTypeController.deleteLeaveApplications}"
                   styleClass="ui-button-danger" disabled="#{!leaveTypeController.hasSelectedLeaveApplication()}" update="@this">
                   <p:confirm header="Confirmation" message="Delete the selected LeaveApplication?"
@@ -193,15 +193,19 @@
                 </p:cellEditor>
             </p:column>
 
-            <p:column headerText="Count">
+            <p:column headerText="Day Type">
                 <p:cellEditor>
                     <f:facet name="output">
                         <h:outputText value="#{product.dayType}">
                             <f:convertNumber type="currency" currencySymbol="$"/>
                         </h:outputText>
                     </f:facet>
-                    <f:facet name="input">
-                        <p:inputNumber value="#{product.dayType}" style="width:100%" label="Price" symbol="#"/>
+                    <f:facet name="input">                       
+                        <p:selectOneMenu id="role" value="#{product.dayType}">
+                            <f:selectItem itemLabel="Full Day" itemValue="H"/>
+                            <f:selectItem itemLabel="First Half" itemValue="F"/>
+                            <f:selectItem itemLabel="First Half" itemValue="S"/>                                               
+                        </p:selectOneMenu>
                     </f:facet>
                 </p:cellEditor>
             </p:column>

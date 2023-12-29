@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.inops.visitorpass.entity.LeaveBalance;
+import com.inops.visitorpass.entity.LeaveBalanceOld;
 import com.inops.visitorpass.entity.LeaveEncashment;
 import com.inops.visitorpass.repository.LeaveBalanceRepository;
 import com.inops.visitorpass.repository.LeaveEncashRepository;

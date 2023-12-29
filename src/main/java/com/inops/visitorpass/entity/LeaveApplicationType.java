@@ -9,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,10 +35,11 @@ public class LeaveApplicationType {
 	private LeaveApplication leaveApplication;
 
 	private Date appliedDate;
-	private float dayType;
+	private float count;
+	private String dayType;
 	private String comments;
 	private String status;
-		
+
 	public void setApplicationTypeId(long applicationTypeId) {
 		this.applicationTypeId = applicationTypeId;
 	}
@@ -52,20 +52,28 @@ public class LeaveApplicationType {
 		this.appliedDate = appliedDate;
 	}
 
-	public void setDayType(float dayType) {
-		this.dayType = dayType;
-	}
-
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
-	
+
 	public void setLeaveTypeCode(String leaveTypeCode) {
 		this.leaveTypeCode = leaveTypeCode;
 	}
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public void setDayType(String dayType) {
+		this.dayType = dayType;
+	}
+
+	public void setCount(float count) {
+		if (!dayType.isEmpty() && dayType.equals("H"))
+			count = 1f;
+		else if (!dayType.isEmpty())
+			count = 0.5f;
+		this.count = count;
 	}
 
 }

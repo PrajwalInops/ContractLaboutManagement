@@ -31,13 +31,10 @@ public class LeaveBalanceReportService implements DataExtractionService {
 				employeeIds.stream().map(Employee::getEmployeeId).collect(Collectors.toList()));
 
 		return leaveBalances.get().stream().map(leave -> {
-			Employee employee = employeeIds.stream()
-					.filter(emp -> emp.getEmployeeId().equalsIgnoreCase(leave.getLeaveBalanceId().getEmployeeId()))
-					.findAny().orElse(null);
-
-			return new Balance(employee.getEmployeeName(), employee.getDepartment().getDepartmentName(),
-					leave.getLeaveBalanceId().getEmployeeId(), leave.getBalance(), leave.getLastCreditDate(),
-					leave.getLeaveBalanceId().getLeaveTypeId());
+			
+			return new Balance(leave.getEmployee().getEmployeeName(), leave.getEmployee().getDepartment().getDepartmentName(),
+					leave.getEmployee().getEmployeeId(), leave.getClosingBalance(), leave.getCreditDate(),
+					leave.getLeaveType().getLeaveCode());
 		}).collect(Collectors.toList());
 
 	}

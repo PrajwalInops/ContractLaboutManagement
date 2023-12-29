@@ -226,7 +226,7 @@ public class UserController {
 					user.setLastName(selectedUser.getLastName());
 					user.setPassword(selectedUser.getPassword());
 					user.setMobile(selectedUser.getMobile());
-
+					userService.saveUser(user);
 				}
 				addMessage(FacesMessage.SEVERITY_INFO, "Info Message", "User updated successfully");
 			}

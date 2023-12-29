@@ -1,9 +1,13 @@
 package com.inops.visitorpass.service.impl;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.repository.ComputeRepository;
 import com.inops.visitorpass.service.ICompute;
 
@@ -14,9 +18,13 @@ import lombok.RequiredArgsConstructor;
 public class ComputeServiceImpl implements ICompute {
 
 	private final ComputeRepository computeRepository;
+	private final ApplicationContext ctx;
 
-	public void computeAll() {
-		computeRepository.autometicComputeAll(new Date(), new Date());
+	public void computeAll(Date fromDate) {
+		List<Employee> employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
+		employees.forEach(
+				employee -> computeRepository.ComputeAttendanceFor(employee.getEmployeeId(), fromDate, fromDate, 0));
+
 	}
 
 	@Override
@@ -37,7 +45,8 @@ public class ComputeServiceImpl implements ICompute {
 
 	@Override
 	public void createMusterForAll(Date fromDate) {
-		// TODO Auto-generated method stub
+		List<Employee> employees = ((Optional<List<Employee>>) ctx.getBean("getEmployees")).get();
+		employees.forEach(employee -> computeRepository.CreateMusterFor(employee.getEmployeeId(), fromDate, 0, 0));
 
 	}
 

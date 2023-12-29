@@ -44,6 +44,9 @@ public class LeaveTypeEntity implements Serializable {
 	@JoinTable(name = "Leave_Type_Entitlements", joinColumns = @JoinColumn(name = "Leave_Type_Id"), inverseJoinColumns = @JoinColumn(name = "entitlement_Role_Id"))
 	private List<RoleEntitlement> entitlementRoles;
 	
+	private String leaveCreditDuration;
+	private double leaveCredit;
+	
 	private String applicableGender;
 	private String applicableMaritalStatus;
 	private String leaveBalanceBasedOn;
@@ -244,4 +247,12 @@ public class LeaveTypeEntity implements Serializable {
 		this.resetMonth = resetMonth;
 	}
 
+	public void setLeaveCreditDuration(String leaveCreditDuration) {
+		this.leaveCreditDuration = leaveCreditDuration;
+	}
+
+	public void setLeaveCredit(double leaveCredit) {
+		this.leaveCredit = leaveCredit;
+	}
+	
 }

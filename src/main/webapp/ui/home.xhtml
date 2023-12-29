@@ -66,13 +66,13 @@
                         <div class="product-item">
                             <div class="product-item-content">
                                 <div class="mb-3">
-                                    <p:graphicImage name="demo/images/product/#{product.leaveBalanceId.leaveTypeId}" styleClass="product-image"/>
+                                    <p:graphicImage name="demo/images/product/#{product.leaveType.leaveCode}" styleClass="product-image"/>
                                 </div>
                                 <div>
-                                    <h4 class="mb-1">#{product.leaveBalanceId.leaveTypeId}</h4>
+                                    <h4 class="mb-1">#{product.leaveType.leaveCode}</h4>
                                     <h6 class="mt-0 mb-3">
-                                        <h:outputText value="#{product.balance}">
-                                            <f:convertNumber type="currency" pattern="¤#0" currencySymbol="#" />
+                                        <h:outputText value="#{product.closingBalance}">
+                                            <f:convertNumber type="currency" pattern="¤#00.00" currencySymbol="#" />
                                         </h:outputText>
                                     </h6>
                                     <!--<span class="product-badge status-#{product.inventoryStatus.name().toLowerCase()}">#{product.inventoryStatus.text}</span>-->
