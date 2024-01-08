@@ -12,7 +12,7 @@ import java.util.function.BiPredicate;
 import javax.annotation.PostConstruct;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.inops.visitorpass.entity.Employee;
 import com.inops.visitorpass.entity.LeaveBalance;
@@ -30,7 +30,7 @@ import lombok.extern.log4j.Log4j2;
 @Getter
 @Setter
 @Log4j2
-@Component("leaveComputation")
+@Service("leaveComputation")
 @RequiredArgsConstructor
 public class LeaveComputation implements IJob {
 
