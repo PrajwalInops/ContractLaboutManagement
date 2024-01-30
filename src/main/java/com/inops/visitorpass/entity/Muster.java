@@ -61,4 +61,6 @@ public class Muster {
 	@Column(name = "Adjshrthrs")
 	private String shortHrs;
 
+	@Column(name = "Outpass")
+	private int outPass;
 }

@@ -33,11 +33,11 @@ public class FourHoursExtraReportService implements DataExtractionService {
 				employeeIds.stream().map(Employee::getEmployeeId).collect(Collectors.toList()));
 
 		employeeIds.stream().forEach(employee -> {
-			FourhoursExtra extra = new FourhoursExtra();
+			
 			muster.get().stream().filter(must -> must.getMusterId().getEmployeeId().equals(employee.getEmployeeId()))
 					.collect(Collectors.toList()).forEach(musterData -> {
 						if(musterData.getExtraHours()>240)
-						{
+						{   FourhoursExtra extra = new FourhoursExtra();
 							extra.setShift(musterData.getShiftId());
 							extra.setIn1(musterData.getFirstInPunch());
 							extra.setOut1(musterData.getLastOutPunch());

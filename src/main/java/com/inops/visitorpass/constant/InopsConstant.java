@@ -31,7 +31,8 @@ public class InopsConstant {
 	public static final String PAYROLL_SHORT_HOURS = "Payroll Short Hours";
 	public static final String MANDAYS_DETAILED = "Mandays Detailed";
 	public static final String PERIODIC_CUTLIST = "Periodic Cutlist";
-	
+	public static final String LATE_2_HOURS = "Late 2 Hours";
+	public static final String RGP = "RGP";
 	
 
 }

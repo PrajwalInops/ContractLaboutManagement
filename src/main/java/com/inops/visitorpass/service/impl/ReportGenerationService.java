@@ -39,7 +39,9 @@ import com.inops.visitorpass.domain.LogDeteails;
 import com.inops.visitorpass.domain.PeriodicCutlist;
 import com.inops.visitorpass.domain.PhysicalDays;
 import com.inops.visitorpass.domain.Punch;
+import com.inops.visitorpass.domain.RGP;
 import com.inops.visitorpass.domain.ThreeYears;
+import com.inops.visitorpass.domain.TwohoursLateIn;
 import com.inops.visitorpass.entity.Company;
 import com.inops.visitorpass.entity.Visitor;
 import com.inops.visitorpass.service.DataExtractionService;
@@ -74,6 +76,9 @@ public class ReportGenerationService {
 	private final DataExtractionService logRegisterService, lwpDetailsService, lwpSummaryDetailsService,
 			threeYearsAttendanceReport, detailedPhysicalDaysReport;
 	private final ICompany company;
+	private final DataExtractionService twoHoursLateService;
+	private final DataExtractionService rgpReportService;
+	
 	ZoneId defaultZoneId = ZoneId.systemDefault();
 
 	public byte[] generateVisitorReport(Visitor visitor, String fileName, String divisionName) {
@@ -572,6 +577,40 @@ public class ReportGenerationService {
 			return null;
 		};
 	}
+	
+	public IReport getTwoHourslateDetails() {
+		return (from, to, id, type) -> {
+			try {
+				List<TwohoursLateIn> lateInDetailed = (List<TwohoursLateIn>) twoHoursLateService
+						.dataExtraction(from, to, id, type);
+
+				return generateFinalReport(from, to, lateInDetailed, "2hrsLateIn.jrxml",
+						"twoHoursLate");
+
+			} catch (Exception e) {
+				log.error("getTwoHourslateDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+
+	
+	public IReport getRGPDetails() {
+		return (from, to, id, type) -> {
+			try {
+				List<RGP> rgpDetailed = (List<RGP>) rgpReportService
+						.dataExtraction(from, to, id, type);
+
+				return generateFinalReport(from, to, rgpDetailed, "RGPReport.jrxml",
+						"GPMovement");
+
+			} catch (Exception e) {
+				log.error("getRGPDetails for {} data exception {}", type, e);
+			}
+			return null;
+		};
+	}
+
 
 	public IReport getMandaysDetails() {
 		return (from, to, id, type) -> {

@@ -25,4 +25,9 @@ public interface MusterRepository extends JpaRepository<Muster, MusterId> {
 	Optional<List<Long>> countAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(@Param("start") Date start,
 			@Param("end") Date end, @Param("employeeId") List<String> employeeId, @Param("from") long from,
 			@Param("to") long to);
+	
+    Optional<List<Muster>> findAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdInAndLatePunchGreaterThan(
+           Date start, Date end, List<String> employeeId, int minLate);
+	    
+	  
 }

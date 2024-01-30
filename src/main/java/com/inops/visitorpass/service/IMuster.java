@@ -19,4 +19,7 @@ public interface IMuster {
 	Optional<List<Long>> countAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(LocalDate start,
 			LocalDate end, List<String> employeeId, long from, long to);
 
+	Optional<List<Muster>> findAllByLatePunchGreaterThanAttendanceDateBetweenAndEmployeeIdIn(LocalDate from, LocalDate to,
+			int minLate, List<String> employeeId);
+
 }

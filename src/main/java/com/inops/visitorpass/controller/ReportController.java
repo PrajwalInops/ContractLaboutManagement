@@ -298,6 +298,16 @@ public class ReportController implements Serializable {
 			buffer = reportGenerationService.getPeriodicCutlistDetails().generate(report.getDateRange().get(0), to,
 					filteredList, report.getReportName());
 			break;
+			
+		case InopsConstant.LATE_2_HOURS:
+			buffer = reportGenerationService.getMandaysDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
+			
+		case InopsConstant.RGP:
+			buffer = reportGenerationService.getPeriodicCutlistDetails().generate(report.getDateRange().get(0), to,
+					filteredList, report.getReportName());
+			break;
 
 		default:
 			break;

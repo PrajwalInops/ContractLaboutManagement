@@ -30,7 +30,7 @@ public class MusterServiceImpl implements IMuster {
 				Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
 				Date.from(end.atStartOfDay(defaultZoneId).toInstant()));
 	}
-
+    
 	@Override
 	public Optional<List<Muster>> findAllByAttendanceDateBetweenAndEmployeeId(LocalDate start, LocalDate end,
 			String employeeId) {
@@ -39,7 +39,7 @@ public class MusterServiceImpl implements IMuster {
 				Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
 				Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId);
 	}
-
+    
 	@Override
 	public Optional<List<Muster>> findAllByAttendanceDateBetweenAndEmployeeId(LocalDate start, LocalDate end,
 			List<String> employeeId) {
@@ -56,4 +56,16 @@ public class MusterServiceImpl implements IMuster {
 				Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId, from, to);
 	}
 
-}
+	
+	@Override
+	public Optional<List<Muster>> findAllByLatePunchGreaterThanAttendanceDateBetweenAndEmployeeIdIn(LocalDate start, LocalDate end,
+			int minLate, List<String> employeeId) {
+		return musterRepository.findAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdInAndLatePunchGreaterThan(
+	                    Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
+	                    Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId, minLate);
+	}
+	
+	
+	
+	
+	}
