@@ -22,4 +22,10 @@ public interface IMuster {
 	Optional<List<Muster>> findAllByLatePunchGreaterThanAttendanceDateBetweenAndEmployeeIdIn(LocalDate from, LocalDate to,
 			int minLate, List<String> employeeId);
 
+	Optional<List<Muster>> findAllByAttendanceIdAndAttendanceDateBetweenAndEmployeeIdIn(String attID, LocalDate start,
+			LocalDate end, List<String> employeeId);
+
+	Optional<List<Muster>> findAllByLeaveTypeIdNotAndAttendanceDateBetweenAndEmployeeIdIn(String leaveID, LocalDate from,
+			LocalDate to, List<String> employeeId);
+
 }

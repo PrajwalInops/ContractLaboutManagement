@@ -63,4 +63,29 @@ public class Muster {
 
 	@Column(name = "Outpass")
 	private int outPass;
+	
+	@Column(name = "In1")
+	private String in1;
+	
+	@Column(name = "In2")
+	private String in2;
+	
+	@Column(name = "In3")
+	private String in3;
+	
+	@Column(name = "In4")
+	private String in4;
+	
+	@Column(name = "Out1")
+	private String out1;
+	
+	@Column(name = "Out2")
+	private String out2;
+	
+	@Column(name = "Out3")
+	private String out3;
+	
+	@Column(name = "Out4")
+	private String out4;
+	
 }

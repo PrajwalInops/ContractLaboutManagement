@@ -31,4 +31,10 @@ public class LeaveBalanceService implements ILeaveBalance {
 				Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId);
 	}
 
+	@Override
+	public Optional<List<LeaveBalance>> findAllByEmployeeIdIn(List<String> employeeId) {
+		// TODO Auto-generated method stub
+		return leaveBalanceRepository.findAllByLeaveBalanceIdEmployeeIdIn(employeeId);
+	}
+
 }

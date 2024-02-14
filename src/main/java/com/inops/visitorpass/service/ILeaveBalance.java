@@ -9,4 +9,6 @@ import com.inops.visitorpass.entity.LeaveBalance;
 public interface ILeaveBalance {
 
 	Optional<List<LeaveBalance>> findAllByEmployeeIds(LocalDate start, LocalDate end, List<String> employeeId);
+
+	Optional<List<LeaveBalance>> findAllByEmployeeIdIn(List<String> employeeId);
 }

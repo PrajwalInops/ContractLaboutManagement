@@ -64,6 +64,22 @@ public class MusterServiceImpl implements IMuster {
 	                    Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
 	                    Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId, minLate);
 	}
+
+	@Override
+	public Optional<List<Muster>> findAllByAttendanceIdAndAttendanceDateBetweenAndEmployeeIdIn(String attID,
+			LocalDate start, LocalDate end, List<String> employeeId) {
+		return musterRepository.findAllByAttendanceIdAndMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(
+                attID, Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
+                Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId);
+	}
+
+	@Override
+	public Optional<List<Muster>> findAllByLeaveTypeIdNotAndAttendanceDateBetweenAndEmployeeIdIn(String leaveID,
+			LocalDate start, LocalDate end, List<String> employeeId) {
+		return musterRepository.findAllByLeaveTypeIdNotAndMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(
+				leaveID, Date.from(start.atStartOfDay(defaultZoneId).toInstant()),
+                Date.from(end.atStartOfDay(defaultZoneId).toInstant()), employeeId);
+	}
 	
 	
 	

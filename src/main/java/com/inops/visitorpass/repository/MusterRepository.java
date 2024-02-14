@@ -28,6 +28,12 @@ public interface MusterRepository extends JpaRepository<Muster, MusterId> {
 	
     Optional<List<Muster>> findAllByMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdInAndLatePunchGreaterThan(
            Date start, Date end, List<String> employeeId, int minLate);
+
+	Optional<List<Muster>> findAllByAttendanceIdAndMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(String attID,
+			Date start, Date end, List<String> employeeId);
+
+	Optional<List<Muster>> findAllByLeaveTypeIdNotAndMusterIdAttendanceDateBetweenAndMusterIdEmployeeIdIn(
+			String leaveID, Date from, Date to, List<String> employeeId);
 	    
 	  
 }
