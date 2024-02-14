@@ -48,10 +48,10 @@ public class AppMenu {
 	// CHECKSTYLE:OFF
 	@PostConstruct
 	public void init() {
-		
-		 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		 User user = (User) auth.getPrincipal();
-		 profileName = user.getFirstName();
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = (User) auth.getPrincipal();
+		profileName = user.getFirstName();
 		menuCategories = new ArrayList<>();
 		menuItems = new ArrayList<>();
 
@@ -59,27 +59,27 @@ public class AppMenu {
 		List<MenuItem> generalMenuItems = new ArrayList<>();
 		generalMenuItems.add(new MenuItem("Get Started", "/ui/home"));
 		generalMenuItems.add(new MenuItem("Documentation", ""));
-		generalMenuItems.add(new MenuItem("Content Security",
-				""));
+		generalMenuItems.add(new MenuItem("Content Security", ""));
 		menuCategories.add(new MenuCategory("General", generalMenuItems));
 		// GENERAL CATEGORY END
 
 		// SUPPORT CATEGORY START
 		List<MenuItem> supportMenuItems = new ArrayList<>();
-		//supportMenuItems.add(new MenuItem("Forum", "https://forum.primefaces.org"));
-		//supportMenuItems.add(new MenuItem("Discord Chat", "https://discord.gg/gzKFYnpmCY"));
-		//supportMenuItems.add(new MenuItem("PRO Support", "/support"));
-		
-		if(user.getRole().name().equals("ADMIN")){
-		supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));		
-		supportMenuItems.add(new MenuItem("Reports","/ui/reporting"));
-		approval = true;
-		}else {
-		supportMenuItems.add(new MenuItem("Pre Approvals","/ui/preApproval"));
+		// supportMenuItems.add(new MenuItem("Forum", "https://forum.primefaces.org"));
+		// supportMenuItems.add(new MenuItem("Discord Chat",
+		// "https://discord.gg/gzKFYnpmCY"));
+		// supportMenuItems.add(new MenuItem("PRO Support", "/support"));
+
+		if (user.getRole().name().equals("ADMIN")) {
+			// supportMenuItems.add(new MenuItem("Visitor Pass","/ui/visitorPass"));
+			supportMenuItems.add(new MenuItem("Reports", "/ui/reporting"));
+			approval = true;
+		} else {
+			supportMenuItems.add(new MenuItem("Pre Approvals", "/ui/preApproval"));
 		}
-		supportMenuItems.add(new MenuItem("User Management","/ui/usersManagement"));
-		menuCategories.add(new MenuCategory("Visitor", supportMenuItems));
-		
+		supportMenuItems.add(new MenuItem("User Management", "/ui/usersManagement"));
+		menuCategories.add(new MenuCategory("Reporting", supportMenuItems));
+
 		// SUPPORT CATEGORY END
 
 		/*
@@ -692,10 +692,6 @@ public class AppMenu {
 		filteredItems.sort(Comparator.comparing(MenuItem::getParentLabel));
 		return filteredItems;
 	}
-	
-	
-
-
 
 	public boolean isApproval() {
 		return approval;
@@ -708,7 +704,7 @@ public class AppMenu {
 	public String getProfileName() {
 		return profileName;
 	}
-	
+
 	public List<MenuItem> getMenuItems() {
 		return menuItems;
 	}

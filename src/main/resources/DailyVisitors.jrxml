@@ -105,7 +105,7 @@
 				<imageExpression><![CDATA["coffee_stain.png"]]></imageExpression>
 			</image>
 			<textField>
-				<reportElement x="260" y="10" width="370" height="40" uuid="733200c1-01ee-4f90-85ce-92c1865d0d8e"/>
+				<reportElement x="250" y="10" width="380" height="40" uuid="733200c1-01ee-4f90-85ce-92c1865d0d8e"/>
 				<textElement textAlignment="Left">
 					<font fontName="Times New Roman" size="20"/>
 				</textElement>

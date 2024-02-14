@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Tbldepartments")
+@Table(name = "tbldepartments")
 public class Department {
 
 	private static final long serialVersionUID = 1L;
